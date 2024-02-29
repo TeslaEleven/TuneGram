@@ -230,7 +230,7 @@ if(tracksProcessed == tracksToCount && tracksProcessed !== 0) {
 function drawInfo(item, index, array) {
 console.log(item)
 var fullDate = item.attributes.releaseDate;
-var cover = "/fallback.svg";
+var cover = "fallback.svg";
 var sub = ""
 var subsub = ""
 if(item.attributes.artwork) {
@@ -273,7 +273,7 @@ music.addEventListener('playbackStateDidChange', ({ oldState, state }) => {
   console.log(oldState + state)
   if(state == "10") {
     document.querySelector('#nowspinning').querySelector('heading').innerHTML = 'Not Playing';
-    document.querySelector('#nowspinning').querySelector('img').src = '/fallback.svg';
+    document.querySelector('#nowspinning').querySelector('img').src = 'fallback.svg';
   }
 });
 } catch (err) {
@@ -309,7 +309,7 @@ if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
   }
 }
 function drawSadResults(type) {
-  var card = `<card><img src="/fallback.svg"/><heading>No Results</heading><subheading>:(</subheading></card>`
+  var card = `<card><img src="fallback.svg"/><heading>No Results</heading><subheading>:(</subheading></card>`
   if(type == "album") {
     document.querySelector('#bigcards').innerHTML = card
   }
@@ -353,7 +353,7 @@ function drawBoth() {
 function drawPlists(item, index, array) {
   plistsToCount = array.length
     console.log(item)
-var cover = "/fallback.svg"
+var cover = "fallback.svg"
 if(item.attributes.artwork) {
 cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500)
 }
@@ -372,17 +372,17 @@ var npId = ""
 var searchId = ""
 function toAlbum(id) {
   infoId = id
-  htmx.ajax('GET', '/info.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
+  htmx.ajax('GET', 'info.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
 }
 function musicPlay(id) {
   npId = id;
   if(id !== "itunesonly") {
-  htmx.ajax('GET', '/np.html?id=' + id, {target:'#nowspinning', swap:'outerHTML', delay:"500ms"})
+  htmx.ajax('GET', 'np.html?id=' + id, {target:'#nowspinning', swap:'outerHTML', delay:"500ms"})
   } else {
     alert('This content is only available on the iTunes Store.')
   }
 }
-htmx.ajax('GET', '/np.html?id=', {target:'#nowplaying-btn', swap:'outerHTML', delay:"500ms"})
+htmx.ajax('GET', 'np.html?id=', {target:'#nowplaying-btn', swap:'outerHTML', delay:"500ms"})
 function pausePlay(id) {
 npId = id;
 pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, id);
