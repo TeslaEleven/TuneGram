@@ -1,0 +1,18 @@
+<p class="focus-heading" style="margin-top:1%">Results</p>
+<br>
+<p class="focus-subheading">Albums</p>
+<div id="bigcards">
+</div>
+<br>
+<p class="focus-subheading">Songs</p>
+<div id="songcards">
+</div>
+<br>
+<script>
+    listenSearch.initCustomEvent("listenSearch", true, true, searchId);
+document.dispatchEvent(listenSearch);
+    var albumsToCount = 0;
+    var toDrawAlbums = ""
+    var albumsProcessed = 0;
+    document.querySelectorAll('#result')[0].style.display = "block";
+</script>

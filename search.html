@@ -1,0 +1,23 @@
+<input id="srch-bar" class="form-control" type="search" 
+       name="search" placeholder="Search Songs & Albums" 
+       hx-get="/search-results.html" 
+       hx-trigger="myEvent delay:500ms, search" 
+       hx-target="#result" 
+       hx-indicator="#moving-note">
+<br>
+<div id="result">
+    <div id="moving-note" style="color:#777F76;position:inline-flex"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">search</p>
+</div>
+<script>
+document.querySelectorAll('#content')[0].style.display = "block";
+var srchBar = document.querySelector('input');
+srchBar.addEventListener("keydown", function (e) {
+    e = e || window.event;
+    if(e.keyCode == 13) {
+    searchId = document.querySelector('#srch-bar').value;
+    htmx.trigger("#srch-bar", "myEvent");
+    document.getElementById('result').style.display = "flex";
+    document.getElementById('result').innerHTML = `<div id="moving-note" class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">search</p>`
+    }
+});
+</script>

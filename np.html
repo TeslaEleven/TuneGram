@@ -1,0 +1,13 @@
+<songcard id="nowspinning" style="margin:0;padding:0;background-color:#E3E1DB;color:#2F3633">
+<img src="./fallback.svg" style="background-color: #2F3633;border-radius:5px"/>
+<iholder>
+<heading style="color:#2F3633">Not Playing</heading>
+<apple-music-progress></apple-music-progress>
+</iholder>
+</songcard>
+<script>
+if(npId !== null) {
+nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, npId);
+document.dispatchEvent(nowPlayingEvent);
+}
+</script>
