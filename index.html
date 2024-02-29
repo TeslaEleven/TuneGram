@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>TuneGram</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.png">
-  <link href="/style.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" type="image/x-icon" href=favicon.png">
+  <link href="style.css" rel="stylesheet" type="text/css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
 
 <body>
   <div class="header">
-    <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="/onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
+    <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
       <p class="name title-font">TuneGram</p>
     </div>
     <container valign="middle" id="player">
@@ -29,12 +29,12 @@
      <p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">graphic_eq</p>
     </div>
   </container>
-    <div valign="right" title="Search" id="srch-btn" onclick="loadContent('srch')" hx-get="/search.html" hx-target="#content" hx-swap="innerHTML swap:1s">
+    <div valign="right" title="Search" id="srch-btn" onclick="loadContent('srch')" hx-get="search.html" hx-target="#content" hx-swap="innerHTML swap:1s">
      <p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">search</p>
     </div>
   </div>
   <hr>
-  <div id="content" hx-get="/onboard.html" hx-swap="innerHTML swap:1s" hx-trigger="load">
+  <div id="content" hx-get="onboard.html" hx-swap="innerHTML swap:1s" hx-trigger="load">
     <div class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">music_note</p>
 </div>
   </div>
