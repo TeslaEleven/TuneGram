@@ -1,0 +1,20 @@
+<p onclick="authStuff()" style="color:blue">Authorize</p>
+<script>
+  document.addEventListener('musickitloaded', async function () {
+function authStuff() {
+    await MusicKit.configure({
+      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6Ik1YWDcyU0YyQzkifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzA5ODczNjk5LCJleHAiOjE3MTAzMDU2OTksIm9yaWdpbiI6WyJodHRwczovL3R1bmVncmFtLm5ldGxpZnkuYXBwIl19.5Mkp5cdZ50fT1J7MOxULeqB4o1rgyxud0Yve7MRsJk9U2jBx6yhEET0cP1W0EkJP28NnzH9TFq0OPS8NCK1WKw',
+      app: {
+        name: 'musickit-tst',
+        build: '1.0.0',
+      },
+      debug: true,
+      suppressErrorDialog: false
+   });
+   const music = MusicKit.getInstance();
+await music.authorize().then(() => {
+  window.location.replace('home.html);
+})
+}
+  })
+</script>
