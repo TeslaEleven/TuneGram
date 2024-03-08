@@ -1,13 +1,93 @@
-<script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" data-web-components async></script>
-<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6Ik1YWDcyU0YyQzkifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzA5ODczNjk5LCJleHAiOjE3MTAzMDU2OTksIm9yaWdpbiI6WyJodHRwczovL3R1bmVncmFtLm5ldGxpZnkuYXBwIl19.5Mkp5cdZ50fT1J7MOxULeqB4o1rgyxud0Yve7MRsJk9U2jBx6yhEET0cP1W0EkJP28NnzH9TFq0OPS8NCK1WKw" />
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>TuneGram</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.png">
+  <link href="/style.css" rel="stylesheet" type="text/css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" data-web-components async></script>
+<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IjU5OVRBWEpINlYifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzA5ODcyNTc3LCJleHAiOjE3MTAzMDQ1NzcsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.nRal9nLnjEnl5NmpHK_bNgYnk05hRwmyz1fP10Wj-slkEHgdtLWw_fPQciJzNTmxf2oCoveb8nRfx7MDmnq2nA" />
 <meta name="apple-music-app-name" content="musickit-tst" />
 <meta name="apple-music-app-build" content="1.0.0" />
-<p onclick="authStuff()" style="color:blue">Authorize</p>
+<script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="header">
+    <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="/onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
+      <p class="name title-font">TuneGram</p>
+    </div>
+    <container valign="middle" id="player">
+    <div title="Now Playing" id="nowplaying-btn" style="width:2%">
+     <p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">graphic_eq</p>
+    </div>
+  </container>
+    <div valign="right" title="Search" id="srch-btn" onclick="loadContent('srch')" hx-get="/search.html" hx-target="#content" hx-swap="innerHTML swap:1s">
+     <p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">search</p>
+    </div>
+  </div>
+  <hr>
+  <div id="content" hx-get="/onboard.html" hx-swap="innerHTML swap:1s" hx-trigger="load">
+    <div class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">music_note</p>
+</div>
+  </div>
+</body>
 <script>
+    const queryParameters = { l: 'en-us' };
+  function assignVar(type, num) {
+    if(type == "album") {
+        albumsToCount = num;
+    } else  if(type =="plist"){
+        plistsToCount = num
+    }
+}
+      var albumsToCount = 0;
+    var toDrawAlbums = ""
+    var albumsProcessed = 0;
+    var songsToCount = 0;
+    var toDrawSongs = ""
+    var songsProcessed = 0;
+    var plistsToCount = 0;
+    var toDrawPlists = ""
+    var plistsProcessed = 0;
+    var tracksToCount = 0;
+    var toDrawTracks = ""
+    var tracksProcessed = 0;
+    var heavyToCount = 0;
+    var toDrawHeavy = ""
+    var heavyProcessed = 0;
+function boundToString(rect) {
+  return `rect(w=${rect.width}, h=${rect.height})`;
+}
+  function loadContent(page) {
+    document.getElementById('content').innerHTML = `<div class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">music_note</p>`
+    document.getElementById('content').style.display = "inline-flex";
+    if(page == "srch") {
+      document.querySelector('#srch-btn').style.backgroundColor = "#2F3633";
+      document.querySelector('#srch-btn').style.color = "#E3E1DB";
+    }
+    if(page == "nap") {
+      document.querySelector('#srch-btn').style.color = "#2F3633";
+      document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
+    }
+  }
+const listenSearch = document.createEvent("CustomEvent");
+const listenOnBoard = document.createEvent("Event");
+const infoScreen = document.createEvent("CustomEvent");
+const nowPlayingEvent = document.createEvent('CustomEvent')
+const pausePlayEvent = document.createEvent('CustomEvent')
+
   document.addEventListener('musickitloaded', async function () {
-function authStuff() {
+  try {
     await MusicKit.configure({
-      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6Ik1YWDcyU0YyQzkifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzA5ODczNjk5LCJleHAiOjE3MTAzMDU2OTksIm9yaWdpbiI6WyJodHRwczovL3R1bmVncmFtLm5ldGxpZnkuYXBwIl19.5Mkp5cdZ50fT1J7MOxULeqB4o1rgyxud0Yve7MRsJk9U2jBx6yhEET0cP1W0EkJP28NnzH9TFq0OPS8NCK1WKw',
+      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IjU5OVRBWEpINlYifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzA5ODcyNTc3LCJleHAiOjE3MTAzMDQ1NzcsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.nRal9nLnjEnl5NmpHK_bNgYnk05hRwmyz1fP10Wj-slkEHgdtLWw_fPQciJzNTmxf2oCoveb8nRfx7MDmnq2nA',
       app: {
         name: 'musickit-tst',
         build: '1.0.0',
@@ -17,8 +97,296 @@ function authStuff() {
    });
    const music = MusicKit.getInstance();
 await music.authorize().then(() => {
-  window.location.replace('home.html);
+  async function searchTerm(term) {
+await music.api.music(`/v1/catalog/us/search`, { term: term, types: 'albums,songs'}).then((res) => {
+  if(res.data.results) {
+    if(res.data.results.songs) {
+    var songs = res.data.results.songs.data;
+    songs.forEach(searchSongs)
+    } else {
+      drawSadResults('song');
+    }
+    if(res.data.results.albums) {
+    var albums = res.data.results.albums.data;
+    albums.forEach(searchAlbums)
+    } else {
+      drawSadResults('album');
+    }
+  } else {
+    drawSadResults('both');
+  }
+}).catch((err) =>{
+  console.log(err)
 })
 }
-  })
+document.addEventListener("listenOnBoard", (e) => {
+loadLibrary()
+},false);
+document.addEventListener("pausePlayEvent", (e) => {
+if(music.isPlaying == true) {
+  music.pause()
+} else {
+  music.play();
+}
+},false);
+document.addEventListener( "listenSearch", (e) => {
+searchTerm(e.detail)
+},false);
+document.addEventListener( "infoScreen", (e) => {
+infoDo(e.detail)
+},false);
+document.addEventListener( "nowPlayingEvent",async (e) => {
+var songId = e.detail;
+if(e.detail !== "") {
+const queue = await music.setQueue({ song: e.detail, startPlaying: true });
+if(songId.includes('i.')) {
+  getDeets("/v1/me/library/songs/");
+} else {
+  console.log('here')
+  getDeets("/v1/catalog/{{storefrontId}}/songs/")
+}
+async function getDeets(link) {
+await music.api.music(link + e.detail, queryParameters).then(async (res) => {
+    var root = res.data.data[0].attributes
+    var cover = MusicKit.formatArtworkURL(root.artwork, 500, 500);
+    var title = root.name;
+    var id = e.detail;
+    document.querySelector('#nowspinning').querySelector('heading').innerHTML = title;
+    document.querySelector('#nowspinning').querySelector('img').src = cover;
+    document.querySelector('#nowspinning').setAttribute('onclick', `pausePlay('${id}')`)
+})
+}
+}
+},false);
+})
+async function infoDo(id) {
+  if(id.startsWith('p')) {
+    await music.api.music('/v1/me/library/playlists/' + id, queryParameters).then(async (res) => {
+    var plist = res.data.data;
+    plist.forEach(drawInfo)
+    await music.api.music(`/v1/me/library/playlists/${id}/tracks`, queryParameters).then((res) => {
+      var tracks = res.data.data;
+      tracks.forEach(appendTracks)
+    });
+})
+  } else if(id.startsWith('s')) {
+    var songId = id.slice(1)
+    await music.api.music("/v1/catalog/{{storefrontId}}/songs/" + songId, queryParameters).then(async (res) => {
+    var albumOfSong = res.data.data[0].relationships.albums.data[0].id
+    await music.api.music('/v1/catalog/{{storefrontId}}/albums/' + albumOfSong, queryParameters).then((res) => {
+    var album = res.data.data;
+    if(album[0].relationships.tracks.data) {
+      var tracks = album[0].relationships.tracks.data;
+      tracks.forEach(appendTracks)
+    }
+    album.forEach(drawInfo)
+    })
+})
+  } else if(!id.startsWith('p') && !id.startsWith('l')) {
+  await music.api.music('/v1/catalog/{{storefrontId}}/albums/' + id, queryParameters).then((res) => {
+    var album = res.data.data;
+    if(album[0].relationships.tracks.data) {
+      var tracks = album[0].relationships.tracks.data;
+      tracks.forEach(appendTracks)
+    }
+    album.forEach(drawInfo)
+})
+  } else if(id.startsWith('l')) {
+    await music.api.music('/v1/me/library/albums/' + id, queryParameters).then((res) => {
+    var album = res.data.data;
+    if(album[0].relationships.tracks.data) {
+      var tracks = album[0].relationships.tracks.data;
+      tracks.forEach(appendTracks)
+    }
+    album.forEach(drawInfo)
+    });
+  }
+}
+function converter(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
+function appendTracks(item, index, array) {
+  tracksToCount = array.length;
+  var title = item.attributes.name
+  var runtime = item.attributes.durationInMillis;
+  var id = item.id;
+  console.log(item)
+  var idIcon = "play_arrow";
+  var html = ` <tr>
+            <td class="material-symbols-outlined general-music-control" onclick="musicPlay('${id}')">${idIcon}</td>
+            <td>${title}</td>
+            <td>${converter(runtime)}</td>
+        </tr>`
+tracksProcessed++
+toDrawTracks += html
+if(tracksProcessed == tracksToCount && tracksProcessed !== 0) {
+    document.querySelector('#tracklist').innerHTML += toDrawTracks;
+    tracksProcessed = 0;
+    toDrawTracks = ""
+}
+}
+function drawInfo(item, index, array) {
+console.log(item)
+var fullDate = item.attributes.releaseDate;
+var cover = "/fallback.svg";
+var sub = ""
+var subsub = ""
+if(item.attributes.artwork) {
+cover = MusicKit.formatArtworkURL(item.attributes.artwork, 1200, 1200);
+}
+if(item.attributes.artistName) {
+  sub = item.attributes.artistName;
+}
+if(item.attributes.releaseDate) {
+  var dt = new Date(item.attributes.releaseDate);
+  subsub = dt.getFullYear();
+}
+document.querySelector('#info-title').innerHTML = item.attributes.name;
+document.querySelector('#info-year').innerHTML = subsub;
+document.querySelector('#info-artist').innerHTML = sub;
+document.querySelector('#info-img').src = cover;
+}
+async function loadLibrary() {
+  if(!sessionStorage.getItem('plistStorage') && !sessionStorage.getItem('albumStorage') && !sessionStorage.getItem('heavyStorage')) {
+  const greaterAlbums = await music.api.music('v1/me/library/albums').then((data) => {
+    var albumses =  data.data;
+    var albums = albumses.data
+ albums.forEach(drawAlbums)
+});
+await music.api.music('/v1/me/history/heavy-rotation').then((data) => {
+  var heavyRotation =  data.data.data;
+  heavyRotation.forEach(drawHeavy)
+});
+const plists = await music.api.music('v1/me/library/playlists').then(async (data) => {
+    var plistses =  data.data;
+    var plists = plistses.data
+ plists.forEach(drawPlists)
+})
+} else {
+  drawBoth()
+  console.log('here')
+}
+}
+music.addEventListener('playbackStateDidChange', ({ oldState, state }) => {
+  console.log(oldState + state)
+  if(state == "10") {
+    document.querySelector('#nowspinning').querySelector('heading').innerHTML = 'Not Playing';
+    document.querySelector('#nowspinning').querySelector('img').src = '/fallback.svg';
+  }
+});
+} catch (err) {
+    console.log(err)
+  }
+  });
+document.querySelectorAll('#content')[0].style.display = "block";
+function drawAlbums(item, index, array) {
+  albumsToCount = array.length
+var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
+albumsProcessed++
+toDrawAlbums += card
+if(albumsProcessed == albumsToCount && albumsProcessed !== 0) {
+    document.querySelector('#bigcards').innerHTML = toDrawAlbums
+    sessionStorage.setItem('albumStorage', toDrawAlbums)
+}
+}
+function drawHeavy(item, index, array) {
+  heavyProcessed++
+  console.log(array.length + heavyProcessed)
+  if(item.attributes) {
+  heavyToCount = array.length
+var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
+toDrawHeavy += card
+if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
+    document.querySelector('#heavycards').innerHTML = toDrawHeavy
+    sessionStorage.setItem('heavyStorage', toDrawHeavy)
+}
+  } else {
+    return;
+  }
+}
+function drawSadResults(type) {
+  var card = `<card><img src="/fallback.svg"/><heading>No Results</heading><subheading>:(</subheading></card>`
+  if(type == "album") {
+    document.querySelector('#bigcards').innerHTML = card
+  }
+  if(type == "song") {
+    document.querySelector('#songcards').innerHTML = card
+  }
+  if(type == "both") {
+    document.querySelector('#bigcards').innerHTML = card
+    document.querySelector('#songcards').innerHTML = card
+  }
+}
+function searchAlbums(item, index, array) {
+  albumsToCount = array.length
+    console.log(albumsToCount)
+var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
+albumsProcessed++
+toDrawAlbums += card
+if(albumsProcessed == albumsToCount && albumsProcessed !== 0) {
+    document.querySelector('#bigcards').innerHTML = toDrawAlbums
+}
+}
+function searchSongs(item, index, array) {
+  songsToCount = array.length
+    console.log(albumsToCount)
+var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+var card = `<songcard onclick="toAlbum('s${item.id}')"><img src="${cover}"/><iholder><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></iholder></songcard>`
+songsProcessed++
+toDrawSongs += card
+if(songsProcessed == songsToCount && songsProcessed !== 0) {
+    document.querySelector('#songcards').innerHTML = toDrawSongs;
+    songsProcessed = 0;
+    toDrawSongs = ""
+}
+}
+function drawBoth() {
+  document.querySelector('#bigcards').innerHTML = sessionStorage.getItem('albumStorage')
+  document.querySelector('#heavycards').innerHTML = sessionStorage.getItem('heavyStorage')
+  document.querySelector('#smallcards').innerHTML = sessionStorage.getItem('plistStorage')
+}
+function drawPlists(item, index, array) {
+  plistsToCount = array.length
+    console.log(item)
+var cover = "/fallback.svg"
+if(item.attributes.artwork) {
+cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500)
+}
+var date = new Date(item.attributes.lastModifiedDate);
+var edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
+var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading></card>`
+plistsProcessed++
+toDrawPlists += card
+if(plistsProcessed == plistsToCount && plistsProcessed !== 0) {
+    document.querySelector('#smallcards').innerHTML = toDrawPlists
+    sessionStorage.setItem('plistStorage', toDrawPlists)
+}
+}
+var infoId = ""
+var npId = ""
+var searchId = ""
+function toAlbum(id) {
+  infoId = id
+  htmx.ajax('GET', '/info.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
+}
+function musicPlay(id) {
+  npId = id;
+  if(id !== "itunesonly") {
+  htmx.ajax('GET', '/np.html?id=' + id, {target:'#nowspinning', swap:'outerHTML', delay:"500ms"})
+  } else {
+    alert('This content is only available on the iTunes Store.')
+  }
+}
+htmx.ajax('GET', '/np.html?id=', {target:'#nowplaying-btn', swap:'outerHTML', delay:"500ms"})
+function pausePlay(id) {
+npId = id;
+pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, id);
+document.dispatchEvent(pausePlayEvent);
+}
 </script>
+</html>
