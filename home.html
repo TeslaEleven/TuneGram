@@ -251,9 +251,12 @@ document.querySelector('#info-img').src = cover;
 async function loadLibrary() {
   if(!sessionStorage.getItem('plistStorage') && !sessionStorage.getItem('albumStorage') && !sessionStorage.getItem('heavyStorage')) {
   const greaterAlbums = await music.api.music('v1/me/library/albums').then((data) => {
+    if(data.data) {
     var albumses =  data.data;
     var albums = albumses.data
  albums.forEach(drawAlbums)
+    } else {
+    }
 });
 await music.api.music('/v1/me/history/heavy-rotation').then((data) => {
   var heavyRotation =  data.data.data;
