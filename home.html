@@ -301,7 +301,7 @@ function drawHeavy(item, index, array) {
   if(item.attributes) {
   heavyToCount = array.length
     var cover = "";
-  if(item.attributes.artwork.url) {
+  if(item.attributes.artwork) {
     cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
   } else {
     cover = "/fallback.svg";
