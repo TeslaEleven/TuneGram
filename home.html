@@ -300,7 +300,12 @@ function drawHeavy(item, index, array) {
   console.log(array.length + heavyProcessed)
   if(item.attributes) {
   heavyToCount = array.length
-var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+    var cover = "";
+  if(item.attributes.artwork.url) {
+    cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+  } else {
+    cover = "/fallback.svg";
+  }
 var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
 toDrawHeavy += card
 if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
