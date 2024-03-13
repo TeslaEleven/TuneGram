@@ -306,6 +306,14 @@ function drawHeavy(item, index, array) {
   } else {
     cover = "/fallback.svg";
   }
+      var subheading = "";
+  if(item.attributes.artistName) {
+    subheading = item.attributes.artistName;
+  } else {
+    var date = new Date(item.attributes.lastModifiedDate);
+    var edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
+    subheading = `Edited: ${edited}`;
+  }
 var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
 toDrawHeavy += card
 if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
