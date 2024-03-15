@@ -24,13 +24,11 @@
     <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
       <p class="name title-font">TuneGram</p>
     </div>
-    <container valign="middle" id="player">
-    <div title="Now Playing" id="nowplaying-btn" style="width:2%">
-     <p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">graphic_eq</p>
-    </div>
-  </container>
-    <div valign="right" title="Search" id="srch-btn" onclick="loadContent('srch')" hx-get="search.html" hx-target="#content" hx-swap="innerHTML swap:1s">
-     <p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">search</p>
+    <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np')" hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap:1s">
+      <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">graphic_eq</p>
+     </div>
+    <div title="Search" class="header-itm" id="srch-btn" onclick="loadContent('srch')" hx-get="search.html" hx-target="#content" hx-swap="innerHTML swap:1s">
+     <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">search</p>
     </div>
   </div>
   <hr>
@@ -40,6 +38,9 @@
   </div>
 </body>
 <script>
+  var hiItsQue = false
+  var queue = "";
+
     const queryParameters = { l: 'en-us' };
   function assignVar(type, num) {
     if(type == "album") {
@@ -72,10 +73,21 @@ function boundToString(rect) {
     if(page == "srch") {
       document.querySelector('#srch-btn').style.backgroundColor = "#2F3633";
       document.querySelector('#srch-btn').style.color = "#E3E1DB";
+      document.querySelector('#np-btn').style.color = "#2F3633";
+      document.querySelector('#np-btn').style.backgroundColor = "#E3E1DB";
+    }
+    if(page == "np") {
+      npId = "viewonly"
+      document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
+      document.querySelector('#np-btn').style.color = "#E3E1DB";
+      document.querySelector('#srch-btn').style.color = "#2F3633";
+      document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
     }
     if(page == "nap") {
       document.querySelector('#srch-btn').style.color = "#2F3633";
       document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
+      document.querySelector('#np-btn').style.color = "#2F3633";
+      document.querySelector('#np-btn').style.backgroundColor = "#E3E1DB";
     }
   }
 const listenSearch = document.createEvent("CustomEvent");
@@ -83,6 +95,8 @@ const listenOnBoard = document.createEvent("Event");
 const infoScreen = document.createEvent("CustomEvent");
 const nowPlayingEvent = document.createEvent('CustomEvent')
 const pausePlayEvent = document.createEvent('CustomEvent')
+const playLater = document.createEvent('CustomEvent')
+const playNext = document.createEvent('CustomEvent')
 
   document.addEventListener('musickitloaded', async function () {
   try {
@@ -122,11 +136,20 @@ await music.api.music(`/v1/catalog/us/search`, { term: term, types: 'albums,song
 document.addEventListener("listenOnBoard", (e) => {
 loadLibrary()
 },false);
-document.addEventListener("pausePlayEvent", (e) => {
+document.addEventListener("pausePlayEvent", async (e) => {
+var typee = e.detail
+var type = typee.slice(0,2);
+var id = typee.slice(2)
+if(type == "re") {
+  await music.skipToPreviousItem()
+} else if(type == "ff") {
+  await music.skipToNextItem()
+} else {
 if(music.isPlaying == true) {
   music.pause()
 } else {
   music.play();
+}
 }
 },false);
 document.addEventListener( "listenSearch", (e) => {
@@ -136,29 +159,71 @@ document.addEventListener( "infoScreen", (e) => {
 infoDo(e.detail)
 },false);
 document.addEventListener( "nowPlayingEvent",async (e) => {
-var songId = e.detail;
+  console.log(e.detail)
+loadVisuals(queue, e.detail)
+var songId = [e.detail];
 if(e.detail !== "") {
-const queue = await music.setQueue({ song: e.detail, startPlaying: true });
-if(songId.includes('i.')) {
-  getDeets("/v1/me/library/songs/");
-} else {
-  console.log('here')
-  getDeets("/v1/catalog/{{storefrontId}}/songs/")
-}
-async function getDeets(link) {
-await music.api.music(link + e.detail, queryParameters).then(async (res) => {
-    var root = res.data.data[0].attributes
-    var cover = MusicKit.formatArtworkURL(root.artwork, 500, 500);
-    var title = root.name;
-    var id = e.detail;
-    document.querySelector('#nowspinning').querySelector('heading').innerHTML = title;
-    document.querySelector('#nowspinning').querySelector('img').src = cover;
-    document.querySelector('#nowspinning').setAttribute('onclick', `pausePlay('${id}')`)
-})
-}
+  if(e.detail !== "viewonly")  {
+    console.log(e.detail)
+    queue = await music.setQueue({ songs: songId, startPlaying: true });
+    loadVisuals(queue, e.detail)
+  }
 }
 },false);
 })
+document.addEventListener("playLater", async (e) => {
+  if(queue == "") {
+    queue = await music.setQueue({ songs: [e.detail], startPlaying: true });
+    loadVisuals(queue, e.detail)
+  } else {
+  music.playLater({songs: [e.detail]})
+  }
+},false);
+document.addEventListener("playNext", async (e) => {
+  if(queue == "") {
+    queue = await music.setQueue({ songs: [e.detail], startPlaying: true });
+    loadVisuals(queue, e.detail)
+  } else {
+  music.playNext({songs: [e.detail]})
+  }
+},false);
+music.addEventListener('nowPlayingItemDidChange', ({ item }) => {
+  if(item !== undefined) {
+  loadVisuals(queue, item.id)
+  }
+});
+music.addEventListener('queueItemsDidChange', ({ item }) => {
+  loadVisuals(queue, queue.currentItem)
+});
+function loadVisuals(queue, id) {
+var songPlaying = queue.currentItem;
+if(songPlaying !== undefined) {
+  console.log(queue)
+var queueItems = queue.items;
+console.log(songPlaying)
+hiItsQue = true;
+queueItems.forEach(appendTracks)
+var root = songPlaying.attributes;
+var art = ""
+if(root.artwork.url) {
+  art = MusicKit.formatArtworkURL(root.artwork, 500, 500);
+} else {
+  art = "fallback.svg"
+}
+document.getElementById('plpa-btn').setAttribute('onclick', `pausePlay('${id}', 'pp')`)
+document.getElementById('rewind-btn').setAttribute('onclick', `pausePlay('na', 're')`)
+document.getElementById('ff-btn').setAttribute('onclick', `pausePlay('na', 'ff')`)
+document.getElementById('info-title').innerHTML = root.name
+document.getElementById('info-artist').innerHTML = root.artistName
+document.getElementById('info-album').innerHTML = root.albumName
+document.getElementById('info-img').src = art
+} else {
+  document.querySelector('#np #info-title').innerHTML = 'Not Playing';
+    document.querySelector('#np #info-artist').innerHTML = '';
+    document.querySelector('#np #info-album').innerHTML = '';
+    document.querySelector('#np img').src = 'fallback.svg';
+}
+}
 async function infoDo(id) {
   if(id.startsWith('p')) {
     await music.api.music('/v1/me/library/playlists/' + id, queryParameters).then(async (res) => {
@@ -182,7 +247,23 @@ async function infoDo(id) {
     album.forEach(drawInfo)
     })
 })
-  } else if(!id.startsWith('p') && !id.startsWith('l')) {
+  }  else if(id.startsWith('i')) {
+    await music.api.music("/v1/me/library/albums/" + id, queryParameters).then(async (res) => {
+    var songReportingId = res.data.data[0].attributes.playParams.reportingId;
+    await music.api.music("/v1/catalog/{{storefrontId}}/songs/" + songReportingId, queryParameters).then(async (res) => {
+    var albumOfSong = res.data.data[0].relationships.albums.data[0].id
+    await music.api.music('/v1/catalog/{{storefrontId}}/albums/' + albumOfSong, queryParameters).then((res) => {
+    var album = res.data.data;
+    if(album[0].relationships.tracks.data) {
+      var tracks = album[0].relationships.tracks.data;
+      tracks.forEach(appendTracks)
+    }
+    album.forEach(drawInfo)
+    })
+  });
+})
+  }else if(!id.startsWith('p') && !id.startsWith('l') && !id.startsWith('i')) {
+    console.log('deathrow')
   await music.api.music('/v1/catalog/{{storefrontId}}/albums/' + id, queryParameters).then((res) => {
     var album = res.data.data;
     if(album[0].relationships.tracks.data) {
@@ -208,17 +289,34 @@ function converter(millis) {
   return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 function appendTracks(item, index, array) {
+  document.getElementById('tracklist').innerHTML = `
+  <th class="labels">Play</th>
+  <th class="labels">Name</th>
+  <th class="labels">Runtime</th>
+  <th class="labels">Queue</th>`
   tracksToCount = array.length;
   var title = item.attributes.name
   var runtime = item.attributes.durationInMillis;
   var id = item.id;
+  var art = ""
+  if(item.attributes.artwork) {
+    art = MusicKit.formatArtworkURL(item.attributes.artwork, 25, 25);
+  } else {
+    art = "fallback.svg"
+  }
   console.log(item)
   var idIcon = "play_arrow";
-  var html = ` <tr>
-            <td class="material-symbols-outlined general-music-control" onclick="musicPlay('${id}')">${idIcon}</td>
+  var  html = ` <tr>
+            <td class="material-symbols-outlined general-music-control" onclick="musicPlay('${id}', '${art}')">${idIcon}</td>
             <td>${title}</td>
             <td>${converter(runtime)}</td>
+            <td class="material-symbols-outlined general-music-control" onclick="playNextOrLast('${id}', 'next')">queue_play_next</td>
+            <td class="material-symbols-outlined general-music-control" onclick="playNextOrLast('${id}', 'later')">add_to_queue</td>
         </tr>`
+  if(hiItsQue == true) {
+    hiItsQue = false;
+// Potential for queue specialness in Now Playing view
+}
 tracksProcessed++
 toDrawTracks += html
 if(tracksProcessed == tracksToCount && tracksProcessed !== 0) {
@@ -275,8 +373,10 @@ const plists = await music.api.music('v1/me/library/playlists').then(async (data
 music.addEventListener('playbackStateDidChange', ({ oldState, state }) => {
   console.log(oldState + state)
   if(state == "10") {
-    document.querySelector('#nowspinning').querySelector('heading').innerHTML = 'Not Playing';
-    document.querySelector('#nowspinning').querySelector('img').src = 'fallback.svg';
+    document.querySelector('#np #info-title').innerHTML = 'Not Playing';
+    document.querySelector('#np #info-artist').innerHTML = '';
+    document.querySelector('#np #info-album').innerHTML = '';
+    document.querySelector('#np img').src = 'fallback.svg';
   }
 });
 } catch (err) {
@@ -306,7 +406,7 @@ function drawHeavy(item, index, array) {
   } else {
     cover = "/fallback.svg";
   }
-      var subheading = "";
+  var subheading = "";
   if(item.attributes.artistName) {
     subheading = item.attributes.artistName;
   } else {
@@ -314,7 +414,7 @@ function drawHeavy(item, index, array) {
     var edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
     subheading = `Edited: ${edited}`;
   }
-var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
+var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading></card>`
 toDrawHeavy += card
 if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
     document.querySelector('#heavycards').innerHTML = toDrawHeavy
@@ -390,18 +490,27 @@ function toAlbum(id) {
   infoId = id
   htmx.ajax('GET', 'info.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
 }
-function musicPlay(id) {
+function musicPlay(id, art) {
   npId = id;
   if(id !== "itunesonly") {
-  htmx.ajax('GET', 'np.html?id=' + id, {target:'#nowspinning', swap:'outerHTML', delay:"500ms"})
+  htmx.ajax('GET', 'np.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
   } else {
     alert('This content is only available on the iTunes Store.')
   }
 }
-htmx.ajax('GET', 'np.html?id=', {target:'#nowplaying-btn', swap:'outerHTML', delay:"500ms"})
-function pausePlay(id) {
-npId = id;
-pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, id);
+function playNextOrLast(id, type) {
+  npId = "viewonly"
+  htmx.ajax('GET', 'np.html?id=', {target:'#content', swap:'innerHTML', delay:"500ms"})
+  if(type == "later") {
+  playLater.initCustomEvent("playLater", true, true, id);
+  document.dispatchEvent(playLater);
+  } else {
+  playNext.initCustomEvent("playNext", true, true, id);
+  document.dispatchEvent(playNext);
+  }
+}
+function pausePlay(id, type) {
+pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, type + id);
 document.dispatchEvent(pausePlayEvent);
 }
 </script>
