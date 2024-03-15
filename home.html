@@ -494,6 +494,7 @@ function musicPlay(id, art) {
   npId = id;
   if(id !== "itunesonly") {
   htmx.ajax('GET', 'np.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
+  loadContent('np')
   } else {
     alert('This content is only available on the iTunes Store.')
   }
@@ -501,6 +502,7 @@ function musicPlay(id, art) {
 function playNextOrLast(id, type) {
   npId = "viewonly"
   htmx.ajax('GET', 'np.html?id=', {target:'#content', swap:'innerHTML', delay:"500ms"})
+  loadContent('np')
   if(type == "later") {
   playLater.initCustomEvent("playLater", true, true, id);
   document.dispatchEvent(playLater);
