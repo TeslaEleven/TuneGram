@@ -1,13 +1,32 @@
-<songcard id="nowspinning" style="margin:0;padding:0;background-color:#E3E1DB;color:#2F3633">
-<img src="fallback.svg" style="background-color: #2F3633;border-radius:5px"/>
-<iholder>
-<heading style="color:#2F3633">Not Playing</heading>
-<apple-music-progress></apple-music-progress>
-</iholder>
-</songcard>
-<script>
-if(npId !== null) {
-nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, npId);
-document.dispatchEvent(nowPlayingEvent);
-}
-</script>
+<div style="display:flex">
+    <div id="np" style="margin-left:2%;margin-top:2%;">
+    <img src="fallback.svg" id="info-img"/>
+    <p class="focus-heading" id="info-title">Not Playing</p>
+    <p class="focus-subheading" id="info-artist"></p>
+    <p class="focus-subheading" style="font-size:1.3em;color:#ACC0C3" id="info-album"></p>
+    <div id="play-controls" style="display:flex;width:100%;justify-content: space-between;padding:2%">
+        <p id="rewind-btn" class="material-symbols-outlined">fast_rewind</p>
+        <p id="plpa-btn" class="material-symbols-outlined">play_pause</p>
+        <p id="ff-btn" class="material-symbols-outlined">fast_forward</p>
+    </div>
+    <apple-music-progress></apple-music-progress>
+    </div>
+    <div id="tlcontent" style="overflow-y: scroll;height:87.5vh;">
+        <p class="focus-heading">Queue</p>
+    <br>
+    <div style="margin-left:auto;margin-right:auto;overflow-x: hidden;">
+        <table id="tracklist">
+            <th class="labels">Playback</th>
+            <th class="labels">Name</th>
+            <th class="labels">Runtime</th>
+        </table>
+    </div>
+    <script>
+        document.querySelectorAll('#tlcontent')[0].style.display = "block";
+    </script>
+    </div>
+    </div>
+    <script>
+        nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, npId);
+        document.dispatchEvent(nowPlayingEvent);
+    </script>    
