@@ -1,6 +1,8 @@
 # TuneGram
 A cool little Apple Music client.
 ### Development Timeline
-Development - Feb 23
-Beta 1 - Feb 29
-Beta 2 - Mar 15
+<b>Development</b> Feb 23
+<br>
+<b>Beta 1</b> Feb 29
+<br>
+<b>Beta 2</b> Mar 15
