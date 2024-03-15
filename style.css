@@ -3,6 +3,8 @@
   font-size:3em;
   margin:0;
   transition:100ms ease-in;
+  width:80vw;
+  cursor:pointer
 }
 #nameplate:hover .title-font {
   font-weight:400;
@@ -11,6 +13,19 @@
 #nameplate:hover {
   background-color:#E3E1DB;
   color: #2F3633;
+}
+.header-itm {
+  width:10vw;
+  height:10vh;
+  margin:0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left:1px solid #2F3633;
+  cursor:pointer;
+}
+.header-itm p {
+  flex: 0 0 fit-content;
 }
 #player {
   align-items: center;
@@ -34,13 +49,13 @@
   margin-bottom:0;
   margin-right:0;
 }
-.header div {
-  width:5%;
-  height:10%;
-  margin:0;
-  display:table-cell;
-  border-left:1px solid #2F3633;
-  cursor:pointer;
+#controls {
+  width:20vw;
+}
+#controls div {
+  display:inline-flex;
+  max-width:fit-content;
+  overflow: hidden;
 }
 apple-music-progress {
   width:85%;
@@ -55,20 +70,34 @@ apple-music-progress {
   border-left:1px solid #2F3633;
   cursor:pointer;
 }
-#srch-btn:hover {
-  width:6.5%;
+#np-btn:hover {
   margin:0;
-  display:table-cell;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-left:1px solid #2F3633;
   background-color:#2F3633;
   color:#E3E1DB;
   transition:100ms ease;
 }
-#srch-btn {
-  width:6.5%;
+#srch-btn:hover {
+  margin:0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left:1px solid #2F3633;
+  background-color:#2F3633;
+  color:#E3E1DB;
+  transition:100ms ease;
+}
+#rewind-btn,
+#ff-btn,
+#plpa-btn {
+  cursor:pointer;
+  font-size:2vw
 }
 .header {
-  display:table;
+  display:flex;
   margin:0;
   height:10vh;
 }
