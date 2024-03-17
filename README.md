@@ -8,5 +8,3 @@ A cool little Apple Music client.
 <b>Beta 2</b> Mar 15
 <br>
 <b>v1.0.0</b> Mar 17
-<br>
-<b>v1.0.1</b> Mar 17
