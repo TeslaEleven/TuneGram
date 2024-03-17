@@ -186,7 +186,7 @@ body {
       overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 3; /* number of lines to show */
-              line-clamp: 3; 
+      line-clamp: 3; 
       -webkit-box-orient: vertical;
       text-overflow: ellipsis;
     }
@@ -196,7 +196,13 @@ body {
       margin-right:auto;
     }
     #info-artist {
-      font-size:150%
+      font-size:150%;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;/* number of lines to show */
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+      text-overflow: ellipsis;
     }
     #info-year {
       font-size:100%
