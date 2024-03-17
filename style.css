@@ -182,19 +182,19 @@ body {
       -webkit-box-orient: vertical;
       text-overflow: ellipsis;
     }
-    apple-music-progress {
-      width:auto;
-      margin-left:auto;
-      margin-right:auto;
-    }
     #info-album {
-           overflow: hidden;
+      overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 3; /* number of lines to show */
               line-clamp: 3; 
       -webkit-box-orient: vertical;
       text-overflow: ellipsis;
-      }
+    }
+    apple-music-progress {
+      width:auto;
+      margin-left:auto;
+      margin-right:auto;
+    }
     #info-artist {
       font-size:150%
     }
