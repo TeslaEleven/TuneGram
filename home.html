@@ -125,9 +125,8 @@ const playNext = document.createEvent('CustomEvent')
    const music = MusicKit.getInstance();
 await music.authorize().then(() => {
   document.body.addEventListener('htmx:afterSwap', function(res) {
-    console.log(res.detail.requestConfig.elt)
-    var resUlt = res.detail.requestConfig.elt;
-    if(resUlt.id == "np-btn") {
+    var resUlt = res.detail.requestConfig.path;
+    if(resUlt.includes("np.html")) {
       if(music.playbackState == 2) {
   document.getElementById('plpa-btn').innerHTML = "pause"
 } else if(music.playbackState == 3) {
