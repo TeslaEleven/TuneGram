@@ -187,6 +187,14 @@ body {
       margin-left:auto;
       margin-right:auto;
     }
+    #info-album {
+           overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; /* number of lines to show */
+              line-clamp: 3; 
+      -webkit-box-orient: vertical;
+      text-overflow: ellipsis;
+      }
     #info-artist {
       font-size:150%
     }
