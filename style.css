@@ -98,10 +98,17 @@ apple-music-progress {
   cursor:pointer;
   font-size:200%
 }
+#plpa-btn {
+  transform:scale(1.5)
+}
 .header {
   display:flex;
   margin:0;
   flex: 0 1 auto;
+  position:fixed;
+  background-color:#E3E1DB;
+  border-bottom: 1px solid #2F3633;
+  z-index: 1000;
 }
 .title-font {
   font-family: "MuseoModerno", sans-serif;
@@ -120,11 +127,10 @@ body {
   font-family: "Ubuntu", sans-serif;
   font-weight: 300;
   font-style: normal;
-  overflow: hidden;
+  overflow-x: hidden;
   max-width:100%;
   display: flex;
   flex-flow: column;
-  max-height: 100vh;
 }
 .material-symbols-outlined {
   font-variation-settings:
@@ -151,15 +157,21 @@ body {
   }
 }
   @media (max-width: 650px) {
-    #np-btn {
-      font-size:70%
-    }
-    #srch-btn {
-      font-size:70%
-    }
     #infobox {
       flex-direction: column;
       max-width: 100vw;
+    }
+    .header-itm {
+      width:17%;
+    }
+    .header {
+      width:100vw
+    }
+    #nameplate {
+      width:66%;
+    }
+    .name {
+      width:66%;
     }
     #info-title {
       font-size:200%;
@@ -184,14 +196,13 @@ body {
     #tracklist {
       white-space: nowrap;
       max-width:100vw;
-
     }
     #table-wrap {
       overflow-x: scroll;
     }
     #tlcontent {
       max-width:100vw !important;
-      height: 100% !important;
+      max-height: fit-content !important;
       overflow: initial !important;
     }
     #np {
@@ -217,11 +228,14 @@ body {
   }
 #content {
   width:100%;
+  height:87.5vh;
   flex: 1 1 auto;
+  height:fit-content;
   display:inline-flex;
   justify-content: center;
   align-items: center;
   overflow: auto;
+  margin-top: 10vh;
 }
 card {
   min-width:269.232px;
@@ -579,8 +593,8 @@ artcard:active {
   padding-top:1%;
 }
 #tlcontent {
-  max-height:90vh;
   min-width:71vw;
+  max-height:90vh;
   display:inline-flex;
   justify-content: center;
   align-items: center;
@@ -616,9 +630,7 @@ to {
   padding-top:5px;
 }
 tr {
-  min-width:130vh;
   display:table-row;
-  border-bottom: 1px solid #2F3633
 }
 .general-music-control {
   text-align:center !important;
