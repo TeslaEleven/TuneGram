@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
   <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" data-web-components async></script>
-<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IjZRSjdMNEY2OEIifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzEwNzA4NDUzLCJleHAiOjE3MTExNDA0NTMsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.foYv_gm3ICNA5FcLIYRgC62YPPp-a2waUf5zJh8D5mIzMhyJURv6oAWDFwFUFdMGaDADVNMAlCByjCCzjtEdiw" />
+<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IjZRSjdMNEY2OEIifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzEwNzA2Nzc4LCJleHAiOjE3MTExMzg3NzgsIm9yaWdpbiI6WyJodHRwczovL2NvbWljc2VydmVyLm9yZyJdfQ.Nobl8FIv6rCmPpdv5C7EIGMKiD0p304fSIY5fP7UMir9k2ai0GyxZTq0QQEmf_EgHGbrIveof-5DrV3QUi0LkA" />
 <meta name="apple-music-app-name" content="musickit-tst" />
 <meta name="apple-music-app-build" content="1.0.0" />
 <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
@@ -114,7 +114,7 @@ const playNext = document.createEvent('CustomEvent')
   document.addEventListener('musickitloaded', async function () {
   try {
     await MusicKit.configure({
-      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IjZRSjdMNEY2OEIifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzEwNzA4NDUzLCJleHAiOjE3MTExNDA0NTMsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.foYv_gm3ICNA5FcLIYRgC62YPPp-a2waUf5zJh8D5mIzMhyJURv6oAWDFwFUFdMGaDADVNMAlCByjCCzjtEdiw',
+      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IjZRSjdMNEY2OEIifQ.eyJpc3MiOiJaVVhBRzVCNkY3IiwiaWF0IjoxNzEwNzA2Nzc4LCJleHAiOjE3MTExMzg3NzgsIm9yaWdpbiI6WyJodHRwczovL2NvbWljc2VydmVyLm9yZyJdfQ.Nobl8FIv6rCmPpdv5C7EIGMKiD0p304fSIY5fP7UMir9k2ai0GyxZTq0QQEmf_EgHGbrIveof-5DrV3QUi0LkA',
       app: {
         name: 'musickit-tst',
         build: '1.0.0',
