@@ -1,5 +1,5 @@
 <input id="srch-bar" class="form-control" type="search" 
-       name="search" placeholder="Search Songs, Lyrics, & More" 
+       name="search" placeholder="Search" 
        hx-get="search-results.html" 
        hx-trigger="myEvent delay:500ms, search" 
        hx-target="#result" 
@@ -11,6 +11,9 @@
 <script>
 document.querySelectorAll('#content')[0].style.display = "block";
 var srchBar = document.querySelector('input');
+$('#result').css({ 
+        height: '67.5vh'
+    });
 srchBar.addEventListener("keydown", function (e) {
     e = e || window.event;
     if(e.keyCode == 13) {

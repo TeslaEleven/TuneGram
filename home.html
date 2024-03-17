@@ -20,7 +20,7 @@
 </head>
 
 <body>
-  <div class="header">
+  <div class="header" style="height:10vh">
     <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
       <p class="name title-font">TuneGram</p>
     </div>
@@ -158,12 +158,18 @@ if(music.isPlaying == true) {
 }
 }
 },false);
+const audioContext = new AudioContext();
 document.addEventListener( "listenSearch", (e) => {
 searchTerm(e.detail)
 },false);
 document.addEventListener( "infoScreen", (e) => {
 infoDo(e.detail)
 },false);
+async function getTrackURL(trackId) {
+  await music.api.music("/v1/catalog/{{storefrontId}}/songs/" + trackId, queryParameters).then((res) => {
+console.log(res.data.data[0].attributes.previews[0].url)
+})
+}
 document.addEventListener( "nowPlayingEvent",async (e) => {
   console.log(e.detail)
 loadVisuals(queue, e.detail)
@@ -171,7 +177,7 @@ var songId = [e.detail];
 if(e.detail !== "") {
   if(e.detail !== "viewonly")  {
     console.log(e.detail)
-    queue = await music.setQueue({ songs: songId, startPlaying: true });
+    queue = await music.setQueue({ songs: songId, startPlaying: true })
     loadVisuals(queue, e.detail)
   }
 }
@@ -499,16 +505,16 @@ function toAlbum(id) {
 function musicPlay(id, art) {
   npId = id;
   if(id !== "itunesonly") {
+  loadContent('np');
   htmx.ajax('GET', 'np.html?id=' + id, {target:'#content', swap:'innerHTML', delay:"500ms"})
-  loadContent('np')
   } else {
     alert('This content is only available on the iTunes Store.')
   }
 }
 function playNextOrLast(id, type) {
   npId = "viewonly"
+  loadContent('np');
   htmx.ajax('GET', 'np.html?id=', {target:'#content', swap:'innerHTML', delay:"500ms"})
-  loadContent('np')
   if(type == "later") {
   playLater.initCustomEvent("playLater", true, true, id);
   document.dispatchEvent(playLater);

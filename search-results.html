@@ -9,6 +9,9 @@
 </div>
 <br>
 <script>
+        $('#result').css({ 
+        height: ''
+    });
     listenSearch.initCustomEvent("listenSearch", true, true, searchId);
 document.dispatchEvent(listenSearch);
     var albumsToCount = 0;
