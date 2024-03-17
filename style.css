@@ -23,6 +23,8 @@
   align-items: center;
   border-left:1px solid #2F3633;
   cursor:pointer;
+  overflow-x:hidden;
+  font-size:100%;
 }
 .header-itm p {
   flex: 0 0 fit-content;
@@ -34,7 +36,7 @@
 .focus-heading {
   color:#396E80;
   font-weight:500;
-  font-size:3vw;
+  font-size: 300%; /* Set the width to 3% of the screen width */
   margin-left:3%;
   margin-top:5%;
   margin-bottom:0;
@@ -43,19 +45,23 @@
 .focus-subheading {
   color:#8DA8AD;
   font-weight:500;
-  font-size:2vw;
+  font-size:200%;
   margin-left:3%;
   margin-top:0;
   margin-bottom:0;
   margin-right:0;
 }
 #controls {
-  width:20vw;
+  width:2000%;
 }
 #controls div {
   display:inline-flex;
   max-width:fit-content;
   overflow: hidden;
+}
+apple-music-progress {
+  width:85%;
+  margin-left:4%;
 }
 #currentplay {
   width:20%;
@@ -90,12 +96,12 @@
 #ff-btn,
 #plpa-btn {
   cursor:pointer;
-  font-size:2vw
+  font-size:200%
 }
 .header {
   display:flex;
   margin:0;
-  height:10vh;
+  flex: 0 1 auto;
 }
 .title-font {
   font-family: "MuseoModerno", sans-serif;
@@ -114,8 +120,11 @@ body {
   font-family: "Ubuntu", sans-serif;
   font-weight: 300;
   font-style: normal;
-  overflow-x: hidden;
-  max-width:100%
+  overflow: hidden;
+  max-width:100%;
+  display: flex;
+  flex-flow: column;
+  max-height: 100vh;
 }
 .material-symbols-outlined {
   font-variation-settings:
@@ -130,7 +139,9 @@ body {
   
 }
 
-
+#table-wrap {
+  overflow-x: hidden;
+}
 @keyframes moveUpDown {
   0% {
     color: #396E80;
@@ -139,19 +150,84 @@ body {
     color:#8DA8AD;
   }
 }
+  @media (max-width: 650px) {
+    #np-btn {
+      font-size:70%
+    }
+    #srch-btn {
+      font-size:70%
+    }
+    #infobox {
+      flex-direction: column;
+      max-width: 100vw;
+    }
+    #info-title {
+      font-size:200%;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* number of lines to show */
+              line-clamp: 2; 
+      -webkit-box-orient: vertical;
+      text-overflow: ellipsis;
+    }
+    apple-music-progress {
+      width:auto;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    #info-artist {
+      font-size:150%
+    }
+    #info-year {
+      font-size:100%
+    }
+    #tracklist {
+      white-space: nowrap;
+      max-width:100vw;
 
+    }
+    #table-wrap {
+      overflow-x: scroll;
+    }
+    #tlcontent {
+      max-width:100vw !important;
+      height: 100% !important;
+      overflow: initial !important;
+    }
+    #np {
+      max-width:100vw !important;
+      max-height: 100vh !important;
+      margin:0 !important;
+      padding:10px;
+    }
+    #greater-pc {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    #np-child {
+      display:flex !important;
+    }
+    #np img {
+      height:25vh;
+      width:auto !important;
+    }
+    #info-wrapper {
+      flex-direction: column;
+    }
+  }
 #content {
   width:100%;
-  height:87.5vh;
+  height:90vh;
+  flex: 1 1 auto;
   display:inline-flex;
   justify-content: center;
   align-items: center;
   overflow: auto;
 }
 card {
-  min-width: 270px;
-  max-width:270px;
-  height: 285px;
+  min-width:269.232px;
+  max-width:269.232px;
+  height: auto;
   border: 1px solid #777F76;
   padding: 10px;
   box-shadow: -1px 1px #777F76;
@@ -199,7 +275,8 @@ card {
   padding:1%;
 }
 card img {
-  width:90%;
+  width: 90%;
+  max-width:250px !important;
   display:block;
   border-radius:10px;
   margin-bottom:3px;
@@ -207,7 +284,7 @@ card img {
 card heading {
   color:#2F3633;
   font-weight:500;
-  font-size:1.5vw;
+  font-size:150%;
   margin-top:0;
   margin-bottom:0;
   margin-right:0;
@@ -215,12 +292,13 @@ card heading {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  max-width:270px
+  width:269.232px;
+  display:block;
 }
 card subheading {
   color:#2F3633;
   font-weight:400;
-  font-size:1vw;
+  font-size:100%;
   display:block;
   margin-top:0;
   margin-bottom:0;
@@ -332,7 +410,6 @@ input {
 }
 #result {
   width:100%;
-  height:67.5vh;
   display:inline-flex;
   justify-content: center;
   align-items: center;
@@ -342,7 +419,7 @@ input {
 
 songcard {
   width:450px;
-  height:6vh;
+  height: 6%;
   border: 1px solid;
   padding: 10px;
   box-shadow: -1px 1px #2F3633;
@@ -372,7 +449,7 @@ tr {
 }
 songcard img {
   width:auto;
-  height:6vh;
+  height:43.2px;
   display:flex;
   border-radius:10px;
   margin-bottom:3px;
@@ -380,7 +457,7 @@ songcard img {
   songcard heading {
   color:#E3E1DB;
   font-weight:500;
-  font-size:1.5vw;
+  font-size:150%;
   margin-top:0;
   margin-bottom:0;
   margin-right:0;
@@ -400,7 +477,7 @@ iholder {
 songcard subheading {
   color:#E3E1DB;
   font-weight:400;
-  font-size:1vw;
+  font-size:100%;
   display:block;
   margin-top:0;
   margin-bottom:0;
@@ -487,8 +564,10 @@ artcard:active {
 
 #np {
   display:block;
-  max-height:70vh;
+  flex:1 1 auto;
   align-items: center;
+  overflow:scroll;
+  max-width:29vw;
 }
 
 #np img {
@@ -501,8 +580,8 @@ artcard:active {
   padding-top:1%;
 }
 #tlcontent {
-  min-width:130vh;
-  min-height:85vh;
+  max-height:90vh;
+  min-width:71vw;
   display:inline-flex;
   justify-content: center;
   align-items: center;
