@@ -1,9 +1,9 @@
 {
-  name: "TuneGram",
-  short_name: "TuneGram",
-  display: "standalone",
-  scope: "/",
-  start_url: "/",
+  "name": "TuneGram",
+  "short_name": "TuneGram",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
       "src": "favicon.png",
