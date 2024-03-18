@@ -591,7 +591,8 @@ artcard:active {
   display:block;
   flex:1 1 auto;
   align-items: center;
-  overflow:scroll;
+  overflow-x:hidden;
+  overflow-y:scroll;
   max-width:29vw;
 }
 
