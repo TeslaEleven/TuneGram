@@ -112,6 +112,7 @@ const pausePlayEvent = document.createEvent('CustomEvent')
 const playLater = document.createEvent('CustomEvent')
 const playNext = document.createEvent('CustomEvent')
 function getSearch() {
+    if(audio_) { audio_.pause() };
     htmx.ajax('GET', 'search.html', {target:'#content', swap:'innerHTML', delay:"500ms"})
   }
   document.addEventListener('musickitloaded', async function () {
