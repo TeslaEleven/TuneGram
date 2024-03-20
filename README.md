@@ -7,4 +7,5 @@ A cool little Apple Music client.
 <br>
 <b>Beta 2</b> Mar 15
 <br>
-<b>v1.0.0</b> Mar 17
+<b>Initial Release</b> Mar 17
+and so on...
