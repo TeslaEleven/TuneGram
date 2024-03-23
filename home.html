@@ -230,7 +230,13 @@ function loadMore(type) {
   } else if(methodType == "playlist") {
     targetPractice = "#smallcards"
   }
-  htmx.ajax('GET', 'seemore.html', {target:targetPractice, swap:'afterend', scroll:"bottom"})
+  htmx.ajax('GET', 'seemore.html', {target:targetPractice, swap:'afterend'})
+    $('#bigcards card').last()[0].scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+    block: 'nearest', 
+    inline: 'center'
+});
 }
 document.addEventListener( "infoScreen", (e) => {
 infoDo(e.detail)
