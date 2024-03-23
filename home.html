@@ -231,12 +231,6 @@ function loadMore(type) {
     targetPractice = "#smallcards"
   }
   htmx.ajax('GET', 'seemore.html', {target:targetPractice, swap:'afterend'})
-    $('#bigcards card').last()[0].scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-    block: 'nearest', 
-    inline: 'center'
-});
 }
 document.addEventListener( "infoScreen", (e) => {
 infoDo(e.detail)
@@ -258,7 +252,6 @@ if(music.isAuthorized) {
   })
   async function seeMore() {
     var rawMethod = methodType;
-    console.log(methodType)
     var chosenFunc = "";
     var methodUrl = ""
     if(rawMethod == "heavy") {
@@ -273,11 +266,15 @@ if(music.isAuthorized) {
 
     }
     var offSet = document.querySelector(targetPractice).children.length;
-    console.log(offSet)
     const greaterAlbums = await music.api.music(methodUrl, { offset: offSet}).then((data) => {
+      $(targetPractice + ' card').last()[0].scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+    block: 'nearest', 
+    inline: 'center'
+});
     if(data.data) {
       var res =  data.data.data;
-      console.log(res)
       if(res.length == 0) {
       } else {
       res.forEach(chosenFunc)
@@ -388,7 +385,6 @@ function appendTracks(item, index, array) {
   var title = item.attributes.name
   var runtime = item.attributes.durationInMillis;
   var id;
-  console.log(item)
   if(music.isAuthorized) {
     id = item.id
   } else {
@@ -497,7 +493,6 @@ albumsProcessed++
 toDrawAlbums += card
 if(albumsProcessed == albumsToCount && albumsProcessed !== 0) {
     document.querySelector('#bigcards').innerHTML += toDrawAlbums;
-    console.log(sessionStorage.getItem('albumStorage') + toDrawAlbums)
     var setStorageStr = toDrawAlbums;
     if(sessionStorage.getItem('albumStorage')) {
       setStorageStr = sessionStorage.getItem('albumStorage') + toDrawAlbums;
@@ -533,7 +528,7 @@ if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
     }
     sessionStorage.setItem('heavyStorage',  setStorageStr)}
   } else {
-    return;
+    console.log('Couldn\'t append an item in Heavy Rotation. Likely a station.')
   }
 }
 function drawSadResults(type) {
@@ -635,4 +630,3 @@ pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, type + id);
 document.dispatchEvent(pausePlayEvent);
 }
 </script>
-</html>
