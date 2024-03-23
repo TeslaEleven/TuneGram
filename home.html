@@ -267,16 +267,22 @@ if(music.isAuthorized) {
     }
     var offSet = document.querySelector(targetPractice).children.length;
     const greaterAlbums = await music.api.music(methodUrl, { offset: offSet}).then((data) => {
-      $(targetPractice + ' card').last()[0].scrollIntoView({
+    if(data.data) {
+      var res =  data.data.data;
+      if(res.length == 0) {
+              $(targetPractice + ' card').last()[0].scrollIntoView({
     behavior: "smooth",
     block: "start",
     block: 'nearest', 
     inline: 'center'
 });
-    if(data.data) {
-      var res =  data.data.data;
-      if(res.length == 0) {
       } else {
+              $(targetPractice + ' card').last()[0].scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+    block: 'nearest', 
+    inline: 'center'
+});
       res.forEach(chosenFunc)
       }
     }
