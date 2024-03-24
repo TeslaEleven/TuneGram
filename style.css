@@ -4,7 +4,7 @@
   margin:0;
   transition:100ms ease-in;
   width:80vw;
-  cursor:pointer
+  cursor:pointer;
 }
 #nameplate:hover .title-font {
   font-weight:400;
