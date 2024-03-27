@@ -16,7 +16,7 @@
 }
 .header-itm {
   width:10vw;
-  height:10vh;
+  height:82px;
   margin:0;
   display: flex;
   justify-content: center;
@@ -260,7 +260,7 @@ body {
   justify-content: center;
   align-items: center;
   overflow: auto;
-  margin-top: 10vh;
+  margin-top: 82px;
 }
 card {
   min-width:269.232px;
