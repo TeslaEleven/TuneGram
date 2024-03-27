@@ -23,7 +23,7 @@
   align-items: center;
   border-left:1px solid #2F3633;
   cursor:pointer;
-  overflow-x:hidden;
+  overflow:hidden;
   font-size:100%;
 }
 .header-itm p {
@@ -617,7 +617,8 @@ artcard:active {
   display:block;
   flex:1 1 auto;
   align-items: center;
-  overflow:scroll;
+  overflow-x:hidden;
+  overflow-y:scroll;
   max-width:29vw;
 }
 
