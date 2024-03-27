@@ -428,7 +428,8 @@ toDrawTracks += html
 if(tracksProcessed == tracksToCount && tracksProcessed !== 0) {
     document.querySelector('#tracklist').innerHTML += toDrawTracks;
     tracksProcessed = 0;
-    toDrawTracks = ""
+    toDrawTracks = "";
+    document.getElementById('infobox').classList.remove('skeleton-page')
 }
 }
 function drawInfo(item, index, array) {
