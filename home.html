@@ -331,6 +331,8 @@ if(e.detail !== "") {
   if(e.detail !== "viewonly")  {
     queue = await music.setQueue({ songs: songId, startPlaying: true })
     loadVisuals(queue, e.detail)
+  } else {
+    ["n/a"].forEach(appendTracks)
   }
 }
 },false);
@@ -364,11 +366,7 @@ var songPlaying = queue.currentItem;
 if(songPlaying !== undefined) {
 var queueItems = queue.items;
 hiItsQue = true;
-if(queueItems == []) {
-  ["n/a"].forEach(appendTracks)
-} else {
 queueItems.forEach(appendTracks)
-}
 var root = songPlaying.attributes;
 var art = ""
 if(root.artwork.url) {
@@ -397,8 +395,8 @@ function converter(millis) {
   return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 function appendTracks(item, index, array) {
-  if(array == ["n/a"]) {
-    console.warn('No appendable tracks to Queue or Tracklist.');
+  if(item === "n/a") {
+    console.warn('No tracks to add to either the Queue or Tracklist tables.');
     document.getElementById('infobox').classList.remove('skeleton-page');
   } else {
   tracksToCount = array.length;
