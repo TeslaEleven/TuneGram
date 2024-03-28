@@ -168,10 +168,16 @@ async function infoDo(id) {
     await music.api.music('/v1/me/library/playlists/' + id, queryParameters).then(async (res) => {
     var plist = res.data.data;
     plist.forEach(drawInfo)
+    console.log(res)
     await music.api.music(`/v1/me/library/playlists/${id}/tracks`, queryParameters).then((res) => {
       var tracks = res.data.data;
       tracks.forEach(appendTracks)
-    });
+    }).catch(err => {
+      console.log(err)
+      if(err) {
+        ["n/a"].forEach(appendTracks)
+      }
+    })
 })
   } else if(id.startsWith('s')) {
     var songId = id.slice(1)
@@ -358,7 +364,11 @@ var songPlaying = queue.currentItem;
 if(songPlaying !== undefined) {
 var queueItems = queue.items;
 hiItsQue = true;
+if(queueItems == []) {
+  ["n/a"].forEach(appendTracks)
+} else {
 queueItems.forEach(appendTracks)
+}
 var root = songPlaying.attributes;
 var art = ""
 if(root.artwork.url) {
@@ -387,7 +397,7 @@ function converter(millis) {
   return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 function appendTracks(item, index, array) {
-  if(array.length == 0) {
+  if(array == ["n/a"]) {
     console.warn('No appendable tracks to Queue or Tracklist.');
     document.getElementById('infobox').classList.remove('skeleton-page');
   } else {
