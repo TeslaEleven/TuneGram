@@ -160,7 +160,7 @@ await music.api.music(`/v1/catalog/us/search`, { term: term, types: 'albums,song
     drawSadResults('both');
   }
 }).catch((err) =>{
-  console.log(err)
+  console.error(err)
 })
 }
 async function infoDo(id) {
@@ -387,6 +387,10 @@ function converter(millis) {
   return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 function appendTracks(item, index, array) {
+  if(array.length == 0) {
+    console.warn('No appendable tracks to Queue or Tracklist.');
+    document.getElementById('infobox').classList.remove('skeleton-page');
+  } else {
   tracksToCount = array.length;
   var title = item.attributes.name
   var runtime = item.attributes.durationInMillis;
@@ -431,6 +435,7 @@ if(tracksProcessed == tracksToCount && tracksProcessed !== 0) {
     toDrawTracks = "";
     document.getElementById('infobox').classList.remove('skeleton-page')
 }
+  }
 }
 function drawInfo(item, index, array) {
 var fullDate = item.attributes.releaseDate;
@@ -488,7 +493,7 @@ music.addEventListener('playbackStateDidChange', ({ oldState, state }) => {
 }
 });
 } catch (err) {
-    console.log(err)
+    console.error(err)
   }
   });
 document.querySelectorAll('#content')[0].style.display = "block";
@@ -535,7 +540,7 @@ if(heavyProcessed == heavyToCount && heavyProcessed !== 0) {
     }
     sessionStorage.setItem('heavyStorage',  setStorageStr)}
   } else {
-    console.log('Couldn\'t append an item in Heavy Rotation. Likely a station.')
+    console.warn('Couldn\'t append an item in Heavy Rotation. Likely a station.')
   }
 }
 function drawSadResults(type) {
