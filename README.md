@@ -1,5 +1,5 @@
 # TuneGram
-A cool little Apple Music client.
+A cool little Apple Music client. Now deprecated.
 ### Development Timeline
 <b>Development</b> Feb 23
 <br>
@@ -8,4 +8,7 @@ A cool little Apple Music client.
 <b>Beta 2</b> Mar 15
 <br>
 <b>Initial Release</b> Mar 17
-and so on...
+<br>
+...
+<br>
+<b>Deprecation</b> Jul 23
