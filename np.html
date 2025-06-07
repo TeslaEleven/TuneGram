@@ -1,11 +1,12 @@
 <div id="infobox" style="display:flex" class="skeleton-page">
     <div id="np" style="margin-left:2%;margin-top:2%;display:block">
-        <div id="np-child">
-            <img src="fallback.svg" id="info-img"/>
-        <div id="info-wrapper">
-            <p class="focus-heading" id="info-title">Not Playing</p>
-            <p class="focus-subheading" id="info-artist"></p>
-            <p class="focus-subheading" style="font-size:1.3em;color:#ACC0C3" id="info-album"></p>
+        <div id="np-child" style="display:grid!important">
+            <img src="fallback.svg" id="info-img" style="width:100%!important;height:auto!important"/>
+        <div id="info-wrapper-np">
+            <p class="focus-subheading" id="info-title" style="color:#396E80;margin-top:5%">Not Playing</p>
+            <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
+            <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
+            <p style="font-size: 1.5em; color: #ACC0C3; margin: 0; margin-left: 3%; font-size: 1em;" id="info-details"></p>
         </div>
         </div>
     <div id="greater-pc">
@@ -18,8 +19,7 @@
     </div>
     </div>
     <div id="tlcontent" style="overflow-y: scroll;">
-        <p class="focus-heading">Queue</p>
-    <br>
+        <p class="focus-heading" id="trklst">Queue</p>
     <div style="margin-left:auto;margin-right:auto;" id="table-wrap">
         <table id="tracklist">
             <th class="labels">Playback</th>

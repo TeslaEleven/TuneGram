@@ -14,9 +14,10 @@
     href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
   <link rel="manifest" href="manifest.json">
-  <meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjUxMzIzLCJleHAiOjE3NDkzMzc3MjMsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.EmFyh6vW0VaqroFFkT9DBSODOdpAoiseholEjrSNk4w0gyxeojWuR_yrFfvQOPmiSsAdFwBxuy-Tjttsg--taw" />
-<meta name="apple-music-app-name" content="TuneGram" />
-<meta name="apple-music-app-build" content="2.0.0" />
+  <meta name="apple-music-developer-token"
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MzMwODUyLCJleHAiOjE3NDk0MTcyNTIsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.kqZjL3kNeN_kIpbnjWH8TmuZOeVsDeNi816ILXcXq-2FfKWhHzW26QxxfvWE5OWkAhwkjckrqtS8LP2CDmx3aQ" />
+  <meta name="apple-music-app-name" content="TuneGram" />
+  <meta name="apple-music-app-build" content="2.0.0" />
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script src="https://unpkg.com/htmx.org@1.9.10"
@@ -48,6 +49,7 @@
         class="material-symbols-outlined">music_note</p>
     </div>
   </div>
+  <div id="np-container" style="display:none"></div>
 </body>
 <script>
   var audio_;
@@ -64,6 +66,7 @@
       plistsToCount = num
     }
   }
+  var tags = ["deluxe", "live", "acoustic", "explicit", "master", "remix", "version", "bonus", "original", "soundtrack", "remastered", "reissue", "re-recorded", "re-recording", "reimagined", "reimagining", "cover", "stripped down"];
   var plistWarns = [];
   var albumsToCount = 0;
   var toDrawAlbums = ""
@@ -93,6 +96,32 @@
     document.getElementById('content').style.height = "87.5vh";
   })
   function loadContent(page) {
+    // If navigating away from np, hide it
+    if (page !== "np" && page !== "np-header") {
+      hideNowPlayingScreen();
+    }
+    // If navigating to np, restore if possible
+    if (page === "np" || page === "np-header") {
+      if (showNowPlayingScreen()) {
+        // Don't reload np.html if we restored it
+        // Update header button styles as usual
+        if (page == "np-header") {
+          npId = "viewonly"
+          document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
+          document.querySelector('#np-btn').style.color = "#E3E1DB";
+          document.querySelector('#srch-btn').style.color = "#2F3633";
+          document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
+        }
+        if (page == "np") {
+          document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
+          document.querySelector('#np-btn').style.color = "#E3E1DB";
+          document.querySelector('#srch-btn').style.color = "#2F3633";
+          document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
+        }
+        return;
+      }
+    }
+
     document.getElementById('content').innerHTML = `<div class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">music_note</p>`
     document.getElementById('content').style.display = "inline-flex";
 
@@ -136,7 +165,7 @@
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjUxMzIzLCJleHAiOjE3NDkzMzc3MjMsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.EmFyh6vW0VaqroFFkT9DBSODOdpAoiseholEjrSNk4w0gyxeojWuR_yrFfvQOPmiSsAdFwBxuy-Tjttsg--taw',
+        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MzMwODUyLCJleHAiOjE3NDk0MTcyNTIsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.kqZjL3kNeN_kIpbnjWH8TmuZOeVsDeNi816ILXcXq-2FfKWhHzW26QxxfvWE5OWkAhwkjckrqtS8LP2CDmx3aQ',
         app: {
           name: 'TuneGram',
           build: '2.0.0',
@@ -192,6 +221,7 @@
             }).catch(err => {
               console.log(err)
               if (err) {
+                console.error(err)
                 ["n/a"].forEach(appendTracks)
               }
             })
@@ -346,28 +376,31 @@
           var songId = [e.detail];
           if (e.detail !== "") {
             if (e.detail !== "viewonly") {
-              queue = await music.setQueue({ songs: songId, startPlaying: true })
-              loadVisuals(queue, e.detail)
+              await music.setQueue({ songs: songId, startPlaying: true })
+              loadVisuals(music.queue.items, e.detail)
             } else {
-              ["n/a"].forEach(appendTracks)
+              loadVisuals(music.queue.items, music.queue.currentItem.id);
+              (music.queue.items).forEach(appendTracks)
             }
           }
         }, false);
       }
       document.addEventListener("playLater", async (e) => {
-        if (queue == "") {
+        if ((music.queue.items).length == 0) {
           queue = await music.setQueue({ songs: [e.detail], startPlaying: true });
           loadVisuals(queue, e.detail)
         } else {
           music.playLater({ songs: [e.detail] })
+          queue = music.queue.items;
         }
       }, false);
       document.addEventListener("playNext", async (e) => {
-        if (queue == "") {
+        if ((music.queue.items).length == 0) {
           queue = await music.setQueue({ songs: [e.detail], startPlaying: true });
           loadVisuals(queue, e.detail)
         } else {
           music.playNext({ songs: [e.detail] })
+          queue = music.queue.items;
         }
       }, false);
       music.addEventListener('nowPlayingItemDidChange', ({ item }) => {
@@ -376,12 +409,14 @@
         }
       });
       music.addEventListener('queueItemsDidChange', ({ item }) => {
-        loadVisuals(queue, queue.currentItem)
+        const queue = music.queue.items;
+        queue.forEach(appendTracks)
+        loadVisuals(queue, music.queue.currentItem)
       });
       function loadVisuals(queue, id) {
-        var songPlaying = queue.currentItem;
+        var songPlaying = music.queue.currentItem;
         if (songPlaying !== undefined) {
-          var queueItems = queue.items;
+          var queueItems = music.queue.items;
           hiItsQue = true;
           var root = songPlaying.attributes;
           var art = ""
@@ -392,7 +427,24 @@
           } else {
             art = "fallback.svg"
           }
-
+          var detailSubheading = "";
+          var name = (root.name).toLowerCase();
+          var albumName = (root.albumName).toLowerCase();
+          if (name.includes('(') || name.includes('[')) {
+            console.log('Found a parenthesis or bracket in the song name: ' + name);
+            var detailSub = "";
+            if (name.includes('(') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+              detailSub = (root.name).split('(')[1].split(')')[0];
+            } else if (name.includes('[') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+              detailSub = (root.name).split('[')[1].split(']')[0];
+            }
+            root.name = (root.name).split('(')[0].split('[')[0].trim();
+            detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
+          }
+          if (albumName.includes('(') || albumName.includes('[')) {
+            console.log('Found a parenthesis or bracket in the album name: ' + name);
+            root.albumName = (root.albumName).split('(')[0].split('[')[0].trim();
+          }
           document.getElementById('plpa-btn').setAttribute('onclick', `pausePlay('${id}', 'pp')`)
           document.getElementById('rewind-btn').setAttribute('onclick', `pausePlay('na', 're')`)
           document.getElementById('ff-btn').setAttribute('onclick', `pausePlay('na', 'ff')`)
@@ -400,6 +452,7 @@
           document.getElementById('info-artist').innerHTML = root.artistName
           document.getElementById('info-album').innerHTML = root.albumName
           document.getElementById('info-img').src = art
+          document.getElementById('info-details').innerHTML = detailSubheading;
         } else {
           document.querySelector('#np #info-title').innerHTML = 'Not Playing';
           document.querySelector('#np #info-artist').innerHTML = '';
@@ -478,10 +531,24 @@
           var dt = new Date(item.attributes.releaseDate);
           subsub = dt.getFullYear();
         }
+        var detailSubheading = "";
+        var name = (item.attributes.name).toLowerCase();
+        if (name.includes('(') || name.includes('[')) {
+          console.log('Found a parenthesis or bracket in the album name: ' + name);
+          var detailSub = "";
+          if (name.includes('(') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+            detailSub = (item.attributes.name).split('(')[1].split(')')[0];
+          } else if (name.includes('[') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+            detailSub = (item.attributes.name).split('[')[1].split(']')[0];
+          }
+          item.attributes.name = (item.attributes.name).split('(')[0].split('[')[0].trim();
+          detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
+        }
         document.querySelector('#info-title').innerHTML = item.attributes.name;
         document.querySelector('#info-year').innerHTML = subsub;
         document.querySelector('#info-artist').innerHTML = sub;
         document.querySelector('#info-img').src = cover;
+        document.querySelector("#info-details").innerHTML = detailSubheading;
       }
       async function loadLibrary() {
         if (!sessionStorage.getItem('plistStorage') || !sessionStorage.getItem('albumStorage') || !sessionStorage.getItem('heavyStorage')) {
@@ -530,8 +597,21 @@
       albumsProcessed++
       return;
     }
+    var name = (item.attributes.name).toLowerCase();
     if (item.attributes.name === undefined) {
       item.attributes.name = "Unknown Album";
+    }
+    var detailSubheading = "";
+    if (name.includes('(') || name.includes('[')) {
+      console.log('Found a parenthesis or bracket in the album name: ' + name);
+      var detailSub = "";
+      if (name.includes('(') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+        detailSub = (item.attributes.name).split('(')[1].split(')')[0];
+      } else if (name.includes('[') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+        detailSub = (item.attributes.name).split('[')[1].split(']')[0];
+      }
+      item.attributes.name = (item.attributes.name).split('(')[0].split('[')[0].trim();
+      detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
     }
     if (item.attributes.artistName === undefined) {
       item.attributes.artistName = "Unknown Artist";
@@ -545,7 +625,7 @@
       }
     }
     var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
-    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
+    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}</card>`
     albumsProcessed++
     toDrawAlbums += card
     if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
@@ -598,22 +678,39 @@
     }
   }
   function drawSadResults(type) {
-    var card = `<card><img src="fallback.svg"/><heading>No Results</heading><subheading>:(</subheading></card>`
     if (type == "album") {
-      document.querySelector('#bigcards').innerHTML = card
+      document.querySelector('#bigcards').remove()
+      document.querySelector('#albums-results').remove()
     }
     if (type == "song") {
-      document.querySelector('#songcards').innerHTML = card
+      document.querySelector('#songcards').remove()
+      document.querySelector('#songs-results').remove()
     }
     if (type == "both") {
-      document.querySelector('#bigcards').innerHTML = card
-      document.querySelector('#songcards').innerHTML = card
+      document.querySelector('#bigcards').remove()
+      document.querySelector('#songcards').remove()
+      document.querySelector('#albums-results').remove()
+      document.querySelector('#songs-results').remove()
     }
   }
   function searchAlbums(item, index, array) {
     albumsToCount = array.length
     var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
-    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></card>`
+    var name = (item.attributes.name).toLowerCase();
+    console.log('Processing album: ' + name);
+    var detailSubheading = "";
+    if (name.includes('(') || name.includes('[')) {
+      console.log('Found a parenthesis or bracket in the album name: ' + name);
+      var detailSub = "";
+      if (name.includes('(') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+        detailSub = (item.attributes.name).split('(')[1].split(')')[0];
+      } else if (name.includes('[') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
+        detailSub = (item.attributes.name).split('[')[1].split(']')[0];
+      }
+      item.attributes.name = (item.attributes.name).split('(')[0].split('[')[0].trim();
+      detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
+    }
+    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}</card>`
     albumsProcessed++
     toDrawAlbums += card
     if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
@@ -708,5 +805,38 @@
   function pausePlay(id, type) {
     pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, type + id);
     document.dispatchEvent(pausePlayEvent);
+  }
+
+  function showNowPlayingScreen() {
+    // If np-container has content, move it back to #content and show
+    const npContainer = document.getElementById('np-container');
+    if (npContainer.childElementCount > 0) {
+      document.getElementById('content').innerHTML = '';
+      // Move all children back to #content
+      while (npContainer.firstChild) {
+        document.getElementById('content').appendChild(npContainer.firstChild);
+      }
+      document.getElementById('content').style.display = "inline-flex";
+      document.getElementById('content').style.height = "fit-content";
+      npContainer.style.display = "none";
+      return true;
+    }
+    return false;
+  }
+
+  function hideNowPlayingScreen() {
+    // If #content contains the np screen, move it to np-container and hide
+    const content = document.getElementById('content');
+    const npScreen = content.querySelector('#np');
+    if (npScreen) {
+      // Move all children to np-container
+      const npContainer = document.getElementById('np-container');
+      npContainer.innerHTML = '';
+      while (content.firstChild) {
+        npContainer.appendChild(content.firstChild);
+      }
+      npContainer.style.display = "none";
+      content.innerHTML = '';
+    }
   }
 </script>

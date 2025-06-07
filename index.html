@@ -1,45 +1,359 @@
-<script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" data-web-components async></script>
-<link href="style.css" rel="stylesheet" type="text/css" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="manifest" href="manifest.json">
-<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjQ0MjY0LCJleHAiOjE3NDkzMzA2NjQsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.b8F9gwxgIgB5Ptu_g4jOVLeiZuacQ1HIw1a7A5hMsGey-PDpIk7RSztldtoqMMpEahkxHjCIOINY1RsUpAZqeg" />
-<meta name="apple-music-app-name" content="TuneGram" />
-<meta name="apple-music-app-build" content="2.0.0" />
-<title>Authorize | TuneGram</title>
-<link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<div style="
-width: 100vw;
-height: 100vh;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;">
-<p id="auth" style="color:black;font-size:10vh;cursor:pointer;margin:0;" style="flex: 0 0 fit-content;" class="material-symbols-outlined">login</p>
-<p onclick="window.location.replace('app')" style="color:#396E80;cursor:pointer;flex: 0 0 fit-content;margin:0;font-size:25px">or <i>Preview</i></p>
-</div>
-<script>
-  document.addEventListener('musickitloaded', async function () {
-    try {
-      await MusicKit.configure({
-      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjQ0MjY0LCJleHAiOjE3NDkzMzA2NjQsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.b8F9gwxgIgB5Ptu_g4jOVLeiZuacQ1HIw1a7A5hMsGey-PDpIk7RSztldtoqMMpEahkxHjCIOINY1RsUpAZqeg',
-      app: {
-        name: 'TuneGram',
-        build: '2.0.0',
-      },
-      debug: true,
-      suppressErrorDialog: false
-   });
-   const music = MusicKit.getInstance();
-  document.getElementById('auth').addEventListener("click", async function(e) {
-    await music.authorize().then(() => {
-  window.location.replace('app');
-})
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" data-web-components async></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-music-developer-token"
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjUxMzIzLCJleHAiOjE3NDkzMzc3MjMsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.EmFyh6vW0VaqroFFkT9DBSODOdpAoiseholEjrSNk4w0gyxeojWuR_yrFfvQOPmiSsAdFwBxuy-Tjttsg--taw" />
+  <meta name="apple-music-app-name" content="TuneGram" />
+  <meta name="apple-music-app-build" content="2.0.0" />
+  <title>Authorize | TuneGram</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <style>
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 0;
+      padding: 0;
+    }
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 40%;
+      padding: 20px;
+    }
+
+    .title {
+      font-family: Ubuntu;
+      font-size: 2em;
+      font-weight: bold;
+      color: #396E80;
+    }
+
+    .body-text {
+      font-family: Ubuntu;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    .video {
+      width: 55%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    video {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 0
+    }
+
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 50vw;
+      margin: 0 auto;
+      background-color: #E3E1DB;
+      /* Match page background */
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-container {
+      min-width: 100%;
+      box-sizing: border-box;
+      border: 3px solid #396E80;
+      border-radius: 8px;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+      background-color: black;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    .carousel-dot.active {
+      background-color: #396E80;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        max-width: 100vw;
+        background-color: #E3E1DB;
+      }
+
+      .carousel {
+        max-width: 100vw;
+      }
+
+      .carousel-container {
+        border-width: 2px;
+      }
+
+      .carousel-dots {
+        justify-content: center;
+      }
+
+      #email-form {
+        align-items: flex-start;
+      }
+
+      .container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .left {
+        width: 90%;
+      }
+
+      .video {
+        width: 100%;
+        margin-top: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body style="background-color:#E3E1DB;display: block;margin:0;max-width:50vw;margin-right:auto;margin-left:auto;">
+
+  <p class="name title-font" style="text-align: center;width:100%">TuneGram</p>
+  <div class="body-text" style="font-size:1em; margin: 10px;text-align: center;">An Apple Music web client that serves
+    up music faster and more private than regular Apple Music.</div>
+  <br>
+  <div class="carousel">
+    <div class="carousel-track">
+      <div class="carousel-container">
+        <div class="container">
+          <div class="left">
+            <div class="title" style="color:#8DA8AD">Home Page</div>
+            <div class="body-text">Recommendations, current heavy rotation, albums, and playlists are all front and center once logged in.</div>
+          </div>
+          <div class="video">
+            <video autoplay muted playsinline>
+              <source src="/videos/hp.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="container">
+          <div class="left">
+            <div class="title" style="color:#8DA8AD">Search</div>
+            <div class="body-text">Search artists, lyrics, songs, albums, and more </div>
+          </div>
+          <div class="video">
+            <video autoplay muted playsinline>
+              <source src="/videos/search.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="container">
+          <div class="left">
+            <div class="title" style="color:#8DA8AD">Now Playing</div>
+            <div class="body-text">See or interface with what's on through now playing, and enjoy uninterrupted music while browsing.</div>
+          </div>
+          <div class="video">
+            <video autoplay muted playsinline>
+              <source src="/videos/np.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="container">
+          <div class="left">
+            <div class="title" style="color:#8DA8AD">Song View</div>
+            <div class="body-text">See in-depth details on a song by clicking the three dots.</div>
+          </div>
+          <div class="video">
+            <video autoplay muted playsinline>
+              <source src="/videos/refer.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="container">
+          <div class="left">
+            <div class="title" style="color:#8DA8AD">Preview Mode</div>
+            <div class="body-text">Non-subscribers can still experience TuneGram with the help of iTunes Previews.</div>
+          </div>
+          <div class="video">
+            <video autoplay muted playsinline>
+              <source src="/videos/theme.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-dots">
+      <div class="carousel-dot active"></div>
+      <div class="carousel-dot"></div>
+      <div class="carousel-dot"></div>
+      <div class="carousel-dot"></div>
+      <div class="carousel-dot"></div>
+    </div>
+  </div>
+  <div style="background-color: #8DA8AD; color: #2F3633; padding: 20px; margin-top: 20px; text-align: left;border-radius:8px;margin-bottom:20px">
+    <h2 id="account-heading" style="margin: 0; font-family: Ubuntu;">Ready to begin?</h2>
+    <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
+      <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer" onclick="window.location.replace('app')">enter Preview Mode</i></p>
+      <p style="font-size:.7em;margin:0">Note: Preview Mode has limited functionality and does not require an Apple Music subscription.</p>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    const $track = $('.carousel-track');
+    const $dots = $('.carousel-dot');
+    const $containers = $('.carousel-container');
+    let currentIndex = 0;
+    let isDragging = false;
+    let startX = 0;
+    let movementX = 0;
+
+    function updateCarousel(index) {
+      const width = $track.children().first().outerWidth();
+      $track.css('transform', `translateX(-${index * width}px)`);
+      $dots.removeClass('active').eq(index).addClass('active');
+      playOnlyCurrentVideo(index);
+    }
+
+    function playOnlyCurrentVideo(index) {
+      $containers.each(function (i) {
+        const video = $(this).find('video').get(0);
+        if (i === index) {
+          video.play();
+        } else {
+          video.pause();
+          video.currentTime = 0;
+        }
+      });
+    }
+
+    $dots.on('click', function () {
+      currentIndex = $(this).index();
+      updateCarousel(currentIndex);
+    });
+
+    $track.on('mousedown touchstart', function (event) {
+      isDragging = true;
+      startX = event.type === 'mousedown' ? event.pageX : event.originalEvent.touches[0].pageX;
+      movementX = 0;
+      $track.css('transition', 'none');
+    });
+
+    $(document).on('mousemove touchmove', function (event) {
+      if (!isDragging) return;
+      const currentX = event.type === 'mousemove' ? event.pageX : event.originalEvent.touches[0].pageX;
+      movementX = currentX - startX;
+      const width = $track.children().first().outerWidth();
+      $track.css('transform', `translateX(calc(-${currentIndex * width}px + ${movementX}px))`);
+    });
+
+    $(document).on('mouseup touchend', function () {
+      if (!isDragging) return;
+      isDragging = false;
+      $track.css('transition', 'transform 0.5s ease-in-out');
+      if (movementX > 50 && currentIndex > 0) {
+        currentIndex--;
+      } else if (movementX < -50 && currentIndex < $track.children().length - 1) {
+        currentIndex++;
+      }
+      updateCarousel(currentIndex);
+    });
+
+    // Advance carousel when video ends
+    $containers.each(function (i) {
+      const video = $(this).find('video').get(0);
+      video.addEventListener('ended', function () {
+        if (currentIndex < $containers.length - 1) {
+          currentIndex++;
+        } else {
+          currentIndex = 0;
+        }
+        updateCarousel(currentIndex);
+      });
+    });
+
+    // Pause all videos except the current one on load/resize
+    function handleResizeLoad() {
+      const isMobile = $(window).width() <= 768;
+      const $body = $('body');
+      const $heading = $('#account-heading');
+
+      if (isMobile) {
+        $body.css({ margin: '0 5vw', maxWidth: '100vw' });
+        $heading.css('fontSize', '1.5em');
+      } else {
+        $body.css({ margin: '0 auto', maxWidth: '50vw' });
+        $heading.css('fontSize', '2em');
+      }
+      playOnlyCurrentVideo(currentIndex);
+    }
+
+    $(window).on('resize load', handleResizeLoad);
+
+    $(window).on('load', function () {
+      $track.css('cursor', 'grab');
+      playOnlyCurrentVideo(currentIndex);
+    });
+
+    document.addEventListener('musickitloaded', async function () {
+      try {
+        await MusicKit.configure({
+          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjUxMzIzLCJleHAiOjE3NDkzMzc3MjMsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.EmFyh6vW0VaqroFFkT9DBSODOdpAoiseholEjrSNk4w0gyxeojWuR_yrFfvQOPmiSsAdFwBxuy-Tjttsg--taw',
+          app: {
+            name: 'TuneGram',
+            build: '2.0.0',
+          },
+          debug: true,
+          suppressErrorDialog: false
+        });
+        const music = MusicKit.getInstance();
+        document.getElementById('auth').addEventListener("click", async function (e) {
+          await music.authorize().then(() => {
+            window.location.replace('app');
+          })
         });
 
-    } catch (err) {
-    console.log(err)
-  }
-  })
-</script>
+      } catch (err) {
+        console.log(err)
+      }
+    })
+  </script>
+</body>
+
+</html>
