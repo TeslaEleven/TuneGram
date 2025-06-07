@@ -1,14 +1,16 @@
 {
-  "name": "TuneGram",
+  "name": "TuneGram for Apple Music",
   "short_name": "TuneGram",
-  "display": "standalone",
-  "scope": "/",
+  "description": "Faster, more private Apple Music client.",
   "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E3E1DB",
+  "theme_color": "#2F3633",
   "icons": [
     {
-      "src": "favicon.png",
-      "sizes": "1982x1982",
-      "type": "image/png"
+      "src": "/favicon.png",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
     }
   ]
 }
