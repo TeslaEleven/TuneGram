@@ -192,7 +192,7 @@ body {
       font-size:200%;
       overflow: hidden;
       display: -webkit-box;
-      -webkit-line-clamp: 2; /* number of lines to show */
+      -webkit-line-clamp: 2;
               line-clamp: 2; 
       -webkit-box-orient: vertical;
       text-overflow: ellipsis;
@@ -200,7 +200,7 @@ body {
     #info-album {
       overflow: hidden;
       display: -webkit-box;
-      -webkit-line-clamp: 3; /* number of lines to show */
+      -webkit-line-clamp: 3;
               line-clamp: 3; 
       -webkit-box-orient: vertical;
       text-overflow: ellipsis;

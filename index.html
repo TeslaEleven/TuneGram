@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="manifest" href="manifest.json">
-<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjUxMzIzLCJleHAiOjE3NDkzMzc3MjMsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.EmFyh6vW0VaqroFFkT9DBSODOdpAoiseholEjrSNk4w0gyxeojWuR_yrFfvQOPmiSsAdFwBxuy-Tjttsg--taw" />
+<meta name="apple-music-developer-token" content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjQ0MjY0LCJleHAiOjE3NDkzMzA2NjQsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.b8F9gwxgIgB5Ptu_g4jOVLeiZuacQ1HIw1a7A5hMsGey-PDpIk7RSztldtoqMMpEahkxHjCIOINY1RsUpAZqeg" />
 <meta name="apple-music-app-name" content="TuneGram" />
 <meta name="apple-music-app-build" content="2.0.0" />
 <title>Authorize | TuneGram</title>
@@ -17,13 +17,13 @@ flex-direction: column;
 justify-content: center;
 align-items: center;">
 <p id="auth" style="color:black;font-size:10vh;cursor:pointer;margin:0;" style="flex: 0 0 fit-content;" class="material-symbols-outlined">login</p>
-<p onclick="window.location.replace('app')" style="color:rgb(255, 68, 0);cursor:pointer;flex: 0 0 fit-content;margin:0;font-size:25px">or <i>Preview</i></p>
+<p onclick="window.location.replace('app')" style="color:#396E80;cursor:pointer;flex: 0 0 fit-content;margin:0;font-size:25px">or <i>Preview</i></p>
 </div>
 <script>
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjUxMzIzLCJleHAiOjE3NDkzMzc3MjMsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.EmFyh6vW0VaqroFFkT9DBSODOdpAoiseholEjrSNk4w0gyxeojWuR_yrFfvQOPmiSsAdFwBxuy-Tjttsg--taw',
+      developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MjQ0MjY0LCJleHAiOjE3NDkzMzA2NjQsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.b8F9gwxgIgB5Ptu_g4jOVLeiZuacQ1HIw1a7A5hMsGey-PDpIk7RSztldtoqMMpEahkxHjCIOINY1RsUpAZqeg',
       app: {
         name: 'TuneGram',
         build: '2.0.0',
