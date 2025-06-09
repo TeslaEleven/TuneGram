@@ -8,9 +8,10 @@
   <link href="style.css" rel="stylesheet" type="text/css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" type="image/x-icon" href="favicon.png">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MzMzMDM1LCJleHAiOjE3NTEwNjEwMzUsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.6xhnhCnN0xkl59-C-58MILBnDMUAtBAkMt1C9z2merFMb9JAoVJF40JTB95Zo0jp2fCZdlKvUoxlZYzLsSwzJw" />
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDE3NDIyLCJleHAiOjE3NDk1MDM4MjIsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.AAWbOGBTrMqDh5Q36AsdiBL19cC5b8S9LWGE4UOH8LPgnZuRqOTncyY5h214XAX3bxlBWqufcnusz8zb_jpTrw" />
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.0.0" />
   <title>Authorize | TuneGram</title>
@@ -157,7 +158,8 @@
         <div class="container">
           <div class="left">
             <div class="title" style="color:#8DA8AD">Home Page</div>
-            <div class="body-text">Recommendations, current heavy rotation, albums, and playlists are all front and center once logged in.</div>
+            <div class="body-text">Recommendations, current heavy rotation, albums, and playlists are all front and
+              center once logged in.</div>
           </div>
           <div class="video">
             <video autoplay muted playsinline>
@@ -183,7 +185,8 @@
         <div class="container">
           <div class="left">
             <div class="title" style="color:#8DA8AD">Now Playing</div>
-            <div class="body-text">See or interface with what's on through now playing, and enjoy uninterrupted music while browsing.</div>
+            <div class="body-text">See or interface with what's on through now playing, and enjoy uninterrupted music
+              while browsing.</div>
           </div>
           <div class="video">
             <video autoplay muted playsinline>
@@ -200,7 +203,7 @@
           </div>
           <div class="video">
             <video autoplay muted playsinline>
-              <source src="/videos/refer.mp4" type="video/mp4">
+              <source src="/videos/sv.mp4" type="video/mp4">
             </video>
           </div>
         </div>
@@ -213,7 +216,7 @@
           </div>
           <div class="video">
             <video autoplay muted playsinline>
-              <source src="/videos/theme.mp4" type="video/mp4">
+              <source src="/videos/pm.mp4" type="video/mp4">
             </video>
           </div>
         </div>
@@ -227,11 +230,14 @@
       <div class="carousel-dot"></div>
     </div>
   </div>
-  <div style="background-color: #8DA8AD; color: #2F3633; padding: 20px; margin-top: 20px; text-align: left;border-radius:8px;margin-bottom:20px">
+  <div
+    style="background-color: #8DA8AD; color: #2F3633; padding: 20px; margin-top: 20px; text-align: left;border-radius:8px;margin-bottom:20px">
     <h2 id="account-heading" style="margin: 0; font-family: Ubuntu;">Ready to begin?</h2>
     <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
-      <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer" onclick="window.location.replace('app')">enter Preview Mode</i></p>
-      <p style="font-size:.7em;margin:0">Note: Preview Mode has limited functionality and does not require an Apple Music subscription.</p>
+      <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer"
+          onclick="window.location.replace('app')">enter Preview Mode</i></p>
+      <p style="font-size:.7em;margin:0">Note: Preview Mode has limited functionality and does not require an Apple
+        Music subscription.</p>
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -334,7 +340,7 @@
     document.addEventListener('musickitloaded', async function () {
       try {
         await MusicKit.configure({
-          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MzMzMDM1LCJleHAiOjE3NTEwNjEwMzUsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.6xhnhCnN0xkl59-C-58MILBnDMUAtBAkMt1C9z2merFMb9JAoVJF40JTB95Zo0jp2fCZdlKvUoxlZYzLsSwzJw',
+          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDE3NDIyLCJleHAiOjE3NDk1MDM4MjIsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.AAWbOGBTrMqDh5Q36AsdiBL19cC5b8S9LWGE4UOH8LPgnZuRqOTncyY5h214XAX3bxlBWqufcnusz8zb_jpTrw',
           app: {
             name: 'TuneGram',
             build: '2.0.0',

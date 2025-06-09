@@ -13,9 +13,11 @@
   <link
     href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/colorthief@2.3.2/dist/color-thief.umd.js"></script>
+
   <link rel="manifest" href="manifest.json">
   <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MzMzMDM1LCJleHAiOjE3NTEwNjEwMzUsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.6xhnhCnN0xkl59-C-58MILBnDMUAtBAkMt1C9z2merFMb9JAoVJF40JTB95Zo0jp2fCZdlKvUoxlZYzLsSwzJw" />
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDE3NDIyLCJleHAiOjE3NDk1MDM4MjIsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.AAWbOGBTrMqDh5Q36AsdiBL19cC5b8S9LWGE4UOH8LPgnZuRqOTncyY5h214XAX3bxlBWqufcnusz8zb_jpTrw" />
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.0.0" />
   <link rel="stylesheet"
@@ -86,6 +88,9 @@
   var heavyToCount = 0;
   var toDrawHeavy = ""
   var heavyProcessed = 0;
+  var toDrawRecs = "";
+  var recsProcessed = 0;
+  var recsToCount = 0;
   function boundToString(rect) {
     return `rect(w=${rect.width}, h=${rect.height})`;
   }
@@ -96,27 +101,25 @@
     document.getElementById('content').style.height = "87.5vh";
   })
   function loadContent(page) {
-    // If navigating away from np, hide it
     if (page !== "np" && page !== "np-header") {
       hideNowPlayingScreen();
     }
-    // If navigating to np, restore if possible
     if (page === "np" || page === "np-header") {
       if (showNowPlayingScreen()) {
-        // Don't reload np.html if we restored it
-        // Update header button styles as usual
         if (page == "np-header") {
           npId = "viewonly"
-          document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
-          document.querySelector('#np-btn').style.color = "#E3E1DB";
+          document.querySelector('#np-btn').style.color = "#396E80";
           document.querySelector('#srch-btn').style.color = "#2F3633";
-          document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
         }
         if (page == "np") {
-          document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
-          document.querySelector('#np-btn').style.color = "#E3E1DB";
+          document.querySelector('#np-btn').style.color = "#396E80";
           document.querySelector('#srch-btn').style.color = "#2F3633";
-          document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
+        }
+        // Always add blue border if artwork is present and on np tab
+        const npBtn = document.getElementById('np-btn');
+        const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
+        if (img && img.src && !img.src.endsWith('fallback.svg')) {
+          img.classList.add('np-artwork-active');
         }
         return;
       }
@@ -126,29 +129,29 @@
     document.getElementById('content').style.display = "inline-flex";
 
     if (page == "srch") {
-      document.querySelector('#srch-btn').style.backgroundColor = "#2F3633";
-      document.querySelector('#srch-btn').style.color = "#E3E1DB";
+      document.querySelector('#srch-btn').style.color = "#396E80";
       document.querySelector('#np-btn').style.color = "#2F3633";
-      document.querySelector('#np-btn').style.backgroundColor = "#E3E1DB";
+      // Remove blue border if not on np tab
+      const npBtn = document.getElementById('np-btn');
+      const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
+      if (img) img.classList.remove('np-artwork-active');
     }
-    if (page == "np-header") {
-      npId = "viewonly"
-      document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
-      document.querySelector('#np-btn').style.color = "#E3E1DB";
+    if (page == "np-header" || page == "np") {
+      document.querySelector('#np-btn').style.color = "#396E80";
       document.querySelector('#srch-btn').style.color = "#2F3633";
-      document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
-    }
-    if (page == "np") {
-      document.querySelector('#np-btn').style.backgroundColor = "#2F3633";
-      document.querySelector('#np-btn').style.color = "#E3E1DB";
-      document.querySelector('#srch-btn').style.color = "#2F3633";
-      document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
+      const npBtn = document.getElementById('np-btn');
+      const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
+      if (img && img.src && !img.src.endsWith('fallback.svg')) {
+        img.classList.add('np-artwork-active');
+      }
     }
     if (page == "nap") {
       document.querySelector('#srch-btn').style.color = "#2F3633";
-      document.querySelector('#srch-btn').style.backgroundColor = "#E3E1DB";
       document.querySelector('#np-btn').style.color = "#2F3633";
-      document.querySelector('#np-btn').style.backgroundColor = "#E3E1DB";
+      // Remove blue border if not on np tab
+      const npBtn = document.getElementById('np-btn');
+      const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
+      if (img) img.classList.remove('np-artwork-active');
     }
   }
   const listenSearch = document.createEvent("CustomEvent");
@@ -165,7 +168,7 @@
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5MzMzMDM1LCJleHAiOjE3NTEwNjEwMzUsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.6xhnhCnN0xkl59-C-58MILBnDMUAtBAkMt1C9z2merFMb9JAoVJF40JTB95Zo0jp2fCZdlKvUoxlZYzLsSwzJw',
+        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDE3NDIyLCJleHAiOjE3NDk1MDM4MjIsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.AAWbOGBTrMqDh5Q36AsdiBL19cC5b8S9LWGE4UOH8LPgnZuRqOTncyY5h214XAX3bxlBWqufcnusz8zb_jpTrw',
         app: {
           name: 'TuneGram',
           build: '2.0.0',
@@ -210,7 +213,24 @@
         })
       }
       async function infoDo(id) {
-        if (id.startsWith('p')) {
+        if (id.startsWith('pl')) {
+          await music.api.music(`/v1/catalog/${storefront}/playlists/${id}`, queryParameters).then(async (res) => {
+            var plist = res.data.data;
+            plist.forEach(drawInfo);
+            console.log(res);
+            await music.api.music(`/v1/catalog/${storefront}/playlists/${id}/tracks`, queryParameters).then((res) => {
+              var tracks = res.data.data;
+              tracks.forEach(appendTracks);
+            }).catch(err => {
+              console.log(err);
+              if (err) {
+                console.error(err);
+                ["n/a"].forEach(appendTracks);
+              }
+            });
+          });
+        }
+        if (id.startsWith('p') && !id.startsWith('pl')) {
           await music.api.music('/v1/me/library/playlists/' + id, queryParameters).then(async (res) => {
             var plist = res.data.data;
             plist.forEach(drawInfo)
@@ -282,6 +302,8 @@
           targetPractice = "#bigcards"
         } else if (methodType == "playlist") {
           targetPractice = "#smallcards"
+        } else if (methodType == "recs") {
+          targetPractice = "#rec-cards"
         }
         htmx.ajax('GET', 'seemore.html', { target: targetPractice, swap: 'afterend' })
       }
@@ -307,18 +329,17 @@
           var rawMethod = methodType;
           var chosenFunc = "";
           var methodUrl = ""
+          var offSet = document.querySelector(targetPractice).children.length;
           if (rawMethod == "heavy") {
             methodUrl = "/v1/me/history/heavy-rotation";
             chosenFunc = drawHeavy;
           } else if (rawMethod == "album") {
             methodUrl = "/v1/me/library/albums";
             chosenFunc = drawAlbums;
-          } else {
+          } else if (rawMethod == "playlist") {
             methodUrl = "/v1/me/library/playlists";
             chosenFunc = drawPlists;
-
           }
-          var offSet = document.querySelector(targetPractice).children.length;
           const greaterAlbums = await music.api.music(methodUrl, { offset: offSet }).then((data) => {
             if (data.data) {
               var res = data.data.data;
@@ -379,8 +400,13 @@
               await music.setQueue({ songs: songId, startPlaying: true })
               loadVisuals(music.queue.items, e.detail)
             } else {
-              loadVisuals(music.queue.items, music.queue.currentItem.id);
-              (music.queue.items).forEach(appendTracks)
+              if (music.queue.currentItem) {
+                loadVisuals(music.queue.items, music.queue.currentItem.id);
+                (music.queue.items).forEach(appendTracks)
+                updateHighlightedTrack();
+              } else {
+                ["n/a"].forEach(appendTracks)
+              }
             }
           }
         }, false);
@@ -405,7 +431,13 @@
       }, false);
       music.addEventListener('nowPlayingItemDidChange', ({ item }) => {
         if (item !== undefined) {
+          let artworkUrl = '';
+          if (item.attributes && item.attributes.artwork) {
+            artworkUrl = MusicKit.formatArtworkURL(item.attributes.artwork, 96, 96);
+          }
+          updateNpBtnArtwork(artworkUrl);
           loadVisuals(queue, item.id)
+          updateHighlightedTrack();
         }
       });
       music.addEventListener('queueItemsDidChange', ({ item }) => {
@@ -419,10 +451,12 @@
           var queueItems = music.queue.items;
           hiItsQue = true;
           var root = songPlaying.attributes;
-          var art = ""
+          var art = "";
+          var bgColor = "#396E80";
           if (root.artwork) {
             if (root.artwork.url) {
               art = MusicKit.formatArtworkURL(root.artwork, 500, 500);
+              bgColor = getBgColor(art)
             }
           } else {
             art = "fallback.svg"
@@ -445,19 +479,20 @@
             console.log('Found a parenthesis or bracket in the album name: ' + name);
             root.albumName = (root.albumName).split('(')[0].split('[')[0].trim();
           }
-          document.getElementById('plpa-btn').setAttribute('onclick', `pausePlay('${id}', 'pp')`)
-          document.getElementById('rewind-btn').setAttribute('onclick', `pausePlay('na', 're')`)
-          document.getElementById('ff-btn').setAttribute('onclick', `pausePlay('na', 'ff')`)
-          document.getElementById('info-title').innerHTML = root.name
-          document.getElementById('info-artist').innerHTML = root.artistName
-          document.getElementById('info-album').innerHTML = root.albumName
-          document.getElementById('info-img').src = art
-          document.getElementById('info-details').innerHTML = detailSubheading;
+          document.querySelector('#np #plpa-btn').setAttribute('onclick', `pausePlay('${id}', 'pp')`)
+          document.querySelector('#np #rewind-btn').setAttribute('onclick', `pausePlay('na', 're')`)
+          document.querySelector('#np #ff-btn').setAttribute('onclick', `pausePlay('na', 'ff')`)
+          document.querySelector('#info-wrapper-np #info-title').innerHTML = root.name
+          document.querySelector('#info-wrapper-np #info-artist').innerHTML = root.artistName
+          document.querySelector('#info-wrapper-np #info-album').innerHTML = root.albumName
+          document.querySelector('#np #info-img').src = art
+          document.querySelector('#np #info-img').style.border = `3px solid ${bgColor}`;
+          document.querySelector('#info-wrapper-np #info-details').innerHTML = detailSubheading;
         } else {
-          document.querySelector('#np #info-title').innerHTML = 'Not Playing';
-          document.querySelector('#np #info-artist').innerHTML = '';
-          document.querySelector('#np #info-album').innerHTML = '';
-          document.querySelector('#np img').src = 'fallback.svg';
+          document.querySelector('#info-wrapper-np #info-title').innerHTML = 'Not Playing';
+          document.querySelector('#info-wrapper-np #info-artist').innerHTML = '';
+          document.querySelector('#info-wrapper-np #info-album').innerHTML = '';
+          document.querySelector('#np #info-img').src = 'fallback.svg';
         }
       }
       function converter(millis) {
@@ -488,7 +523,7 @@
           var idIcon = "play_arrow";
           var html = ` <tr>
             <td class="material-symbols-outlined general-music-control" onclick="musicPlay('${id}', '${art}')">${idIcon}</td>
-            <td>${title}</td>
+            <td class="song-title">${title}</td>
             <td>${converter(runtime)}</td>`
           if (music.isAuthorized) {
             document.getElementById('tracklist').innerHTML = `
@@ -498,7 +533,7 @@
   <th class="labels">Queue</th>`
             html += `<td class="material-symbols-outlined general-music-control" onclick="playNextOrLast('${id}', 'next')">queue_play_next</td>
             <td class="material-symbols-outlined general-music-control" onclick="playNextOrLast('${id}', 'later')">add_to_queue</td>
-        </tr>`
+            </tr>`
           } else {
             html += "</tr>"
           }
@@ -510,10 +545,19 @@
           toDrawTracks += html
           if (tracksProcessed == tracksToCount && tracksProcessed !== 0) {
             document.querySelector('#tracklist').innerHTML += toDrawTracks;
+            if (document.querySelectorAll('.queue-trklst tr').length > 1) {
+              document.querySelectorAll('.queue-trklst tr')[1].classList.add('playing');
+            }
             tracksProcessed = 0;
             toDrawTracks = "";
             document.getElementById('infobox').classList.remove('skeleton-page')
           }
+        }
+      }
+      function updateHighlightedTrack() {
+        if (queue && music.queue.position !== undefined) {
+          document.querySelectorAll('.queue-trklst tr').forEach(tr => tr.classList.remove('playing'));
+          document.querySelectorAll('.queue-trklst tr')[music.queue.position + 1].classList.add('playing');
         }
       }
       function drawInfo(item, index, array) {
@@ -521,8 +565,14 @@
         var cover = "fallback.svg";
         var sub = ""
         var subsub = ""
+        var bgColor = "#396E80";
         if (item.attributes.artwork) {
-          cover = MusicKit.formatArtworkURL(item.attributes.artwork, 1200, 1200);
+          if (item.attributes.artwork.url) {
+            cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+            bgColor = getBgColor(cover)
+          }
+        } else {
+          cover = "fallback.svg"
         }
         if (item.attributes.artistName) {
           sub = item.attributes.artistName;
@@ -547,11 +597,13 @@
         document.querySelector('#info-title').innerHTML = item.attributes.name;
         document.querySelector('#info-year').innerHTML = subsub;
         document.querySelector('#info-artist').innerHTML = sub;
-        document.querySelector('#info-img').src = cover;
+        document.querySelector('#info #info-img').src = cover;
         document.querySelector("#info-details").innerHTML = detailSubheading;
+        document.querySelector('#info #info-img').style.border = `3px solid ${bgColor}`;
+        document.querySelector("#play-all").setAttribute('onclick', `playAll('${item.id}')`);
       }
       async function loadLibrary() {
-        if (!sessionStorage.getItem('plistStorage') || !sessionStorage.getItem('albumStorage') || !sessionStorage.getItem('heavyStorage')) {
+        if (!sessionStorage.getItem('plistStorage') || !sessionStorage.getItem('albumStorage') || !sessionStorage.getItem('heavyStorage') || !sessionStorage.getItem('recStorage')) {
           const greaterAlbums = await music.api.music('/v1/me/library/albums').then((data) => {
             if (data.data) {
               var albums = data.data.data
@@ -565,6 +617,15 @@
           const plists = await music.api.music('/v1/me/library/playlists').then(async (data) => {
             var plists = data.data.data
             plists.forEach(drawPlists)
+          })
+          const recs = await music.api.music('/v1/me/recommendations').then(async (data) => {
+            var parentData = data.data.data
+            var num = Math.random() * parentData.length | 0
+            var recs = parentData[num].relationships.contents.data;
+            var attrs = parentData[num].attributes.title.stringForDisplay;
+            recs.forEach(drawRecs)
+            document.querySelector("#rec-heading").innerHTML = attrs;
+            sessionStorage.setItem("rec-heading-innerhtml", document.querySelector("#rec-heading").innerHTML);
           })
         } else {
           drawBoth()
@@ -583,11 +644,67 @@
           document.getElementById('plpa-btn').innerHTML = "play_arrow"
         }
       });
+
+      window.playAll = async function (id) {
+        let isLibrary = (id.startsWith('p') && !id.startsWith('pl')) || id.startsWith('i');
+        let isPlaylist = id.startsWith('pl') || (isLibrary && id.startsWith('p'));
+        let isAlbum = !isPlaylist && (id.startsWith('a') || id.startsWith('i')) || /^\d/.test(id);
+        let albumApiUrl = isAlbum ? `/v1/catalog/${storefront}/albums/${id}` : `/v1/me/library/albums/${id}`;
+        let playlistApiUrl = isPlaylist ? `/v1/catalog/${storefront}/playlists/${id}` : `/v1/me/library/playlists/${id}`;
+        let apiUrl = isPlaylist ? playlistApiUrl : albumApiUrl;
+        let albumRes = await music.api.music(apiUrl, { l: 'en-us' });
+        let albumData = albumRes?.data?.data?.[0];
+        if (!albumData || !albumData.relationships || !albumData.relationships.tracks || !albumData.relationships.tracks.data) return;
+        let tracks = albumData.relationships.tracks.data;
+        let ids = [];
+        for (let track of tracks) {
+          if (track.attributes?.playParams?.reportingId) {
+            ids.push(track.attributes.playParams.reportingId);
+          } else if (track.id) {
+            ids.push(track.id);
+          }
+        }
+        ids = ids.filter(Boolean);
+        if (!ids.length) return;
+        loadContent('np');
+        htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" });
+        await music.setQueue({ songs: ids, startPlaying: true });
+        queue = music.queue.items;
+      }
+
     } catch (err) {
       console.error(err)
     }
   });
   document.querySelectorAll('#content')[0].style.display = "block";
+  function drawRecs(item, index, array) {
+    recsToCount = array.length;
+    var cover = "";
+    if (item.attributes.artwork) {
+      cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
+    } else if (!item.attributes.artwork && item.attributes.artistName) {
+      return;
+    }
+    var subheading = "";
+    if (item.attributes.artistName) {
+      subheading = item.attributes.artistName;
+    } else {
+      var date = new Date(item.attributes.lastModifiedDate);
+      var edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
+      subheading = `Edited: ${edited}`;
+    }
+    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading></card>`
+    recsProcessed++
+    toDrawRecs += card
+    if (recsProcessed == recsToCount && recsProcessed !== 0) {
+      document.querySelector('#rec-cards').innerHTML += toDrawRecs
+      var setStorageStr = toDrawRecs;
+      if (sessionStorage.getItem('recStorage')) {
+        setStorageStr = sessionStorage.getItem('recStorage') + toDrawRecs;
+      }
+      sessionStorage.setItem('recStorage', setStorageStr)
+    }
+  }
   function drawAlbums(item, index, array) {
     albumsToCount = array.length
     if (item.attributes.url) {
@@ -733,6 +850,8 @@
     document.querySelector('#bigcards').innerHTML = sessionStorage.getItem('albumStorage')
     document.querySelector('#heavycards').innerHTML = sessionStorage.getItem('heavyStorage')
     document.querySelector('#smallcards').innerHTML = sessionStorage.getItem('plistStorage')
+    document.querySelector('#rec-cards').innerHTML = sessionStorage.getItem('recStorage')
+    document.querySelector("#rec-heading").innerHTML = sessionStorage.getItem("rec-heading-innerhtml");
   }
   function drawPlists(item, index, array) {
     plistsToCount = array.length
@@ -808,11 +927,9 @@
   }
 
   function showNowPlayingScreen() {
-    // If np-container has content, move it back to #content and show
     const npContainer = document.getElementById('np-container');
     if (npContainer.childElementCount > 0) {
       document.getElementById('content').innerHTML = '';
-      // Move all children back to #content
       while (npContainer.firstChild) {
         document.getElementById('content').appendChild(npContainer.firstChild);
       }
@@ -825,11 +942,9 @@
   }
 
   function hideNowPlayingScreen() {
-    // If #content contains the np screen, move it to np-container and hide
     const content = document.getElementById('content');
     const npScreen = content.querySelector('#np');
     if (npScreen) {
-      // Move all children to np-container
       const npContainer = document.getElementById('np-container');
       npContainer.innerHTML = '';
       while (content.firstChild) {
@@ -837,6 +952,42 @@
       }
       npContainer.style.display = "none";
       content.innerHTML = '';
+    }
+  }
+
+  function getBgColor(url) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+    try {
+      const colorThief = new ColorThief();
+      const [r, g, b] = colorThief.getColor(img);
+      return `rgb(${r}, ${g}, ${b})`
+    } catch (err) {
+      return 'Failed to extract color: ' + err.message
+    }
+  }
+
+  function updateNpBtnArtwork(artworkUrl) {
+    const npBtn = document.getElementById('np-btn');
+    if (!npBtn) return;
+    let img = npBtn.querySelector('.np-artwork-img');
+    let icon = npBtn.querySelector('.material-symbols-outlined');
+    if (artworkUrl && artworkUrl !== 'fallback.svg') {
+      if (!img) {
+        img = document.createElement('img');
+        img.className = 'np-artwork-img';
+        if (icon) icon.style.display = 'none';
+        npBtn.appendChild(img);
+      }
+      img.src = artworkUrl;
+      img.style.display = 'block';
+      if (icon) icon.style.display = 'none';
+      npBtn.classList.add('active');
+    } else {
+      if (img) img.style.display = 'none';
+      if (icon) icon.style.display = 'block';
+      npBtn.classList.remove('active');
     }
   }
 </script>
