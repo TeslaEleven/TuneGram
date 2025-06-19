@@ -142,7 +142,7 @@ apple-music-progress {
   margin: 0;
   flex: 0 1 auto;
   position: fixed;
-  background-image: linear-gradient(#2F3633, #E3E1DB);
+  background-image: linear-gradient(#8DA8AD, transparent);
   z-index: 1000;
 }
 
