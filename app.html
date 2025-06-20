@@ -34,7 +34,7 @@
   <div class="header" style="height:82px">
     <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
       hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
-      <p class="name title-font">TuneGram</p>
+      <p class="name title-font adaptive-text">TuneGram</p>
     </div>
     <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np-header')"
       hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap:1s">
@@ -990,4 +990,31 @@
       npBtn.classList.remove('active');
     }
   }
+  
+function getBackgroundColor(el) {
+  while (el) {
+    const bg = window.getComputedStyle(el).backgroundColor;
+    if (bg && bg !== '#2F3633' && bg !== 'transparent') {
+      return bg;
+    }
+    el = el.parentElement;
+  }
+  return '#E3E1DB';
+}
+
+function getLuminance(rgb) {
+  const [r, g, b] = rgb.match(/\d+/g).map(Number).map(v => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow(((v + 0.055) / 1.055), 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function adaptTextColor(el) {
+  const bg = getBackgroundColor(el);
+  const luminance = getLuminance(bg);
+  el.classList.add(luminance > 0.5 ? 'text-black' : 'text-white');
+}
+
+document.querySelectorAll('.adaptive-text').forEach(adaptTextColor);
 </script>
