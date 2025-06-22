@@ -572,7 +572,10 @@
       function loadLyrics() {
         var songName = music.queue.currentItem ? music.queue.currentItem.attributes.name : '';
         var artistName = music.queue.currentItem ? music.queue.currentItem.attributes.artistName : '';
-        if (songName && artistName) {
+        var albumName = music.queue.currentItem ? music.queue.currentItem.attributes.albumName : ''; 
+        var dur = music.queue.currentItem ? music.queue.currentItem.attributes.durationInMillis : '';
+        if (songName && artistName && albumName && dur) {
+          var duration = dur / 1000;
           document.querySelector('#lyrics').innerHTML = '<p>Loading lyrics...</p>';
           const cover = document.querySelector('#np #info-img').src;
           getImageColors(cover).then(({ bgColor, contrastColor }) => {
@@ -580,6 +583,7 @@
             bgColor = bgColor || "#396E80";
             contrastColor = contrastColor || "#E3E1DB";
             document.querySelector('#lyrics').style.backgroundColor = bgColor;
+            document.querySelector('#lyrics').style.color = contrastColor;
             const sheet = document.styleSheets[0];
             for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
               if (sheet.cssRules[i].selectorText === '.lyric-line' ||
@@ -590,7 +594,7 @@
             document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; }`, 0);
             document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; }`, 0);
           });
-          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
+          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}&album_name=${encodeURIComponent(albumName)}&duration=${encodeURIComponent(duration)}`)
             .then(response => response.json())
             .then(data => {
               if (data.instrumental == false && (data.plainLyrics || data.syncedLyrics)) {
