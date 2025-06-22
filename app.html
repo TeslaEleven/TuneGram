@@ -536,8 +536,8 @@
             <td class="song-title">${title}</td>
             <td>${converter(runtime)}</td>`
           queuecontrols: if (music.isAuthorized) {
-            if(document.querySelector("#np")) {
-              if(document.querySelector("#np").style.display !== "none") {
+            if (document.querySelector("#np")) {
+              if (((document.querySelector("#np").parentElement).parentElement).getAttribute("id") !== "np-container") {
                 break queuecontrols;
               }
             }
@@ -580,7 +580,14 @@
             bgColor = bgColor || "#396E80";
             contrastColor = contrastColor || "#E3E1DB";
             document.querySelector('#lyrics').style.backgroundColor = bgColor;
-            document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; }`, 0);
+            const sheet = document.styleSheets[0];
+            for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
+              if (sheet.cssRules[i].selectorText === '.lyric-line' ||
+                sheet.cssRules[i].selectorText === '.lyric-line.highlight') {
+                sheet.deleteRule(i);
+              }
+            }
+            document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; }`, 0);
             document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; }`, 0);
           });
           fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
@@ -642,27 +649,27 @@
                   }
 
                   let lastBreakIdx = -1;
+                  let glowAnimationFrame = null;
 
                   function stopPulse() {
-                    if (pulseFrame) cancelAnimationFrame(pulseFrame);
+                    if (glowAnimationFrame) cancelAnimationFrame(glowAnimationFrame);
                     document.querySelectorAll('.lyric-break-note').forEach(note => {
                       note.style.opacity = 0.5;
                       note.style.filter = 'brightness(1)';
                     });
                   }
 
-                  function glowNote(note, breakStart, breakEnd) {
-                    if (pulseFrame) cancelAnimationFrame(pulseFrame);
-                    function animate() {
+                  function animateGlow(note, breakStart, breakEnd) {
+                    function step() {
                       const now = music.currentPlaybackTime;
                       const progress = Math.max(0, Math.min(1, (now - breakStart) / (breakEnd - breakStart)));
                       note.style.opacity = 0.5 + 0.5 * progress;
                       note.style.filter = `brightness(${1 + progress})`;
                       if (progress < 1 && now < breakEnd) {
-                        pulseFrame = requestAnimationFrame(animate);
+                        glowAnimationFrame = requestAnimationFrame(step);
                       }
                     }
-                    animate();
+                    step();
                   }
 
                   function highlightCurrentLine() {
@@ -689,13 +696,17 @@
                     }
 
                     lyricLines.forEach(line => line.classList.remove('highlight'));
-                    stopPulse();
 
                     if (breakIdx !== -1) {
-                      const note = lyricLines[breakIdx].querySelector('.lyric-break-note');
-                      if (note) glowNote(note, breakStart, breakEnd);
-                      lastBreakIdx = breakIdx;
+                      lyricLines[breakIdx].classList.add('highlight');
+                      if (breakIdx !== lastBreakIdx) {
+                        stopPulse();
+                        const note = lyricLines[breakIdx].querySelector('.lyric-break-note');
+                        if (note) animateGlow(note, breakStart, breakEnd);
+                        lastBreakIdx = breakIdx;
+                      }
                     } else {
+                      if (lastBreakIdx !== -1) stopPulse();
                       lastBreakIdx = -1;
                     }
 
@@ -1246,10 +1257,12 @@
           }
         }
 
-        if (bgColor === contrastColor) {
+        if (bgColor[0] === contrastColor[0] &&
+          bgColor[1] === contrastColor[1] &&
+          bgColor[2] === contrastColor[2]) {
           contrastColor = bgColor.map(c => c < 128 ? c + 50 : c - 50);
         }
-        const contrastRgbStr = `rgb(${contrastColor.map(x => Math.ceil(x)).join(",")})`;
+        var contrastRgbStr = `rgb(${contrastColor.map(x => Math.ceil(x)).join(",")})`;
         if (bgColor[0] === 0 && bgColor[1] === 0 && bgColor[2] === 0) {
           bgRgbStr = "#396E80";
         }
@@ -1269,6 +1282,7 @@
       imgEl.src = imgUrl;
     });
   }
+
   function updateNpBtnArtwork(artworkUrl) {
     const npBtn = document.getElementById('np-btn');
     if (!npBtn) return;
