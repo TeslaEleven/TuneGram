@@ -13,13 +13,12 @@
   <link
     href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/colorthief@2.3.2/dist/color-thief.umd.js"></script>
 
   <link rel="manifest" href="manifest.json">
   <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDI5OTgxLCJleHAiOjE3NTExNTc5ODEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.N-3LLcJDLmZfX9r-CYw68afcGsttfTHDww4-5Dmqa3Tzdlj7n-yFmIMOBpyQqaBm3R7aSViOhQ4y2Hzx7rZowg" />
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUwNTEzNTI5LCJleHAiOjE3NTA1OTk5MjksIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.GtG2R1bCaAwOzwIhX6VJRZ2Xx106wx1QEmhWxlDxWWN-0eSqkUkYKSrmdI1tUX0mGEDVZ9uTpwtY4UnA2C95zQ" />
   <meta name="apple-music-app-name" content="TuneGram" />
-  <meta name="apple-music-app-build" content="2.0.0" />
+  <meta name="apple-music-app-build" content="2.1.0" />
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script src="https://unpkg.com/htmx.org@1.9.10"
@@ -34,7 +33,7 @@
   <div class="header" style="height:82px">
     <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
       hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
-      <p class="name title-font adaptive-text">TuneGram</p>
+      <p class="name title-font">TuneGram</p>
     </div>
     <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np-header')"
       hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap:1s">
@@ -168,10 +167,10 @@
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDI5OTgxLCJleHAiOjE3NTExNTc5ODEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.N-3LLcJDLmZfX9r-CYw68afcGsttfTHDww4-5Dmqa3Tzdlj7n-yFmIMOBpyQqaBm3R7aSViOhQ4y2Hzx7rZowg',
+        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUwNTEzNTI5LCJleHAiOjE3NTA1OTk5MjksIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.GtG2R1bCaAwOzwIhX6VJRZ2Xx106wx1QEmhWxlDxWWN-0eSqkUkYKSrmdI1tUX0mGEDVZ9uTpwtY4UnA2C95zQ',
         app: {
           name: 'TuneGram',
-          build: '2.0.0',
+          build: '2.1.0',
         },
         debug: true,
         suppressErrorDialog: false
@@ -191,7 +190,7 @@
         searchTerm(e.detail)
       }, false);
       async function searchTerm(term) {
-        await music.api.music(`/v1/catalog/${storefront}/search`, { term: term, types: 'albums,songs' }).then((res) => {
+        await music.api.music(`/v1/catalog/${storefront}/search`, { term: term, types: 'albums,songs,playlists' }).then((res) => {
           if (res.data.results) {
             if (res.data.results.songs) {
               var songs = res.data.results.songs.data;
@@ -204,6 +203,12 @@
               albums.forEach(searchAlbums)
             } else {
               drawSadResults('album');
+            }
+            if (res.data.results.playlists) {
+              var plists = res.data.results.playlists.data;
+              plists.forEach(searchPlists)
+            } else {
+              drawSadResults('plist');
             }
           } else {
             drawSadResults('both');
@@ -403,6 +408,7 @@
               if (music.queue.currentItem) {
                 loadVisuals(music.queue.items, music.queue.currentItem.id);
                 (music.queue.items).forEach(appendTracks)
+                loadLyrics()
                 updateHighlightedTrack();
               } else {
                 ["n/a"].forEach(appendTracks)
@@ -438,12 +444,14 @@
           updateNpBtnArtwork(artworkUrl);
           loadVisuals(queue, item.id)
           updateHighlightedTrack();
+          loadLyrics()
         }
       });
       music.addEventListener('queueItemsDidChange', ({ item }) => {
         const queue = music.queue.items;
         queue.forEach(appendTracks)
         loadVisuals(queue, music.queue.currentItem)
+        updateHighlightedTrack();
       });
       function loadVisuals(queue, id) {
         var songPlaying = music.queue.currentItem;
@@ -456,7 +464,10 @@
           if (root.artwork) {
             if (root.artwork.url) {
               art = MusicKit.formatArtworkURL(root.artwork, 500, 500);
-              bgColor = getBgColor(art)
+              getImageColors(art).then(({ bgColor, contrastColor }) => {
+                bgColor = bgColor || "#396E80";
+                document.querySelector('#np #info-img').style.border = `3px solid ${bgColor}`;
+              });
             }
           } else {
             art = "fallback.svg"
@@ -486,7 +497,6 @@
           document.querySelector('#info-wrapper-np #info-artist').innerHTML = root.artistName
           document.querySelector('#info-wrapper-np #info-album').innerHTML = root.albumName
           document.querySelector('#np #info-img').src = art
-          document.querySelector('#np #info-img').style.border = `3px solid ${bgColor}`;
           document.querySelector('#info-wrapper-np #info-details').innerHTML = detailSubheading;
         } else {
           document.querySelector('#info-wrapper-np #info-title').innerHTML = 'Not Playing';
@@ -525,7 +535,12 @@
             <td class="material-symbols-outlined general-music-control" onclick="musicPlay('${id}', '${art}')">${idIcon}</td>
             <td class="song-title">${title}</td>
             <td>${converter(runtime)}</td>`
-          if (music.isAuthorized) {
+          queuecontrols: if (music.isAuthorized) {
+            if(document.querySelector("#np")) {
+              if(document.querySelector("#np").style.display !== "none") {
+                break queuecontrols;
+              }
+            }
             document.getElementById('tracklist').innerHTML = `
   <th class="labels">Play</th>
   <th class="labels">Name</th>
@@ -546,7 +561,7 @@
           if (tracksProcessed == tracksToCount && tracksProcessed !== 0) {
             document.querySelector('#tracklist').innerHTML += toDrawTracks;
             if (document.querySelectorAll('.queue-trklst tr').length > 1) {
-              document.querySelectorAll('.queue-trklst tr')[1].classList.add('playing');
+              updateHighlightedTrack()
             }
             tracksProcessed = 0;
             toDrawTracks = "";
@@ -554,6 +569,175 @@
           }
         }
       }
+      function loadLyrics() {
+        var songName = music.queue.currentItem ? music.queue.currentItem.attributes.name : '';
+        var artistName = music.queue.currentItem ? music.queue.currentItem.attributes.artistName : '';
+        if (songName && artistName) {
+          document.querySelector('#lyrics').innerHTML = '<p>Loading lyrics...</p>';
+          const cover = document.querySelector('#np #info-img').src;
+          getImageColors(cover).then(({ bgColor, contrastColor }) => {
+            var lightContrast = contrastColor.replace(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/, (match, r, g, b) => `rgba(${r}, ${g}, ${b}, 0.5)`);
+            bgColor = bgColor || "#396E80";
+            contrastColor = contrastColor || "#E3E1DB";
+            document.querySelector('#lyrics').style.backgroundColor = bgColor;
+            document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; }`, 0);
+            document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; }`, 0);
+          });
+          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.instrumental == false && (data.plainLyrics || data.syncedLyrics)) {
+                if (data.syncedLyrics) {
+                  const lyricsArray = data.syncedLyrics.split('\n').map(line => {
+                    const match = line.match(/^\[(\d{2}:\d{2}\.\d{2})\]\s*(.*)$/);
+                    return match ? { time: match[1], text: match[2] } : null;
+                  }).filter(Boolean);
+                  var lyricsHtml = lyricsArray.map(line => {
+                    if (line.text === "") {
+                      return `<p class=\"lyric-line lyric-break\" data-time=\"${line.time}\"><span class=\"material-symbols-outlined lyric-break-note\" style=\"font-size:1.2em;vertical-align:middle;opacity:0.5;transition:filter 0.2s,opacity 0.2s;\">music_note</span></p>`;
+                    } else {
+                      return `<p class=\"lyric-line\" data-time=\"${line.time}\">${line.text}</p>`;
+                    }
+                  }).join('<br>');
+                  document.querySelector('#lyrics').innerHTML = lyricsHtml;
+                  const css = `@media (max-width: 650px) { #lyrics { width: fit-content !important; } }`;
+                  document.styleSheets[0].insertRule(css, 0);
+                  const lyricLines = document.querySelectorAll('.lyric-line');
+                  let lastHighlighted = -1;
+                  let scrollLock = false;
+                  let scrollLockTimeout = null;
+                  let pulseFrame = null;
+
+                  const lyricsDiv = document.getElementById('lyrics');
+                  if (lyricsDiv) {
+                    lyricsDiv.addEventListener('wheel', function () {
+                      scrollLock = true;
+                      if (scrollLockTimeout) clearTimeout(scrollLockTimeout);
+                      scrollLockTimeout = setTimeout(() => {
+                        scrollLock = false;
+                      }, 5000);
+                    }, { passive: true });
+                  }
+
+                  lyricLines.forEach((line, idx) => {
+                    line.addEventListener('click', function (e) {
+                      const t = line.getAttribute('data-time');
+                      if (t) {
+                        const [min, sec] = t.split(':');
+                        const time = parseInt(min) * 60 + parseFloat(sec);
+                        if (music && typeof music.seekToTime === 'function') {
+                          music.seekToTime(time);
+                        } else if (music && music.player && typeof music.player.seekToTime === 'function') {
+                          music.player.seekToTime(time);
+                        }
+                      }
+                    });
+                  });
+
+                  function parseTime(timeStr) {
+                    if (!timeStr) return NaN;
+                    const [min, sec] = timeStr.split(':');
+                    if (!min || !sec) return NaN;
+                    return parseInt(min) * 60 + parseFloat(sec);
+                  }
+
+                  let lastBreakIdx = -1;
+
+                  function stopPulse() {
+                    if (pulseFrame) cancelAnimationFrame(pulseFrame);
+                    document.querySelectorAll('.lyric-break-note').forEach(note => {
+                      note.style.opacity = 0.5;
+                      note.style.filter = 'brightness(1)';
+                    });
+                  }
+
+                  function glowNote(note, breakStart, breakEnd) {
+                    if (pulseFrame) cancelAnimationFrame(pulseFrame);
+                    function animate() {
+                      const now = music.currentPlaybackTime;
+                      const progress = Math.max(0, Math.min(1, (now - breakStart) / (breakEnd - breakStart)));
+                      note.style.opacity = 0.5 + 0.5 * progress;
+                      note.style.filter = `brightness(${1 + progress})`;
+                      if (progress < 1 && now < breakEnd) {
+                        pulseFrame = requestAnimationFrame(animate);
+                      }
+                    }
+                    animate();
+                  }
+
+                  function highlightCurrentLine() {
+                    const currentTime = music.currentPlaybackTime;
+                    let highlightIndex = -1;
+                    let breakIdx = -1, breakStart = null, breakEnd = null;
+
+                    for (let i = 0; i < lyricLines.length; i++) {
+                      const lineTime = lyricLines[i].getAttribute('data-time');
+                      const lineText = lyricLines[i].classList.contains('lyric-break') ? '' : lyricLines[i].innerHTML.trim();
+                      const thisTime = parseTime(lineTime);
+                      const nextTime = (i + 1 < lyricLines.length) ? parseTime(lyricLines[i + 1].getAttribute('data-time')) : Infinity;
+                      if (lineText === '' && !isNaN(thisTime)) {
+                        if (currentTime >= thisTime && currentTime < nextTime) {
+                          breakIdx = i;
+                          breakStart = thisTime;
+                          breakEnd = nextTime;
+                          break;
+                        }
+                      } else if (!isNaN(thisTime) && currentTime >= thisTime && currentTime < nextTime) {
+                        highlightIndex = i;
+                        break;
+                      }
+                    }
+
+                    lyricLines.forEach(line => line.classList.remove('highlight'));
+                    stopPulse();
+
+                    if (breakIdx !== -1) {
+                      const note = lyricLines[breakIdx].querySelector('.lyric-break-note');
+                      if (note) glowNote(note, breakStart, breakEnd);
+                      lastBreakIdx = breakIdx;
+                    } else {
+                      lastBreakIdx = -1;
+                    }
+
+                    if (highlightIndex !== -1) {
+                      lyricLines[highlightIndex].classList.add('highlight');
+                      lastHighlighted = highlightIndex;
+                      if (!scrollLock) {
+                        const lyricsDiv = document.querySelector("#lyrics")
+                        const target = document.querySelector('.highlight');
+                        scrollParentToChild(lyricsDiv, target)
+                      }
+                    }
+                  }
+
+                  music.addEventListener('playbackTimeDidChange', highlightCurrentLine);
+                  highlightCurrentLine();
+                } else if (data.plainLyrics) {
+                  var plainLyrics = data.plainLyrics.replace(/\n/g, "<br>");
+                  document.querySelector('#lyrics').innerHTML = plainLyrics;
+                }
+              } else if (data.instrumental == true) {
+                document.querySelector('#lyrics').innerText = 'Instrumental';
+              } else {
+                document.querySelector('#lyrics').innerText = 'Lyrics not found.';
+              }
+            })
+        } else {
+          document.querySelector('#lyrics').innerText = 'No song playing.';
+        }
+      }
+      function scrollParentToChild(parent, child) {
+        if (!parent || !child) return;
+        const parentRect = parent.getBoundingClientRect();
+        const childRect = child.getBoundingClientRect();
+        const offset = childRect.top - parentRect.top;
+        const scroll = parent.scrollTop;
+        const targetScroll = scroll + offset - (parent.clientHeight / 2) + (child.clientHeight / 2);
+        const maxScroll = parent.scrollHeight - parent.clientHeight;
+        const finalScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+        parent.scrollTo({ top: finalScroll, behavior: 'smooth' });
+      }
+
       function updateHighlightedTrack() {
         if (queue && music.queue.position !== undefined) {
           document.querySelectorAll('.queue-trklst tr').forEach(tr => tr.classList.remove('playing'));
@@ -565,11 +749,16 @@
         var cover = "fallback.svg";
         var sub = ""
         var subsub = ""
-        var bgColor = "#396E80";
         if (item.attributes.artwork) {
           if (item.attributes.artwork.url) {
             cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
-            bgColor = getBgColor(cover)
+            getImageColors(cover).then(({ bgColor, contrastColor }) => {
+              bgColor = bgColor || "#396E80";
+              if (document.querySelector("#np")) {
+                document.querySelector('#np #info-img').style.border = `3px solid ${bgColor}`;
+              }
+              document.querySelector('#info #info-img').style.border = `3px solid ${bgColor}`;
+            });
           }
         } else {
           cover = "fallback.svg"
@@ -599,7 +788,6 @@
         document.querySelector('#info-artist').innerHTML = sub;
         document.querySelector('#info #info-img').src = cover;
         document.querySelector("#info-details").innerHTML = detailSubheading;
-        document.querySelector('#info #info-img').style.border = `3px solid ${bgColor}`;
         document.querySelector("#play-all").setAttribute('onclick', `playAll('${item.id}')`);
       }
       async function loadLibrary() {
@@ -633,10 +821,8 @@
       }
       music.addEventListener('playbackStateDidChange', ({ oldState, state }) => {
         if (state == "10") {
-          document.querySelector('#np #info-title').innerHTML = 'Not Playing';
-          document.querySelector('#np #info-artist').innerHTML = '';
-          document.querySelector('#np #info-album').innerHTML = '';
-          document.querySelector('#np img').src = 'fallback.svg';
+          loadContent('onboard');
+          htmx.ajax('GET', 'onboard.html', { target: '#content', swap: 'innerHTML' });
         }
         if (state == 2) {
           document.getElementById('plpa-btn').innerHTML = "pause"
@@ -803,6 +989,10 @@
       document.querySelector('#songcards').remove()
       document.querySelector('#songs-results').remove()
     }
+    if (type == "plist") {
+      document.querySelector('#plistcards').remove()
+      document.querySelector('#plist-results').remove()
+    }
     if (type == "both") {
       document.querySelector('#bigcards').remove()
       document.querySelector('#songcards').remove()
@@ -834,17 +1024,42 @@
       document.querySelector('#bigcards').innerHTML = toDrawAlbums
     }
   }
+  function searchPlists(item, index, array) {
+    plistsToCount = array.length
+    var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 1000, 1000);
+    console.log(cover)
+    getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      var date = new Date(item.attributes.lastModifiedDate);
+      edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
+      var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading></card>`
+      plistsProcessed++
+      toDrawPlists += card
+      if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
+        document.querySelector('#plistcards').innerHTML = toDrawPlists;
+        plistsProcessed = 0;
+        toDrawPlists = ""
+      }
+    }).catch((err) => {
+      console.error('Error getting background color:', err);
+    });
+  }
+
   function searchSongs(item, index, array) {
     songsToCount = array.length
-    var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
-    var card = `<songcard onclick="toAlbum('s${item.id}')"><img src="${cover}"/><iholder><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading></iholder></songcard>`
-    songsProcessed++
-    toDrawSongs += card
-    if (songsProcessed == songsToCount && songsProcessed !== 0) {
-      document.querySelector('#songcards').innerHTML = toDrawSongs;
-      songsProcessed = 0;
-      toDrawSongs = ""
-    }
+    var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 1000, 1000);
+    console.log(cover)
+    getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      var card = `<card style="background-color:${bgColor};" onclick="toAlbum('s${item.id}')"><img src="${cover}"/><heading style="color:${contrastColor}">${item.attributes.name}</heading><subheading style="color:${contrastColor}">${item.attributes.artistName}</subheading></card>`
+      songsProcessed++
+      toDrawSongs += card
+      if (songsProcessed == songsToCount && songsProcessed !== 0) {
+        document.querySelector('#songcards').innerHTML = toDrawSongs;
+        songsProcessed = 0;
+        toDrawSongs = ""
+      }
+    }).catch((err) => {
+      console.error('Error getting background color:', err);
+    });
   }
   function drawBoth() {
     document.querySelector('#bigcards').innerHTML = sessionStorage.getItem('albumStorage')
@@ -955,19 +1170,105 @@
     }
   }
 
-  function getBgColor(url) {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = url;
-    try {
-      const colorThief = new ColorThief();
-      const [r, g, b] = colorThief.getColor(img);
-      return `rgb(${r}, ${g}, ${b})`
-    } catch (err) {
-      return 'Failed to extract color: ' + err.message
-    }
-  }
+  function getImageColors(imgUrl) {
+    return new Promise((resolve, reject) => {
+      const imgEl = new Image();
+      imgEl.crossOrigin = 'Anonymous';
 
+      imgEl.onload = function () {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        let count = [], avg = [];
+
+        function getMatchingGroupIndex(r, g, b) {
+          const rgb = [r, g, b];
+          if (avg.length === 0) {
+            avg[0] = rgb;
+            count[0] = 1;
+            return;
+          }
+          for (let i = 0; i < avg.length; i++) {
+            const [aR, aG, aB] = avg[i];
+            if (
+              Math.abs(aR - r) < 15 &&
+              Math.abs(aG - g) < 15 &&
+              Math.abs(aB - b) < 15
+            ) {
+              avg[i] = avg[i].map((x, ii) => (x * count[i] + rgb[ii]) / (count[i] + 1));
+              count[i]++;
+              return;
+            }
+          }
+          count[avg.length] = 1;
+          avg[avg.length] = rgb;
+        }
+
+        const ratio = Math.max(
+          Math.ceil((imgEl.naturalHeight + 1) / 256),
+          Math.ceil((imgEl.naturalWidth + 1) / 256)
+        );
+        const width = canvas.width = imgEl.naturalWidth / ratio;
+        const height = canvas.height = imgEl.naturalHeight / ratio;
+
+        context.scale(1 / ratio, 1 / ratio);
+        context.drawImage(imgEl, 0, 0);
+
+        const { data } = context.getImageData(0, 0, width, height);
+
+        for (let x = 0; x < width; x += 2) {
+          for (let y = 0; y < height; y += 2) {
+            const ti = 4 * y * width + 4 * x;
+            getMatchingGroupIndex(data[ti], data[ti + 1], data[ti + 2]);
+          }
+        }
+
+        const bgIndex = count.indexOf(Math.max(...count));
+        const bgColor = avg[bgIndex].map(x => Math.ceil(x));
+        const bgRgbStr = `rgb(${bgColor.join(",")})`;
+
+        function colorDistance(c1, c2) {
+          return Math.sqrt(
+            Math.pow(c1[0] - c2[0], 2) +
+            Math.pow(c1[1] - c2[1], 2) +
+            Math.pow(c1[2] - c2[2], 2)
+          );
+        }
+
+        let maxDist = -1;
+        let contrastColor = [0, 0, 0];
+
+        for (let i = 0; i < avg.length; i++) {
+          if (i === bgIndex) continue;
+          const dist = colorDistance(avg[i], bgColor);
+          if (dist > maxDist) {
+            maxDist = dist;
+            contrastColor = avg[i];
+          }
+        }
+
+        if (bgColor === contrastColor) {
+          contrastColor = bgColor.map(c => c < 128 ? c + 50 : c - 50);
+        }
+        const contrastRgbStr = `rgb(${contrastColor.map(x => Math.ceil(x)).join(",")})`;
+        if (bgColor[0] === 0 && bgColor[1] === 0 && bgColor[2] === 0) {
+          bgRgbStr = "#396E80";
+        }
+        if (contrastColor[0] === 0 && contrastColor[1] === 0 && contrastColor[2] === 0) {
+          contrastRgbStr = "#E3E1DB";
+        }
+        resolve({
+          bgColor: bgRgbStr,
+          contrastColor: contrastRgbStr
+        });
+      };
+
+      imgEl.onerror = function () {
+        reject(new Error('Failed to load image at ' + imgUrl));
+      };
+
+      imgEl.src = imgUrl;
+    });
+  }
   function updateNpBtnArtwork(artworkUrl) {
     const npBtn = document.getElementById('np-btn');
     if (!npBtn) return;
@@ -990,31 +1291,4 @@
       npBtn.classList.remove('active');
     }
   }
-  
-function getBackgroundColor(el) {
-  while (el) {
-    const bg = window.getComputedStyle(el).backgroundColor;
-    if (bg && bg !== '#2F3633' && bg !== 'transparent') {
-      return bg;
-    }
-    el = el.parentElement;
-  }
-  return '#E3E1DB';
-}
-
-function getLuminance(rgb) {
-  const [r, g, b] = rgb.match(/\d+/g).map(Number).map(v => {
-    v /= 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow(((v + 0.055) / 1.055), 2.4);
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-function adaptTextColor(el) {
-  const bg = getBackgroundColor(el);
-  const luminance = getLuminance(bg);
-  el.classList.add(luminance > 0.5 ? 'text-black' : 'text-white');
-}
-
-document.querySelectorAll('.adaptive-text').forEach(adaptTextColor);
 </script>

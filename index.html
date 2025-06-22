@@ -11,9 +11,9 @@
   <link rel="icon" type="image/x-icon" href="favicon.png">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDI5OTgxLCJleHAiOjE3NTExNTc5ODEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.N-3LLcJDLmZfX9r-CYw68afcGsttfTHDww4-5Dmqa3Tzdlj7n-yFmIMOBpyQqaBm3R7aSViOhQ4y2Hzx7rZowg" />
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUwNTEzNTI5LCJleHAiOjE3NTA1OTk5MjksIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.GtG2R1bCaAwOzwIhX6VJRZ2Xx106wx1QEmhWxlDxWWN-0eSqkUkYKSrmdI1tUX0mGEDVZ9uTpwtY4UnA2C95zQ" />
   <meta name="apple-music-app-name" content="TuneGram" />
-  <meta name="apple-music-app-build" content="2.0.0" />
+  <meta name="apple-music-app-build" content="2.1.0" />
   <title>Authorize | TuneGram</title>
   <link
     href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
@@ -340,10 +340,10 @@
     document.addEventListener('musickitloaded', async function () {
       try {
         await MusicKit.configure({
-          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzQ5NDI5OTgxLCJleHAiOjE3NTExNTc5ODEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.N-3LLcJDLmZfX9r-CYw68afcGsttfTHDww4-5Dmqa3Tzdlj7n-yFmIMOBpyQqaBm3R7aSViOhQ4y2Hzx7rZowg',
+          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUwNTEzNTI5LCJleHAiOjE3NTA1OTk5MjksIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.GtG2R1bCaAwOzwIhX6VJRZ2Xx106wx1QEmhWxlDxWWN-0eSqkUkYKSrmdI1tUX0mGEDVZ9uTpwtY4UnA2C95zQ',
           app: {
             name: 'TuneGram',
-            build: '2.0.0',
+            build: '2.1.0',
           },
           debug: true,
           suppressErrorDialog: false
