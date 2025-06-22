@@ -456,6 +456,10 @@ card {
   background-color: #E3E1DB
 }
 
+.lyric-break-note {
+  transition: filter 0.6s linear, opacity 0.6s linear;
+}
+
 #lyrics {
   width: 95%;
   display: inline-block;
