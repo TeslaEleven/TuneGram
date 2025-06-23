@@ -538,6 +538,10 @@
           queuecontrols: if (music.isAuthorized) {
             if (document.querySelector("#np")) {
               if (((document.querySelector("#np").parentElement).parentElement).getAttribute("id") !== "np-container") {
+              document.getElementById('tracklist').innerHTML = `
+  <th class="labels">Play</th>
+  <th class="labels">Name</th>
+  <th class="labels">Runtime</th>`
                 break queuecontrols;
               }
             }
