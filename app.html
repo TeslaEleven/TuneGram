@@ -594,7 +594,7 @@
             document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; }`, 0);
             document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; }`, 0);
           });
-          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}&album_name=${encodeURIComponent(albumName)}&duration=${encodeURIComponent(duration)}`)
+          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}&duration=${encodeURIComponent(duration)}`)
             .then(response => response.json())
             .then(data => {
               if (data.instrumental == false && (data.plainLyrics || data.syncedLyrics)) {
@@ -665,7 +665,8 @@
 
                   function animateGlow(note, breakStart, breakEnd) {
                     function step() {
-                      const now = music.currentPlaybackTime;
+                      const audio = document.querySelector('audio');
+                      var now = audio.currentTime * 1000;
                       const progress = Math.max(0, Math.min(1, (now - breakStart) / (breakEnd - breakStart)));
                       note.style.opacity = 0.5 + 0.5 * progress;
                       note.style.filter = `brightness(${1 + progress})`;
