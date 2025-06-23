@@ -333,7 +333,8 @@ body::-webkit-scrollbar {
   }
 
   #lyrics {
-    width:91.4% !important;
+    width:100% !important;
+    box-sizing: border-box;
   }
 
   #info-artist {
