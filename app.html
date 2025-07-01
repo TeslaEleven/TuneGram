@@ -485,10 +485,10 @@
               detailSub = (root.name).split('[')[1].split(']')[0];
               finalName = (root.name).split('(')[0].split('[')[0].trim();
               detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
-            } else {
-              finalName = root.name;
-              finalAlbumName = root.albumName;
             }
+          } else {
+            finalName = root.name;
+            finalAlbumName = root.albumName;
           }
           if (albumName.includes('(') || albumName.includes('[')) {
             console.log('Found a parenthesis or bracket in the album name: ' + name);
