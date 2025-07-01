@@ -114,7 +114,6 @@
           document.querySelector('#np-btn').style.color = "#396E80";
           document.querySelector('#srch-btn').style.color = "#2F3633";
         }
-        // Always add blue border if artwork is present and on np tab
         const npBtn = document.getElementById('np-btn');
         const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
         if (img && img.src && !img.src.endsWith('fallback.svg')) {
@@ -130,7 +129,6 @@
     if (page == "srch") {
       document.querySelector('#srch-btn').style.color = "#396E80";
       document.querySelector('#np-btn').style.color = "#2F3633";
-      // Remove blue border if not on np tab
       const npBtn = document.getElementById('np-btn');
       const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
       if (img) img.classList.remove('np-artwork-active');
@@ -334,7 +332,7 @@
           var rawMethod = methodType;
           var chosenFunc = "";
           var methodUrl = ""
-          var offSet = document.querySelector(targetPractice).children.length;
+          var offSet = document.querySelector(targetPractice).children.length + 1;
           if (rawMethod == "heavy") {
             methodUrl = "/v1/me/history/heavy-rotation";
             chosenFunc = drawHeavy;
@@ -473,29 +471,35 @@
             art = "fallback.svg"
           }
           var detailSubheading = "";
+          var finalName = "";
+          var finalAlbumName = "";
           var name = (root.name).toLowerCase();
           var albumName = (root.albumName).toLowerCase();
           if (name.includes('(') || name.includes('[')) {
-            console.log('Found a parenthesis or bracket in the song name: ' + name);
             var detailSub = "";
             if (name.includes('(') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
               detailSub = (root.name).split('(')[1].split(')')[0];
+              finalName = (root.name).split('(')[0].split('[')[0].trim();
+              detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
             } else if (name.includes('[') && (tags.some(tag => name.includes(tag)) || /\b(19|20)\d{2}\b/.test(name))) {
               detailSub = (root.name).split('[')[1].split(']')[0];
+              finalName = (root.name).split('(')[0].split('[')[0].trim();
+              detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
+            } else {
+              finalName = root.name;
+              finalAlbumName = root.albumName;
             }
-            root.name = (root.name).split('(')[0].split('[')[0].trim();
-            detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
           }
           if (albumName.includes('(') || albumName.includes('[')) {
             console.log('Found a parenthesis or bracket in the album name: ' + name);
-            root.albumName = (root.albumName).split('(')[0].split('[')[0].trim();
+            finalAlbumName = (root.albumName).split('(')[0].split('[')[0].trim();
           }
           document.querySelector('#np #plpa-btn').setAttribute('onclick', `pausePlay('${id}', 'pp')`)
           document.querySelector('#np #rewind-btn').setAttribute('onclick', `pausePlay('na', 're')`)
           document.querySelector('#np #ff-btn').setAttribute('onclick', `pausePlay('na', 'ff')`)
-          document.querySelector('#info-wrapper-np #info-title').innerHTML = root.name
+          document.querySelector('#info-wrapper-np #info-title').innerHTML = finalName
           document.querySelector('#info-wrapper-np #info-artist').innerHTML = root.artistName
-          document.querySelector('#info-wrapper-np #info-album').innerHTML = root.albumName
+          document.querySelector('#info-wrapper-np #info-album').innerHTML = finalAlbumName
           document.querySelector('#np #info-img').src = art
           document.querySelector('#info-wrapper-np #info-details').innerHTML = detailSubheading;
         } else {
@@ -538,7 +542,7 @@
           queuecontrols: if (music.isAuthorized) {
             if (document.querySelector("#np")) {
               if (((document.querySelector("#np").parentElement).parentElement).getAttribute("id") !== "np-container") {
-              document.getElementById('tracklist').innerHTML = `
+                document.getElementById('tracklist').innerHTML = `
   <th class="labels">Play</th>
   <th class="labels">Name</th>
   <th class="labels">Runtime</th>`
@@ -576,7 +580,7 @@
       function loadLyrics() {
         var songName = music.queue.currentItem ? music.queue.currentItem.attributes.name : '';
         var artistName = music.queue.currentItem ? music.queue.currentItem.attributes.artistName : '';
-        var albumName = music.queue.currentItem ? music.queue.currentItem.attributes.albumName : ''; 
+        var albumName = music.queue.currentItem ? music.queue.currentItem.attributes.albumName : '';
         var dur = music.queue.currentItem ? music.queue.currentItem.attributes.durationInMillis : '';
         if (songName && artistName && albumName && dur) {
           var duration = dur / 1000;
@@ -598,7 +602,7 @@
             document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; }`, 0);
             document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; }`, 0);
           });
-          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}&duration=${encodeURIComponent(duration)}`)
+          fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
             .then(response => response.json())
             .then(data => {
               if (data.instrumental == false && (data.plainLyrics || data.syncedLyrics)) {
@@ -653,7 +657,7 @@
                     if (!timeStr) return NaN;
                     const [min, sec] = timeStr.split(':');
                     if (!min || !sec) return NaN;
-                    return parseInt(min) * 60 + parseFloat(sec);
+                    return (parseInt(min) * 60 + parseFloat(sec)) * 1000;
                   }
 
                   let lastBreakIdx = -1;
@@ -667,10 +671,40 @@
                     });
                   }
 
+                  var audio = document.querySelector('audio');
+                  var now = audio.currentTime * 1000;
+
+                  if (audio) {
+                    audio.addEventListener('timeupdate', function () {
+                      now = audio.currentTime * 1000;
+                      window.now = now;
+                    });
+                  }
+
+
+                  if (!Object.getOwnPropertyDescriptor(window, 'now')) {
+                    let _now = 0;
+                    Object.defineProperty(window, 'now', {
+                      get() { return _now; },
+                      set(value) {
+                        _now = value;
+                        window.dispatchEvent(new CustomEvent('nowChanged', { detail: { now: value } }));
+                      }
+                    });
+                  }
+
+                  window.addEventListener('nowChanged', function (e) {
+                    highlightCurrentLine();
+                  });
+
                   function animateGlow(note, breakStart, breakEnd) {
                     function step() {
-                      const audio = document.querySelector('audio');
-                      var now = audio.currentTime * 1000;
+                      console.log(now, breakStart, breakEnd);
+                      if (now < breakStart || now > breakEnd) {
+                        note.style.opacity = 0.5;
+                        note.style.filter = 'brightness(1)';
+                        return;
+                      }
                       const progress = Math.max(0, Math.min(1, (now - breakStart) / (breakEnd - breakStart)));
                       note.style.opacity = 0.5 + 0.5 * progress;
                       note.style.filter = `brightness(${1 + progress})`;
@@ -682,7 +716,8 @@
                   }
 
                   function highlightCurrentLine() {
-                    const currentTime = music.currentPlaybackTime;
+                    const EPSILON = 60; // milliseconds of leniency (adjust as needed)
+                    const currentTime = now;
                     let highlightIndex = -1;
                     let breakIdx = -1, breakStart = null, breakEnd = null;
 
@@ -690,17 +725,16 @@
                       const lineTime = lyricLines[i].getAttribute('data-time');
                       const lineText = lyricLines[i].classList.contains('lyric-break') ? '' : lyricLines[i].innerHTML.trim();
                       const thisTime = parseTime(lineTime);
-                      const nextTime = (i + 1 < lyricLines.length) ? parseTime(lyricLines[i + 1].getAttribute('data-time')) : Infinity;
-                      if (lineText === '' && !isNaN(thisTime)) {
-                        if (currentTime >= thisTime && currentTime < nextTime) {
+
+                      // Allow for leniency: treat as "reached" if within EPSILON ms
+                      if (!isNaN(thisTime) && currentTime + EPSILON >= thisTime) {
+                        if (lineText === '') {
                           breakIdx = i;
                           breakStart = thisTime;
-                          breakEnd = nextTime;
-                          break;
+                          breakEnd = (i + 1 < lyricLines.length) ? parseTime(lyricLines[i + 1].getAttribute('data-time')) : Infinity;
+                        } else {
+                          highlightIndex = i;
                         }
-                      } else if (!isNaN(thisTime) && currentTime >= thisTime && currentTime < nextTime) {
-                        highlightIndex = i;
-                        break;
                       }
                     }
 
@@ -730,7 +764,6 @@
                     }
                   }
 
-                  music.addEventListener('playbackTimeDidChange', highlightCurrentLine);
                   highlightCurrentLine();
                 } else if (data.plainLyrics) {
                   var plainLyrics = data.plainLyrics.replace(/\n/g, "<br>");
