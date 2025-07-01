@@ -218,14 +218,18 @@ body {
 }
 
 body {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox, Safari 18.2+, Chromium 121+ */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 body::-webkit-scrollbar { 
-    display: none;  /* Older Safari and Chromium */
+    display: none;
 }
 
-#trklst,
+#trklst {
+  margin-left: 1%;
+  font-size: 1.5em;
+}
+
 #queuehistory {
   margin-left: 1%;
   font-size: 1.5em;
@@ -333,8 +337,7 @@ body::-webkit-scrollbar {
   }
 
   #lyrics {
-    width:100% !important;
-    box-sizing: border-box;
+    width:91.4% !important;
   }
 
   #info-artist {
@@ -857,7 +860,6 @@ hr {
   cursor: pointer;
 }
 
-/* Artwork with NP Button */
 .np-artwork-img {
   width: 48px !important;
   height: 48px !important;
