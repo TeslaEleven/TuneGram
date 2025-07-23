@@ -16,7 +16,7 @@
 
   <link rel="manifest" href="manifest.json">
   <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUyMzUwMTAyLCJleHAiOjE3NTQwNzgxMDIsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.tXpuOTrZgAY_s6aKyiChd2f8N3bluwU6o46xjpGbzoxp5W-eBKYfD0Juav4U8ykgI9mulbJdw4RlF2S8BrIXRQ" />
+    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ" />
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.1.0" />
   <link rel="stylesheet"
@@ -114,6 +114,7 @@
           document.querySelector('#np-btn').style.color = "#396E80";
           document.querySelector('#srch-btn').style.color = "#2F3633";
         }
+        // Always add blue border if artwork is present and on np tab
         const npBtn = document.getElementById('np-btn');
         const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
         if (img && img.src && !img.src.endsWith('fallback.svg')) {
@@ -129,6 +130,7 @@
     if (page == "srch") {
       document.querySelector('#srch-btn').style.color = "#396E80";
       document.querySelector('#np-btn').style.color = "#2F3633";
+      // Remove blue border if not on np tab
       const npBtn = document.getElementById('np-btn');
       const img = npBtn ? npBtn.querySelector('.np-artwork-img') : null;
       if (img) img.classList.remove('np-artwork-active');
@@ -165,7 +167,7 @@
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUyMzUwMTAyLCJleHAiOjE3NTQwNzgxMDIsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.tXpuOTrZgAY_s6aKyiChd2f8N3bluwU6o46xjpGbzoxp5W-eBKYfD0Juav4U8ykgI9mulbJdw4RlF2S8BrIXRQ',
+        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ',
         app: {
           name: 'TuneGram',
           build: '2.1.0',
@@ -842,6 +844,7 @@
         document.querySelector('#info #info-img').src = cover;
         document.querySelector("#info-details").innerHTML = detailSubheading;
         document.querySelector("#play-all").setAttribute('onclick', `playAll('${item.id}')`);
+        document.querySelector("#shuffle-all").setAttribute('onclick', `shuffleAll('${item.id}')`);
       }
       async function loadLibrary() {
         if (!sessionStorage.getItem('plistStorage') || !sessionStorage.getItem('albumStorage') || !sessionStorage.getItem('heavyStorage') || !sessionStorage.getItem('recStorage')) {
@@ -883,6 +886,34 @@
           document.getElementById('plpa-btn').innerHTML = "play_arrow"
         }
       });
+
+      window.shuffleAll = async function (id) {
+        let isLibrary = (id.startsWith('p') && !id.startsWith('pl')) || id.startsWith('i');
+        let isPlaylist = id.startsWith('pl') || (isLibrary && id.startsWith('p'));
+        let isAlbum = !isPlaylist && (id.startsWith('a') || id.startsWith('i')) || /^\d/.test(id);
+        let albumApiUrl = isAlbum ? `/v1/catalog/${storefront}/albums/${id}` : `/v1/me/library/albums/${id}`;
+        let playlistApiUrl = isPlaylist ? `/v1/catalog/${storefront}/playlists/${id}` : `/v1/me/library/playlists/${id}`;
+        let apiUrl = isPlaylist ? playlistApiUrl : albumApiUrl;
+        let albumRes = await music.api.music(apiUrl, { l: 'en-us' });
+        let albumData = albumRes?.data?.data?.[0];
+        if (!albumData || !albumData.relationships || !albumData.relationships.tracks || !albumData.relationships.tracks.data) return;
+        let tracks = albumData.relationships.tracks.data;
+        let ids = [];
+        for (let track of tracks) {
+          if (track.attributes?.playParams?.reportingId) {
+            ids.push(track.attributes.playParams.reportingId);
+          } else if (track.id) {
+            ids.push(track.id);
+          }
+        }
+        ids = ids.filter(Boolean);
+        if (!ids.length) return;
+        loadContent('np');
+        htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" });
+        const shufIds = [...ids].sort(() => Math.random() - 0.5);
+        await music.setQueue({ songs: shufIds, startPlaying: true });
+        queue = music.queue.items;
+      }
 
       window.playAll = async function (id) {
         let isLibrary = (id.startsWith('p') && !id.startsWith('pl')) || id.startsWith('i');
