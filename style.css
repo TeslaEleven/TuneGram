@@ -168,11 +168,6 @@ body {
   flex-flow: column;
 }
 
-#play-all:hover {
-  transform: scale(1.1);
-  transition: 100ms ease-in;
-}
-
 .material-symbols-outlined {
   font-variation-settings:
     'FILL' 0,
@@ -380,6 +375,10 @@ body::-webkit-scrollbar {
   #greater-pc {
     overflow: hidden;
     white-space: nowrap;
+  }
+  #greater-trklst {
+    justify-content: center;
+    margin-left:0 !important;
   }
 }
 
@@ -858,6 +857,15 @@ hr {
 .general-music-control {
   text-align: center !important;
   cursor: pointer;
+}
+
+.info-play-controls {
+  margin: 10px;
+}
+
+.info-play-controls:hover {
+  transform: scale(1.1);
+  transition: 100ms ease-in;
 }
 
 .np-artwork-img {
