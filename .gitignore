@@ -1,0 +1,10 @@
+node_modules
+index.js
+*/.DS_Store
+.DS_Store
+/Assets/*
+note.svg
+horse.mp3
+package.json
+package-lock.json
+folder.svg
