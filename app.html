@@ -782,9 +782,16 @@
                       lyricLines[highlightIndex].classList.add('highlight');
                       lastHighlighted = highlightIndex;
                       if (!scrollLock) {
-                        const lyricsDiv = document.querySelector("#lyrics")
-                        const target = document.querySelector('.highlight');
-                        scrollParentToChild(lyricsDiv, target)
+                        const lyricsDiv = document.querySelector("#lyrics");
+                        const target = lyricLines[highlightIndex];
+                        scrollParentToChild(lyricsDiv, target);
+                      }
+                    } else if (breakIdx !== -1 && !scrollLock) {
+                      // Scroll to the next line after the lyric break
+                      const lyricsDiv = document.querySelector("#lyrics");
+                      const nextLine = lyricLines[breakIdx + 1];
+                      if (nextLine) {
+                        scrollParentToChild(lyricsDiv, nextLine);
                       }
                     }
                   }

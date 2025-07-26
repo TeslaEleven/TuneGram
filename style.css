@@ -907,13 +907,13 @@ hr {
     bottom: 3vh;
     left: 50%;
     transform: translateX(-50%) scale(0.92);
-    width: 92vw;
+    width: 60vw;
     height: 82px; /* Match desktop button height */
     display: flex;
     justify-content: space-around;
     align-items: center;
     background: rgba(240, 249, 255, 0.1);
-    backdrop-filter: blur(4.5px) saturate(1.25) contrast(1.09);
+    backdrop-filter: blur(10px) saturate(1.25) contrast(1.09);
     -webkit-backdrop-filter: blur(4.5px) saturate(1.25) contrast(1.09);
     border-radius: 60px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -926,33 +926,15 @@ hr {
     will-change: transform;
   }
 
-  #mobile-nav::before {
-    content: '';
-    position: absolute;
-    inset: -20%;
-    background: radial-gradient(
-      ellipse 140% 140% at 50% 50%,
-      rgba(14, 165, 233, 0.28) 0%,
-      transparent 70%
-    );
-    filter: blur(5.6px);
-    animation: liquidRefract 8s ease-in-out infinite;
-  }
-
-  @keyframes liquidRefract {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(144deg) scale(1.14); }
-  }
-
   .mobile-nav-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 48%;
     height: 70px;
-    background: transparent; /* Match container background */
-    border: none; /* No border */
-    box-shadow: none; /* No shadow */
+    background: transparent;
+    border: none;
+    box-shadow: none;
     border-radius: 60px;
     font-size: 5em;
     color: #396E80;
@@ -964,11 +946,11 @@ hr {
     margin: 10px;
   }
 
-  .mobile-nav-btn:hover {
-    background: rgba(255, 255, 255, 0.45); /* Background on hover */
-    box-shadow: 0 2px 12px rgba(57, 110, 128, 0.10); /* Shadow on hover */
+  .mobile-nav-btn span {
+    font-size: .6em;
+    color: #396E80;
+    transition: color 0.2s ease-in-out;
   }
-
 
   .header {
     flex-direction: column;
