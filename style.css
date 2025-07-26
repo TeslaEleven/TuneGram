@@ -918,9 +918,9 @@ hr {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.24);
     z-index: 2000;
     margin: 0 auto;
-    transition: transform 0.5s cubic-bezier(.68,-0.55,.27,1.55), background 0.3s, box-shadow 0.3s;
+    transition: transform 0.5s cubic-bezier(.68, -0.55, .27, 1.55), background 0.3s, box-shadow 0.3s;
     overflow: hidden;
-    animation: navExpand 0.7s cubic-bezier(.68,-0.55,.27,1.55) 0.1s forwards;
+    animation: navExpand 0.7s cubic-bezier(.68, -0.55, .27, 1.55) 0.1s forwards;
     will-change: transform;
   }
 
@@ -934,24 +934,28 @@ hr {
     border: none;
     border-radius: 60px;
     font-size: 5em;
-    color: #396E80;
+    color: #626262;
     cursor: pointer;
-    transition: transform 0.18s cubic-bezier(.68,-0.55,.27,1.55), box-shadow 0.18s, background 0.18s;
+    transition: transform 0.18s cubic-bezier(.68, -0.55, .27, 1.55), box-shadow 0.18s, background 0.18s;
     will-change: transform, box-shadow, background;
     margin: 10px;
   }
 
+  #name {
+    height: 55px !important;
+    padding: 25px !important
+  }
+
   body {
-    margin-bottom: 82px;
+    margin-bottom: 100px;
   }
 
   .song-title {
-    text-align:center;
+    text-align: center;
   }
 
   .mobile-nav-btn span {
     font-size: .6em;
-    color: #396E80;
     transition: color 0.2s ease-in-out;
   }
 
@@ -963,7 +967,7 @@ hr {
     display: none;
   }
 
-  #np {
+  #infobox {
     overflow: hidden;
     white-space: nowrap;
   }
