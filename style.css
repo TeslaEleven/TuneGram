@@ -903,6 +903,7 @@ hr {
 
 @media (max-width: 650px) {
   #mobile-nav {
+    display: flex !important;
     position: fixed;
     bottom: 3vh;
     left: 50%;
@@ -966,9 +967,8 @@ hr {
   .header-itms {
     display: none;
   }
+}
 
-  #infobox {
-    overflow: hidden;
-    white-space: nowrap;
-  }
+#mobile-nav {
+  display:none;
 }
