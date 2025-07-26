@@ -905,7 +905,7 @@ hr {
   #mobile-nav {
     display: flex !important;
     position: fixed;
-    bottom: 3vh;
+    bottom: 2vh;
     left: 50%;
     transform: translateX(-50%) scale(0.92);
     width: 60vw;
