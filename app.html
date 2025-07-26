@@ -30,19 +30,42 @@
 </head>
 
 <body>
-  <div class="header" style="height:82px">
-    <div valign="left" id="nameplate" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
-      hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%">
-      <p class="name title-font">TuneGram</p>
+  <!-- Add SVG filter for liquid glass effect -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <filter id="liquid-glass">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+      <feColorMatrix in="blur" type="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10"
+        result="goo" />
+      <feBlend in="SourceGraphic" in2="goo" mode="normal" />
+    </filter>
+  </svg>
+  <div class="header" style="height:82px;">
+    <div id="nameplate" valign="left" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
+      hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%;flex-grow:1">
+      <img id="name" src="logo.svg" alt="TuneGram"
+        style="width:auto;height:72px;padding-top:15px;vertical-align: middle;padding:10px">
     </div>
-    <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np-header')"
-      hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap:1s">
-      <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">graphic_eq</p>
+    <div class="header-itms">
+      <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np-header')"
+        hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap:1s">
+        <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">graphic_eq</p>
+      </div>
+      <div title="Search" class="header-itm" id="srch-btn" onclick="loadContent('srch')" hx-get="search.html"
+        hx-target="#content" hx-swap="innerHTML swap:1s">
+        <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">search</p>
+      </div>
     </div>
-    <div title="Search" class="header-itm" id="srch-btn" onclick="loadContent('srch')" hx-get="search.html"
+  </div>
+  <div id="mobile-nav">
+    <button class="mobile-nav-btn" id="np-btn-mobile" onclick="loadContent('np-header')" hx-get="np.html?id=viewonly"
       hx-target="#content" hx-swap="innerHTML swap:1s">
-      <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">search</p>
-    </div>
+      <span class="material-symbols-outlined">graphic_eq</span>
+    </button>
+    <button class="mobile-nav-btn" id="srch-btn-mobile" onclick="loadContent('srch')" hx-get="search.html"
+      hx-target="#content" hx-swap="innerHTML swap:1s">
+      <span class="material-symbols-outlined">search</span>
+    </button>
   </div>
   <div id="content">
     <div class="moving-note">
@@ -615,7 +638,7 @@
                   }).filter(Boolean);
                   var lyricsHtml = lyricsArray.map(line => {
                     if (line.text === "") {
-                      return `<p class=\"lyric-line lyric-break\" data-time=\"${line.time}\"><span class=\"material-symbols-outlined lyric-break-note\" style=\"font-size:1.2em;vertical-align:middle;opacity:0.5;transition:filter 0.2s,opacity 0.2s;\">music_note</span></p>`;
+                      return `<p class=\"lyric-line lyric-break\" data-time=\"${line.time}\"><span class=\"material-symbols-outlined lyric-break-note" style=\"font-size:1.2em;vertical-align:middle;opacity:0.5;transition:filter 0.2s,opacity 0.2s;\">music_note</span></p>`;
                     } else {
                       return `<p class=\"lyric-line\" data-time=\"${line.time}\">${line.text}</p>`;
                     }
