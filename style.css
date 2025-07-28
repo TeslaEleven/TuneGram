@@ -2,6 +2,7 @@
   cursor: pointer;
   transform: scale(1);
   transition: 100ms ease-in;
+  padding: 25px
 }
 
 #name:hover {
@@ -940,11 +941,6 @@ hr {
     transition: transform 0.18s cubic-bezier(.68, -0.55, .27, 1.55), box-shadow 0.18s, background 0.18s;
     will-change: transform, box-shadow, background;
     margin: 10px;
-  }
-
-  #name {
-    height: 55px !important;
-    padding: 25px !important
   }
 
   body {

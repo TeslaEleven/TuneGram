@@ -14,7 +14,7 @@
     content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ" />
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.1.0" />
-  <title>Authorize | TuneGram</title>
+  <title>TuneGram</title>
   <link
     href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
@@ -145,221 +145,227 @@
   </style>
 </head>
 
-<body style="background-color:#E3E1DB;display: block;margin:0;max-width:50vw;margin-right:auto;margin-left:auto;">
-  <div class="header" style="height:82px;display:block;"></div>
-  <p class="name title-font" style="text-align: center;width:100%">TuneGram</p>
-  </div>
-  <div class="body-text" style="font-size:1em; margin: 10px;text-align: center;">An Apple Music web client that serves
-    up music faster than regular Apple Music. All without any record of your listening.</div>
-  <br>
-  <div class="carousel">
-    <div class="carousel-track">
-      <div class="carousel-container">
-        <div class="container">
-          <div class="left">
-            <div class="title" style="color:#8DA8AD">Home Page</div>
-            <div class="body-text">Recommendations, current heavy rotation, albums, and playlists are all front and
-              center once logged in.</div>
-          </div>
-          <div class="video">
-            <video autoplay muted playsinline>
-              <source src="/videos/hp.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-container">
-        <div class="container">
-          <div class="left">
-            <div class="title" style="color:#8DA8AD">Search</div>
-            <div class="body-text">Search artists, lyrics, songs, albums, and more </div>
-          </div>
-          <div class="video">
-            <video autoplay muted playsinline>
-              <source src="/videos/search.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-container">
-        <div class="container">
-          <div class="left">
-            <div class="title" style="color:#8DA8AD">Now Playing</div>
-            <div class="body-text">See or interface with what's on through now playing, and enjoy uninterrupted music
-              while browsing.</div>
-          </div>
-          <div class="video">
-            <video autoplay muted playsinline>
-              <source src="/videos/np.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-container">
-        <div class="container">
-          <div class="left">
-            <div class="title" style="color:#8DA8AD">Lyrics</div>
-            <div class="body-text">Follow along with line-by-line lyrics.</div>
-          </div>
-          <div class="video">
-            <video autoplay muted playsinline>
-              <source src="/videos/sv.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-container">
-        <div class="container">
-          <div class="left">
-            <div class="title" style="color:#8DA8AD">Preview Mode</div>
-            <div class="body-text">Non-subscribers can still experience TuneGram with the help of iTunes Previews.</div>
-          </div>
-          <div class="video">
-            <video autoplay muted playsinline>
-              <source src="/videos/pm.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="carousel-dots">
-      <div class="carousel-dot active"></div>
-      <div class="carousel-dot"></div>
-      <div class="carousel-dot"></div>
-      <div class="carousel-dot"></div>
-      <div class="carousel-dot"></div>
+<body>
+  <div class="header" style="height: 82px; margin-left: -25vw;position:relative;">
+    <div id="nameplate" style="border: none;margin-left: auto; margin-right: auto;">
+      <img id="name" src="logo.svg" alt="TuneGram"
+        style="width: auto; height: 55px; padding-top: 15px; vertical-align: middle; padding: 10px;">
     </div>
   </div>
-  <div
-    style="background-color: #8DA8AD; color: #2F3633; padding: 20px; margin-top: 20px; text-align: left;border-radius:8px;margin-bottom:20px">
-    <h2 id="account-heading" style="margin: 0; font-family: Ubuntu;">Ready to begin?</h2>
-    <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
-      <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer"
-          onclick="window.location.replace('app')">enter Preview Mode</i></p>
-      <p style="font-size:.7em;margin:0">Note: Preview Mode has limited functionality and does not require an Apple
-        Music subscription.</p>
+  <div style="background-color:#E3E1DB;display: block;margin:0;max-width:50vw;margin-right:auto;margin-left:auto;">
+    <div class="body-text" style="font-size:1em; margin: 10px;text-align: center;">An Apple Music web client that serves
+      up music faster than regular Apple Music. All without any record of your listening.</div>
+    <br>
+    <div class="carousel">
+      <div class="carousel-track">
+        <div class="carousel-container">
+          <div class="container">
+            <div class="left">
+              <div class="title" style="color:#8DA8AD">Home Page</div>
+              <div class="body-text">Recommendations, current heavy rotation, albums, and playlists are all front and
+                center once logged in.</div>
+            </div>
+            <div class="video">
+              <video autoplay muted playsinline>
+                <source src="/videos/hp.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-container">
+          <div class="container">
+            <div class="left">
+              <div class="title" style="color:#8DA8AD">Search</div>
+              <div class="body-text">Search artists, lyrics, songs, albums, and more </div>
+            </div>
+            <div class="video">
+              <video autoplay muted playsinline>
+                <source src="/videos/search.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-container">
+          <div class="container">
+            <div class="left">
+              <div class="title" style="color:#8DA8AD">Now Playing</div>
+              <div class="body-text">See or interface with what's on through now playing, and enjoy uninterrupted music
+                while browsing.</div>
+            </div>
+            <div class="video">
+              <video autoplay muted playsinline>
+                <source src="/videos/np.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-container">
+          <div class="container">
+            <div class="left">
+              <div class="title" style="color:#8DA8AD">Lyrics</div>
+              <div class="body-text">Follow along with line-by-line lyrics.</div>
+            </div>
+            <div class="video">
+              <video autoplay muted playsinline>
+                <source src="/videos/sv.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-container">
+          <div class="container">
+            <div class="left">
+              <div class="title" style="color:#8DA8AD">Preview Mode</div>
+              <div class="body-text">Non-subscribers can still experience TuneGram with the help of iTunes Previews.
+              </div>
+            </div>
+            <div class="video">
+              <video autoplay muted playsinline>
+                <source src="/videos/pm.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots">
+        <div class="carousel-dot active"></div>
+        <div class="carousel-dot"></div>
+        <div class="carousel-dot"></div>
+        <div class="carousel-dot"></div>
+        <div class="carousel-dot"></div>
+      </div>
     </div>
-  </div>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    const $track = $('.carousel-track');
-    const $dots = $('.carousel-dot');
-    const $containers = $('.carousel-container');
-    let currentIndex = 0;
-    let isDragging = false;
-    let startX = 0;
-    let movementX = 0;
+    <div
+      style="background-color: #8DA8AD; color: #2F3633; padding: 20px; margin-top: 20px; text-align: left;border-radius:8px;margin-bottom:20px">
+      <h2 id="account-heading" style="margin: 0; font-family: Ubuntu;">Ready to begin?</h2>
+      <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
+        <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer"
+            onclick="window.location.replace('app')">enter Preview Mode</i></p>
+        <p style="font-size:.7em;margin:0">Note: Preview Mode has limited functionality and does not require an Apple
+          Music subscription.</p>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      const $track = $('.carousel-track');
+      const $dots = $('.carousel-dot');
+      const $containers = $('.carousel-container');
+      let currentIndex = 0;
+      let isDragging = false;
+      let startX = 0;
+      let movementX = 0;
 
-    function updateCarousel(index) {
-      const width = $track.children().first().outerWidth();
-      $track.css('transform', `translateX(-${index * width}px)`);
-      $dots.removeClass('active').eq(index).addClass('active');
-      playOnlyCurrentVideo(index);
-    }
-
-    function playOnlyCurrentVideo(index) {
-      $containers.each(function (i) {
-        const video = $(this).find('video').get(0);
-        if (i === index) {
-          video.play();
-        } else {
-          video.pause();
-          video.currentTime = 0;
-        }
-      });
-    }
-
-    $dots.on('click', function () {
-      currentIndex = $(this).index();
-      updateCarousel(currentIndex);
-    });
-
-    $track.on('mousedown touchstart', function (event) {
-      isDragging = true;
-      startX = event.type === 'mousedown' ? event.pageX : event.originalEvent.touches[0].pageX;
-      movementX = 0;
-      $track.css('transition', 'none');
-    });
-
-    $(document).on('mousemove touchmove', function (event) {
-      if (!isDragging) return;
-      const currentX = event.type === 'mousemove' ? event.pageX : event.originalEvent.touches[0].pageX;
-      movementX = currentX - startX;
-      const width = $track.children().first().outerWidth();
-      $track.css('transform', `translateX(calc(-${currentIndex * width}px + ${movementX}px))`);
-    });
-
-    $(document).on('mouseup touchend', function () {
-      if (!isDragging) return;
-      isDragging = false;
-      $track.css('transition', 'transform 0.5s ease-in-out');
-      if (movementX > 50 && currentIndex > 0) {
-        currentIndex--;
-      } else if (movementX < -50 && currentIndex < $track.children().length - 1) {
-        currentIndex++;
+      function updateCarousel(index) {
+        const width = $track.children().first().outerWidth();
+        $track.css('transform', `translateX(-${index * width}px)`);
+        $dots.removeClass('active').eq(index).addClass('active');
+        playOnlyCurrentVideo(index);
       }
-      updateCarousel(currentIndex);
-    });
 
-    // Advance carousel when video ends
-    $containers.each(function (i) {
-      const video = $(this).find('video').get(0);
-      video.addEventListener('ended', function () {
-        if (currentIndex < $containers.length - 1) {
+      function playOnlyCurrentVideo(index) {
+        $containers.each(function (i) {
+          const video = $(this).find('video').get(0);
+          if (i === index) {
+            video.play();
+          } else {
+            video.pause();
+            video.currentTime = 0;
+          }
+        });
+      }
+
+      $dots.on('click', function () {
+        currentIndex = $(this).index();
+        updateCarousel(currentIndex);
+      });
+
+      $track.on('mousedown touchstart', function (event) {
+        isDragging = true;
+        startX = event.type === 'mousedown' ? event.pageX : event.originalEvent.touches[0].pageX;
+        movementX = 0;
+        $track.css('transition', 'none');
+      });
+
+      $(document).on('mousemove touchmove', function (event) {
+        if (!isDragging) return;
+        const currentX = event.type === 'mousemove' ? event.pageX : event.originalEvent.touches[0].pageX;
+        movementX = currentX - startX;
+        const width = $track.children().first().outerWidth();
+        $track.css('transform', `translateX(calc(-${currentIndex * width}px + ${movementX}px))`);
+      });
+
+      $(document).on('mouseup touchend', function () {
+        if (!isDragging) return;
+        isDragging = false;
+        $track.css('transition', 'transform 0.5s ease-in-out');
+        if (movementX > 50 && currentIndex > 0) {
+          currentIndex--;
+        } else if (movementX < -50 && currentIndex < $track.children().length - 1) {
           currentIndex++;
-        } else {
-          currentIndex = 0;
         }
         updateCarousel(currentIndex);
       });
-    });
 
-    // Pause all videos except the current one on load/resize
-    function handleResizeLoad() {
-      const isMobile = $(window).width() <= 768;
-      const $body = $('body');
-      const $heading = $('#account-heading');
-
-      if (isMobile) {
-        $body.css({ margin: '0 5vw', maxWidth: '100vw' });
-        $heading.css('fontSize', '1.5em');
-      } else {
-        $body.css({ margin: '0 auto', maxWidth: '50vw' });
-        $heading.css('fontSize', '2em');
-      }
-      playOnlyCurrentVideo(currentIndex);
-    }
-
-    $(window).on('resize load', handleResizeLoad);
-
-    $(window).on('load', function () {
-      $track.css('cursor', 'grab');
-      playOnlyCurrentVideo(currentIndex);
-    });
-
-    document.addEventListener('musickitloaded', async function () {
-      try {
-        await MusicKit.configure({
-          developerToken: "eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ",
-          app: {
-            name: 'TuneGram',
-            build: '2.1.0',
-          },
-          debug: true,
-          suppressErrorDialog: false
+      // Advance carousel when video ends
+      $containers.each(function (i) {
+        const video = $(this).find('video').get(0);
+        video.addEventListener('ended', function () {
+          if (currentIndex < $containers.length - 1) {
+            currentIndex++;
+          } else {
+            currentIndex = 0;
+          }
+          updateCarousel(currentIndex);
         });
-        const music = MusicKit.getInstance();
-        document.getElementById('auth').addEventListener("click", async function (e) {
-          await music.authorize().then(() => {
-            window.location.replace('app');
-          })
-        });
+      });
 
-      } catch (err) {
-        console.log(err)
+      // Pause all videos except the current one on load/resize
+      function handleResizeLoad() {
+        const isMobile = $(window).width() <= 768;
+        const $body = $('body');
+        const $heading = $('#account-heading');
+
+        if (isMobile) {
+          $body.css({ margin: '0 5vw', maxWidth: '100vw' });
+          $heading.css('fontSize', '1.5em');
+        } else {
+          $body.css({ margin: '0 auto', maxWidth: '50vw' });
+          $heading.css('fontSize', '2em');
+        }
+        playOnlyCurrentVideo(currentIndex);
       }
-    })
-  </script>
+
+      $(window).on('resize load', handleResizeLoad);
+
+      $(window).on('load', function () {
+        $track.css('cursor', 'grab');
+        playOnlyCurrentVideo(currentIndex);
+      });
+
+      document.addEventListener('musickitloaded', async function () {
+        try {
+          await MusicKit.configure({
+            developerToken: "eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ",
+            app: {
+              name: 'TuneGram',
+              build: '2.1.0',
+            },
+            debug: true,
+            suppressErrorDialog: false
+          });
+          const music = MusicKit.getInstance();
+          document.getElementById('auth').addEventListener("click", async function (e) {
+            await music.authorize().then(() => {
+              window.location.replace('app');
+            })
+          });
+
+        } catch (err) {
+          console.log(err)
+        }
+      })
+    </script>
+  </div>
 </body>
 
 </html>
