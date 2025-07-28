@@ -321,6 +321,11 @@ body::-webkit-scrollbar {
     font-family: Ubuntu !important;
   }
 
+  #ind-content {
+    max-width: 100vw !important;
+    margin: 0 !important;
+  }
+
   #tlcontent-np {
     max-width: 100vw !important;
     max-height: fit-content !important;
