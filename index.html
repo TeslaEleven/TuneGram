@@ -242,8 +242,7 @@
       <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
         <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer"
             onclick="window.location.replace('app')">enter Preview Mode</i></p>
-        <p style="font-size:.7em;margin:0">Note: Preview Mode has limited functionality and does not require an Apple
-          Music subscription.</p>
+        <p style="font-size:.7em;margin:0">You may also enter your user token <b onclick="manualCreds()">manually</b></p>
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -343,6 +342,23 @@
         playOnlyCurrentVideo(currentIndex);
       });
 
+      // Function to manually set musicUserToken and authorize MusicKit
+      async function manualCreds() {
+        const music = window.MusicKit ? window.MusicKit.getInstance() : null;
+        let token = prompt('Enter your Music User Token');
+        if (music && token) {
+          music.musicUserToken = token;
+          try {
+            await music.authorize();
+            alert('Authorization complete!');
+          } catch (err) {
+            alert('Authorization failed: ' + err);
+          }
+        } else {
+          alert('MusicKit is not loaded or token not provided.');
+        }
+      }
+
       document.addEventListener('musickitloaded', async function () {
         try {
           await MusicKit.configure({
@@ -357,6 +373,7 @@
           const music = MusicKit.getInstance();
           document.getElementById('auth').addEventListener("click", async function (e) {
             await music.authorize().then(() => {
+              alert('Music User Token:', userToken);
               window.location.replace('app');
             })
           });
