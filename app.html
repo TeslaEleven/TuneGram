@@ -15,8 +15,6 @@
     rel="stylesheet">
 
   <link rel="manifest" href="manifest.json">
-  <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ" />
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.1.0" />
   <link rel="stylesheet"
@@ -33,17 +31,19 @@
   <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
     <filter id="liquid-glass">
       <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-      <feColorMatrix in="blur" type="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10"
-        result="goo" />
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="goo" />
       <feBlend in="SourceGraphic" in2="goo" mode="normal" />
     </filter>
   </svg>
   <div class="header" style="height:82px;">
-    <div id="nameplate" valign="left" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
-      hx-swap="innerHTML swap:1s" style="border:none;margin-left:2%;flex-grow:1">
-      <img id="name" src="logo.svg" alt="TuneGram"
+    <div id="nameplate" valign="left" style="border:none;margin-left:2%;flex-grow:1;display:flex;vertical-align: middle;">
+      <img id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
+      hx-swap="innerHTML swap:1s" src="logo.svg" alt="TuneGram"
         style="width:auto;height:55px;padding-top:15px;vertical-align: middle;padding:10px">
+    <button id="bug-btn"
+      style="background-color:inherit;border:none;border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <span class="material-symbols-outlined" style="font-size:2em;color:#2F3633;">bug_report</span>
+    </button>
     </div>
     <div class="header-itms">
       <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np-header')"
@@ -199,9 +199,10 @@
       });
       const music = MusicKit.getInstance();
 
-      window.addEventListener('keydown', async function(e) {
-
-        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'u') {
+      var bugBtn = document.getElementById('bug-btn');
+      if (bugBtn) {
+        bugBtn.addEventListener('click', async function () {
+          const music = window.MusicKit ? window.MusicKit.getInstance() : null;
           if (music) {
             try {
               const userToken = await music.authorize();
@@ -210,8 +211,8 @@
               alert('Authorization failed: ' + err);
             }
           }
-        }
-      });
+        });
+      }
 
       const storefront = music.storefrontId || 'us';
       if (!music.isAuthorized) {
