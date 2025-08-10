@@ -10,8 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/x-icon" href="favicon.png">
   <link rel="manifest" href="manifest.json">
-  <meta name="apple-music-developer-token"
-    content="eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzUzMzAyOTcxLCJleHAiOjE3NTc2MjI5NzEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.4xs6J1eRqq1PJktmtyIaPtH_vErmHM6MbxIV4Zs0-mQLoEsPyHhg95UTAiWNoEJagxmwyiBXaqsp7YiaQ5TItQ" />
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.1.0" />
   <title>TuneGram</title>
@@ -342,7 +340,6 @@
         playOnlyCurrentVideo(currentIndex);
       });
 
-      // Function to manually set musicUserToken and authorize MusicKit
       async function manualCreds() {
         const music = window.MusicKit ? window.MusicKit.getInstance() : null;
         let token = prompt('Enter your Music User Token');
@@ -351,6 +348,7 @@
           try {
             await music.authorize();
             alert('Authorization complete!');
+            window.location.replace('app');
           } catch (err) {
             alert('Authorization failed: ' + err);
           }
@@ -373,7 +371,6 @@
           const music = MusicKit.getInstance();
           document.getElementById('auth').addEventListener("click", async function (e) {
             await music.authorize().then(() => {
-              alert('Music User Token:', userToken);
               window.location.replace('app');
             })
           });

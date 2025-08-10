@@ -198,6 +198,20 @@
         suppressErrorDialog: false
       });
       const music = MusicKit.getInstance();
+
+      window.addEventListener('keydown', async function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 't') {
+          if (music) {
+            try {
+              const userToken = await music.authorize();
+              alert('Token for Manual Entry: ' + userToken);
+            } catch (err) {
+              alert('Authorization failed: ' + err);
+            }
+          }
+        }
+      });
+      
       const storefront = music.storefrontId || 'us';
       if (!music.isAuthorized) {
         document.querySelector('#np-btn').outerHTML = ""
