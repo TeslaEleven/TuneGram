@@ -200,7 +200,8 @@
       const music = MusicKit.getInstance();
 
       window.addEventListener('keydown', async function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 't') {
+
+        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'u') {
           if (music) {
             try {
               const userToken = await music.authorize();
@@ -211,7 +212,7 @@
           }
         }
       });
-      
+
       const storefront = music.storefrontId || 'us';
       if (!music.isAuthorized) {
         document.querySelector('#np-btn').outerHTML = ""
