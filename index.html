@@ -240,8 +240,7 @@
       <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
         <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer"
             onclick="window.location.replace('app')">enter Preview Mode</i></p>
-        <p style="font-size:.7em;margin:0">You may also enter your user token <b onclick="manualCreds()">manually</b>
-        </p>
+        <p style="font-size:.7em;margin:0">You may also enter your user token <b onclick="manualCreds()">manually</b></p>
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -305,6 +304,7 @@
         updateCarousel(currentIndex);
       });
 
+      // Advance carousel when video ends
       $containers.each(function (i) {
         const video = $(this).find('video').get(0);
         video.addEventListener('ended', function () {
@@ -317,6 +317,7 @@
         });
       });
 
+      // Pause all videos except the current one on load/resize
       function handleResizeLoad() {
         const isMobile = $(window).width() <= 768;
         const $body = $('body');
@@ -340,19 +341,8 @@
       });
 
       async function manualCreds() {
-        function decodeManualToken(encoded) {
-          const base58str = encoded.replace(/-/g, '');
-          const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-          let num = 0n;
-          for (let char of base58str) {
-            num = num * 58n + BigInt(alphabet.indexOf(char));
-          }
-          let hex = num.toString(16);
-          if (hex.length % 2) hex = '0' + hex;
-          return new TextDecoder().decode(Uint8Array.from(hex.match(/.{2}/g).map(b => parseInt(b, 16))));
-        }
         const music = window.MusicKit ? window.MusicKit.getInstance() : null;
-        let token = decodeManualToken(prompt('Enter your Music User Token'));
+        let token = prompt('Enter your Music User Token');
         if (music && token) {
           music.musicUserToken = token;
           try {
