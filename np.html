@@ -6,29 +6,24 @@
                 <p class="focus-subheading" id="info-title" style="margin-top:5%">Not Playing</p>
                 <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
                 <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
-                <p style="font-size: 1.5em;margin: 0; margin-left: 3%; font-size: 1em;"
-                    id="info-details"></p>
+                <p style="font-size: 1.5em;margin: 0; margin-left: 3%; font-size: 1em;" id="info-details"></p>
             </div>
-        </div>
-        <div id="greater-pc">
-            <div id="play-controls" style="display:flex;width:100%;justify-content: space-around;padding:2%">
-                <p id="rewind-btn" class="material-symbols-outlined">fast_rewind</p>
-                <p id="plpa-btn" class="material-symbols-outlined">play_arrow</p>
-                <p id="ff-btn" class="material-symbols-outlined">fast_forward</p>
-            </div>
-            <apple-music-progress></apple-music-progress>
         </div>
     </div>
     <div id="tlcontent-np">
-        <div id="lyrics">
+        <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <div id="lyrics-tab" class="tab-button active" style="cursor: pointer; color: var(--np-text-primary, #2F3633);">Lyrics</div>
+            <div id="queue-tab" class="tab-button" style="cursor: pointer; color: var(--np-text-secondary, #8DA8AD);">History & Queue</div>
+        </div>
+        <div id="lyrics" style="display: block;">
             <div id="lyrics-content">
                 <p id="lyrics-text"></p>
             </div>
         </div>
-        <div id="queuehistorywrapper" style="flex-direction: column;flex-grow:1;width:95%;margin-left:2%">
+        <div id="queuehistorywrapper" style="display: none; flex-direction: column; flex-grow: 1; width: 95%; margin-left: 2%">
             <p class="focus-heading queuehistory" id="queuehistory">Queue & History</p>
-            <div style="margin-left:auto;margin-right:auto;" id="table-wrap">
-                <table id="tracklist" class="queue-trklst" style="width:100%">
+            <div style="margin-left: auto; margin-right: auto;" id="table-wrap">
+                <table id="tracklist" class="queue-trklst" style="width: 100%">
                     <th class="labels">Playback</th>
                     <th class="labels">Name</th>
                     <th class="labels">Runtime</th>
@@ -36,6 +31,14 @@
             </div>
         </div>
     </div>
+</div>
+<div id="play-controls-container" style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--np-bg-primary, rgba(57, 110, 128, 0.15)) 0%, var(--np-bg-secondary, rgba(141, 168, 173, 0.1)) 100%); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.2); padding: 20px; transform: translateY(100%); opacity: 0.7; transition: all 0.3s ease; z-index: 1000;">
+    <div id="play-controls" style="display: flex; width: 100%; justify-content: center; align-items: center; gap: 30px;">
+        <p id="rewind-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_rewind</p>
+        <p id="plpa-btn" class="material-symbols-outlined" style="font-size: 3em; cursor: pointer; color: var(--np-text-primary, #2F3633);">play_arrow</p>
+        <p id="ff-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_forward</p>
+    </div>
+    <apple-music-progress style="width: 100%; margin-top: 15px;"></apple-music-progress>
 </div>
 <script>
     nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, npId);
