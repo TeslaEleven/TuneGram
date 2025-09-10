@@ -258,8 +258,7 @@ body::-webkit-scrollbar {
 #queuehistory {
   margin-left: 1%;
   font-size: 1.5em;
-  margin-top: 1%;
-  color: var(--np-text-primary, #2F3633);
+  margin-top: 1%
 }
 
 #greater-trklst {
@@ -498,8 +497,8 @@ card {
 }
 
 #lyrics {
-  width: 100%;
-  display: block;
+  width: 95%;
+  display: inline-block;
   justify-content: center;
   align-items: center;
   overflow: hidden;
@@ -507,9 +506,8 @@ card {
   font-weight: 500;
   font-family: "Ubuntu", sans-serif;
   border-radius: 10px;
-  height: calc(100vh - 200px);
+  height: 70vh;
   overflow-y: scroll;
-  flex: 1;
 }
 
 .lyric-line {
@@ -1015,20 +1013,4 @@ hr {
 
 #mobile-nav {
   display:none;
-}
-
-.tab-button {
-  transition: all 0.3s ease;
-  border-radius: 8px 8px 0 0;
-  font-weight: 500;
-}
-
-.tab-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.tab-button.active {
-  background-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

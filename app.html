@@ -118,23 +118,9 @@
   }
   document.body.addEventListener('htmx:afterSwap', function (res) {
     document.getElementById('content').style.height = "fit-content";
-    // Hide loading screen when content is loaded
-    const loadingContainer = document.getElementById('loading-container');
-    if (loadingContainer) {
-      loadingContainer.classList.add('hidden');
-      setTimeout(() => {
-        loadingContainer.style.display = 'none';
-      }, 500);
-    }
   })
   document.body.addEventListener('htmx:beforeSwap', function () {
     document.getElementById('content').style.height = "87.5vh";
-    // Show loading screen when starting to load new content
-    const loadingContainer = document.getElementById('loading-container');
-    if (loadingContainer) {
-      loadingContainer.style.display = 'flex';
-      loadingContainer.classList.remove('hidden');
-    }
   })
   function loadContent(page) {
     if (page !== "np" && page !== "np-header") {
@@ -163,9 +149,6 @@
 
     document.getElementById('content').innerHTML = `<div class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">music_note</p>`
     document.getElementById('content').style.display = "inline-flex";
-    
-    // Reset colors when leaving now playing screen
-    resetNowPlayingColors();
 
     if (page == "srch") {
       document.querySelector('#srch-btn').style.color = "#396E80";
@@ -401,16 +384,6 @@
             } else if (music.playbackState == 3) {
               document.getElementById('plpa-btn').innerHTML = "play_arrow"
             }
-            // Initialize tabs and controls
-            initializeNowPlayingScreen();
-          }
-        })
-        
-        // Also handle the new custom np content
-        document.body.addEventListener('htmx:afterSwap', function (res) {
-          // Check if we have the new np structure
-          if (document.getElementById('lyrics-tab') && document.getElementById('queue-tab')) {
-            initializeNowPlayingScreen();
           }
         })
         document.addEventListener("listenSeeMore", async (e) => {
@@ -552,14 +525,11 @@
               art = MusicKit.formatArtworkURL(root.artwork, 500, 500);
               getImageColors(art).then(({ bgColor, contrastColor }) => {
                 bgColor = bgColor || "#396E80";
-                contrastColor = contrastColor || "#E3E1DB";
                 document.querySelector('#np #info-img').style.border = `3px solid ${bgColor}`;
-                applyNowPlayingColors(bgColor, contrastColor);
               });
             }
           } else {
             art = "fallback.svg"
-            applyNowPlayingColors("#396E80", "#E3E1DB");
           }
           var detailSubheading = "";
           var finalName = "";
@@ -1005,52 +975,7 @@
         ids = ids.filter(Boolean);
         if (!ids.length) return;
         loadContent('np');
-        // Load custom np content with new structure
-        const npContent = `
-          <div id="infobox" style="display:flex" class="skeleton-page">
-            <div id="np" style="margin:2%;display:block">
-              <div id="np-child" style="display:grid!important">
-                <img src="fallback.svg" id="info-img" style="width:100%!important;height:auto!important" />
-                <div id="info-wrapper-np">
-                  <p class="focus-subheading" id="info-title" style="margin-top:5%">Not Playing</p>
-                  <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
-                  <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
-                  <p style="font-size: 1.5em;margin: 0; margin-left: 3%; font-size: 1em;" id="info-details"></p>
-                </div>
-              </div>
-            </div>
-            <div id="tlcontent-np">
-              <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
-                <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
-              </div>
-              <div id="lyrics" style="display: block;">
-                <div id="lyrics-content">
-                  <p id="lyrics-text"></p>
-                </div>
-              </div>
-              <div id="queuehistorywrapper" style="display: none; flex-direction: column; flex-grow: 1; width: 95%; margin-left: 2%">
-                <p class="focus-heading queuehistory" id="queuehistory">Queue & History</p>
-                <div style="margin-left: auto; margin-right: auto;" id="table-wrap">
-                  <table id="tracklist" class="queue-trklst" style="width: 100%">
-                    <th class="labels">Playback</th>
-                    <th class="labels">Name</th>
-                    <th class="labels">Runtime</th>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="play-controls-container" style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--np-bg-primary, rgba(57, 110, 128, 0.15)) 0%, var(--np-bg-secondary, rgba(141, 168, 173, 0.1)) 100%); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.2); padding: 20px; transform: translateY(100%); opacity: 0.7; transition: all 0.3s ease; z-index: 1000;">
-            <div id="play-controls" style="display: flex; width: 100%; justify-content: center; align-items: center; gap: 30px;">
-              <p id="rewind-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_rewind</p>
-              <p id="plpa-btn" class="material-symbols-outlined" style="font-size: 3em; cursor: pointer; color: var(--np-text-primary, #2F3633);">play_arrow</p>
-              <p id="ff-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_forward</p>
-            </div>
-            <apple-music-progress style="width: 100%; margin-top: 15px;"></apple-music-progress>
-          </div>
-        `;
-        document.getElementById('content').innerHTML = npContent;
+        htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" });
         const shufIds = [...ids].sort(() => Math.random() - 0.5);
         await music.setQueue({ songs: shufIds, startPlaying: true });
         queue = music.queue.items;
@@ -1078,52 +1003,7 @@
         ids = ids.filter(Boolean);
         if (!ids.length) return;
         loadContent('np');
-        // Load custom np content with new structure
-        const npContent = `
-          <div id="infobox" style="display:flex" class="skeleton-page">
-            <div id="np" style="margin:2%;display:block">
-              <div id="np-child" style="display:grid!important">
-                <img src="fallback.svg" id="info-img" style="width:100%!important;height:auto!important" />
-                <div id="info-wrapper-np">
-                  <p class="focus-subheading" id="info-title" style="margin-top:5%">Not Playing</p>
-                  <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
-                  <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
-                  <p style="font-size: 1.5em;margin: 0; margin-left: 3%; font-size: 1em;" id="info-details"></p>
-                </div>
-              </div>
-            </div>
-            <div id="tlcontent-np">
-              <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
-                <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
-              </div>
-              <div id="lyrics" style="display: block;">
-                <div id="lyrics-content">
-                  <p id="lyrics-text"></p>
-                </div>
-              </div>
-              <div id="queuehistorywrapper" style="display: none; flex-direction: column; flex-grow: 1; width: 95%; margin-left: 2%">
-                <p class="focus-heading queuehistory" id="queuehistory">Queue & History</p>
-                <div style="margin-left: auto; margin-right: auto;" id="table-wrap">
-                  <table id="tracklist" class="queue-trklst" style="width: 100%">
-                    <th class="labels">Playback</th>
-                    <th class="labels">Name</th>
-                    <th class="labels">Runtime</th>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="play-controls-container" style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--np-bg-primary, rgba(57, 110, 128, 0.15)) 0%, var(--np-bg-secondary, rgba(141, 168, 173, 0.1)) 100%); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.2); padding: 20px; transform: translateY(100%); opacity: 0.7; transition: all 0.3s ease; z-index: 1000;">
-            <div id="play-controls" style="display: flex; width: 100%; justify-content: center; align-items: center; gap: 30px;">
-              <p id="rewind-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_rewind</p>
-              <p id="plpa-btn" class="material-symbols-outlined" style="font-size: 3em; cursor: pointer; color: var(--np-text-primary, #2F3633);">play_arrow</p>
-              <p id="ff-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_forward</p>
-            </div>
-            <apple-music-progress style="width: 100%; margin-top: 15px;"></apple-music-progress>
-          </div>
-        `;
-        document.getElementById('content').innerHTML = npContent;
+        htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" });
         await music.setQueue({ songs: ids, startPlaying: true });
         queue = music.queue.items;
       }
@@ -1383,52 +1263,7 @@
     if (!id.startsWith('prev+')) {
       if (id !== "itunesonly") {
         loadContent('np');
-        // Load custom np content with new structure
-        const npContent = `
-          <div id="infobox" style="display:flex" class="skeleton-page">
-            <div id="np" style="margin:2%;display:block">
-              <div id="np-child" style="display:grid!important">
-                <img src="fallback.svg" id="info-img" style="width:100%!important;height:auto!important" />
-                <div id="info-wrapper-np">
-                  <p class="focus-subheading" id="info-title" style="margin-top:5%">Not Playing</p>
-                  <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
-                  <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
-                  <p style="font-size: 1.5em;margin: 0; margin-left: 3%; font-size: 1em;" id="info-details"></p>
-                </div>
-              </div>
-            </div>
-            <div id="tlcontent-np">
-              <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
-                <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
-              </div>
-              <div id="lyrics" style="display: block;">
-                <div id="lyrics-content">
-                  <p id="lyrics-text"></p>
-                </div>
-              </div>
-              <div id="queuehistorywrapper" style="display: none; flex-direction: column; flex-grow: 1; width: 95%; margin-left: 2%">
-                <p class="focus-heading queuehistory" id="queuehistory">Queue & History</p>
-                <div style="margin-left: auto; margin-right: auto;" id="table-wrap">
-                  <table id="tracklist" class="queue-trklst" style="width: 100%">
-                    <th class="labels">Playback</th>
-                    <th class="labels">Name</th>
-                    <th class="labels">Runtime</th>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="play-controls-container" style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--np-bg-primary, rgba(57, 110, 128, 0.15)) 0%, var(--np-bg-secondary, rgba(141, 168, 173, 0.1)) 100%); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.2); padding: 20px; transform: translateY(100%); opacity: 0.7; transition: all 0.3s ease; z-index: 1000;">
-            <div id="play-controls" style="display: flex; width: 100%; justify-content: center; align-items: center; gap: 30px;">
-              <p id="rewind-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_rewind</p>
-              <p id="plpa-btn" class="material-symbols-outlined" style="font-size: 3em; cursor: pointer; color: var(--np-text-primary, #2F3633);">play_arrow</p>
-              <p id="ff-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_forward</p>
-            </div>
-            <apple-music-progress style="width: 100%; margin-top: 15px;"></apple-music-progress>
-          </div>
-        `;
-        document.getElementById('content').innerHTML = npContent;
+        htmx.ajax('GET', 'np.html?id=' + id, { target: '#content', swap: 'innerHTML', delay: "500ms" })
       } else {
         alert('This content is only available on the iTunes Store.')
       }
@@ -1442,52 +1277,7 @@
   function playNextOrLast(id, type) {
     npId = "viewonly"
     loadContent('np');
-    // Load custom np content with new structure
-    const npContent = `
-      <div id="infobox" style="display:flex" class="skeleton-page">
-        <div id="np" style="margin:2%;display:block">
-          <div id="np-child" style="display:grid!important">
-            <img src="fallback.svg" id="info-img" style="width:100%!important;height:auto!important" />
-            <div id="info-wrapper-np">
-              <p class="focus-subheading" id="info-title" style="margin-top:5%">Not Playing</p>
-              <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
-              <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
-              <p style="font-size: 1.5em;margin: 0; margin-left: 3%; font-size: 1em;" id="info-details"></p>
-            </div>
-          </div>
-        </div>
-        <div id="tlcontent-np">
-          <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
-            <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
-          </div>
-          <div id="lyrics" style="display: block;">
-            <div id="lyrics-content">
-              <p id="lyrics-text"></p>
-            </div>
-          </div>
-          <div id="queuehistorywrapper" style="display: none; flex-direction: column; flex-grow: 1; width: 95%; margin-left: 2%">
-            <p class="focus-heading queuehistory" id="queuehistory">Queue & History</p>
-            <div style="margin-left: auto; margin-right: auto;" id="table-wrap">
-              <table id="tracklist" class="queue-trklst" style="width: 100%">
-                <th class="labels">Playback</th>
-                <th class="labels">Name</th>
-                <th class="labels">Runtime</th>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="play-controls-container" style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--np-bg-primary, rgba(57, 110, 128, 0.15)) 0%, var(--np-bg-secondary, rgba(141, 168, 173, 0.1)) 100%); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.2); padding: 20px; transform: translateY(100%); opacity: 0.7; transition: all 0.3s ease; z-index: 1000;">
-        <div id="play-controls" style="display: flex; width: 100%; justify-content: center; align-items: center; gap: 30px;">
-          <p id="rewind-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_rewind</p>
-          <p id="plpa-btn" class="material-symbols-outlined" style="font-size: 3em; cursor: pointer; color: var(--np-text-primary, #2F3633);">play_arrow</p>
-          <p id="ff-btn" class="material-symbols-outlined" style="font-size: 2em; cursor: pointer; color: var(--np-text-primary, #2F3633);">fast_forward</p>
-        </div>
-        <apple-music-progress style="width: 100%; margin-top: 15px;"></apple-music-progress>
-      </div>
-    `;
-    document.getElementById('content').innerHTML = npContent;
+    htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" })
     if (type == "later") {
       playLater.initCustomEvent("playLater", true, true, id);
       document.dispatchEvent(playLater);
@@ -1652,107 +1442,6 @@
       if (img) img.style.display = 'none';
       if (icon) icon.style.display = 'block';
       npBtn.classList.remove('active');
-    }
-  }
-
-  function applyNowPlayingColors(bgColor, contrastColor) {
-    // Convert hex to RGB for CSS variables
-    const hexToRgb = (hex) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      } : null;
-    };
-
-    const bgRgb = hexToRgb(bgColor);
-    const contrastRgb = hexToRgb(contrastColor);
-    
-    if (bgRgb && contrastRgb) {
-      // Set CSS custom properties for dynamic theming
-      document.documentElement.style.setProperty('--np-bg-primary', `rgba(${bgRgb.r}, ${bgRgb.g}, ${bgRgb.b}, 0.15)`);
-      document.documentElement.style.setProperty('--np-bg-secondary', `rgba(${bgRgb.r}, ${bgRgb.g}, ${bgRgb.b}, 0.08)`);
-      document.documentElement.style.setProperty('--np-text-primary', contrastColor);
-      document.documentElement.style.setProperty('--np-text-secondary', `rgba(${contrastRgb.r}, ${contrastRgb.g}, ${contrastRgb.b}, 0.7)`);
-      document.documentElement.style.setProperty('--np-accent', bgColor);
-      
-      // Apply to now playing screen
-      const npElement = document.querySelector('#np');
-      if (npElement) {
-        npElement.classList.add('apple-style');
-      }
-    }
-  }
-
-  function resetNowPlayingColors() {
-    // Reset to default colors
-    document.documentElement.style.setProperty('--np-bg-primary', 'rgba(57, 110, 128, 0.15)');
-    document.documentElement.style.setProperty('--np-bg-secondary', 'rgba(141, 168, 173, 0.1)');
-    document.documentElement.style.setProperty('--np-text-primary', '#2F3633');
-    document.documentElement.style.setProperty('--np-text-secondary', '#8DA8AD');
-    document.documentElement.style.setProperty('--np-accent', '#396E80');
-    
-    const npElement = document.querySelector('#np');
-    if (npElement) {
-      npElement.classList.remove('apple-style');
-    }
-  }
-
-  function switchTab(tabName) {
-    const lyricsTab = document.getElementById('lyrics-tab');
-    const queueTab = document.getElementById('queue-tab');
-    const lyricsContent = document.getElementById('lyrics');
-    const queueContent = document.getElementById('queuehistorywrapper');
-    
-    if (tabName === 'lyrics') {
-      lyricsTab.classList.add('active');
-      queueTab.classList.remove('active');
-      lyricsTab.style.borderBottom = '2px solid var(--np-accent, #396E80)';
-      lyricsTab.style.color = 'var(--np-text-primary, #2F3633)';
-      queueTab.style.borderBottom = '2px solid transparent';
-      queueTab.style.color = 'var(--np-text-secondary, #8DA8AD)';
-      lyricsContent.style.display = 'block';
-      queueContent.style.display = 'none';
-    } else {
-      lyricsTab.classList.remove('active');
-      queueTab.classList.add('active');
-      lyricsTab.style.borderBottom = '2px solid transparent';
-      lyricsTab.style.color = 'var(--np-text-secondary, #8DA8AD)';
-      queueTab.style.borderBottom = '2px solid var(--np-accent, #396E80)';
-      queueTab.style.color = 'var(--np-text-primary, #2F3633)';
-      lyricsContent.style.display = 'none';
-      queueContent.style.display = 'block';
-    }
-  }
-
-  function initializeNowPlayingScreen() {
-    // Add tab functionality
-    const lyricsTab = document.getElementById('lyrics-tab');
-    const queueTab = document.getElementById('queue-tab');
-    
-    if (lyricsTab) {
-      lyricsTab.addEventListener('click', () => switchTab('lyrics'));
-    }
-    if (queueTab) {
-      queueTab.addEventListener('click', () => switchTab('queue'));
-    }
-    
-    // Initialize with lyrics tab active
-    switchTab('lyrics');
-    
-    // Add hover effects for controls
-    const controlsContainer = document.getElementById('play-controls-container');
-    if (controlsContainer) {
-      controlsContainer.addEventListener('mouseenter', () => {
-        controlsContainer.style.transform = 'translateY(0)';
-        controlsContainer.style.opacity = '1';
-      });
-      
-      controlsContainer.addEventListener('mouseleave', () => {
-        controlsContainer.style.transform = 'translateY(100%)';
-        controlsContainer.style.opacity = '0.7';
-      });
     }
   }
 </script>
