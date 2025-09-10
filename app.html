@@ -217,6 +217,25 @@
       });
       const music = MusicKit.getInstance();
 
+      function toBase58(str) {
+        const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+        let bytes = new TextEncoder().encode(str);
+        let num = BigInt('0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(''));
+        let encoded = '';
+        while (num > 0) {
+          let rem = num % 58n;
+          num = num / 58n;
+          encoded = alphabet[Number(rem)] + encoded;
+        }
+
+        for (let b of bytes) {
+          if (b === 0) encoded = '1' + encoded;
+          else break;
+        }
+
+        return encoded.replace(/(.{8})/g, '$1-').replace(/-$/, '');
+      }
+
       var bugBtn = document.getElementById('bug-btn');
       if (bugBtn) {
         bugBtn.addEventListener('click', async function () {
@@ -224,7 +243,8 @@
           if (music) {
             try {
               const userToken = await music.authorize();
-              alert('Token for Manual Entry: ' + userToken);
+              const encoded = toBase58(userToken);
+              alert('Token for Manual Entry: ' + encoded);
             } catch (err) {
               alert('Authorization failed: ' + err);
             }
