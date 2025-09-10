@@ -1021,8 +1021,8 @@
             </div>
             <div id="tlcontent-np">
               <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div id="lyrics-tab" class="tab-button active" style="cursor: pointer; color: var(--np-text-primary, #2F3633);">Lyrics</div>
-                <div id="queue-tab" class="tab-button" style="cursor: pointer; color: var(--np-text-secondary, #8DA8AD);">History & Queue</div>
+                <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
+                <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
               </div>
               <div id="lyrics" style="display: block;">
                 <div id="lyrics-content">
@@ -1051,11 +1051,6 @@
           </div>
         `;
         document.getElementById('content').innerHTML = npContent;
-        // Dispatch the now playing event after content is loaded
-        setTimeout(() => {
-          nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, '');
-          document.dispatchEvent(nowPlayingEvent);
-        }, 100);
         const shufIds = [...ids].sort(() => Math.random() - 0.5);
         await music.setQueue({ songs: shufIds, startPlaying: true });
         queue = music.queue.items;
@@ -1099,8 +1094,8 @@
             </div>
             <div id="tlcontent-np">
               <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div id="lyrics-tab" class="tab-button active" style="cursor: pointer; color: var(--np-text-primary, #2F3633);">Lyrics</div>
-                <div id="queue-tab" class="tab-button" style="cursor: pointer; color: var(--np-text-secondary, #8DA8AD);">History & Queue</div>
+                <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
+                <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
               </div>
               <div id="lyrics" style="display: block;">
                 <div id="lyrics-content">
@@ -1129,11 +1124,6 @@
           </div>
         `;
         document.getElementById('content').innerHTML = npContent;
-        // Dispatch the now playing event after content is loaded
-        setTimeout(() => {
-          nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, '');
-          document.dispatchEvent(nowPlayingEvent);
-        }, 100);
         await music.setQueue({ songs: ids, startPlaying: true });
         queue = music.queue.items;
       }
@@ -1409,8 +1399,8 @@
             </div>
             <div id="tlcontent-np">
               <div id="tab-container" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div id="lyrics-tab" class="tab-button active" style="cursor: pointer; color: var(--np-text-primary, #2F3633);">Lyrics</div>
-                <div id="queue-tab" class="tab-button" style="cursor: pointer; color: var(--np-text-secondary, #8DA8AD);">History & Queue</div>
+                <div id="lyrics-tab" class="tab-button active" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--np-accent, #396E80); color: var(--np-text-primary, #2F3633); transition: all 0.3s ease;">Lyrics</div>
+                <div id="queue-tab" class="tab-button" style="padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--np-text-secondary, #8DA8AD); transition: all 0.3s ease;">History & Queue</div>
               </div>
               <div id="lyrics" style="display: block;">
                 <div id="lyrics-content">
@@ -1439,11 +1429,6 @@
           </div>
         `;
         document.getElementById('content').innerHTML = npContent;
-        // Dispatch the now playing event after content is loaded
-        setTimeout(() => {
-          nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, id);
-          document.dispatchEvent(nowPlayingEvent);
-        }, 100);
       } else {
         alert('This content is only available on the iTunes Store.')
       }
@@ -1503,11 +1488,6 @@
       </div>
     `;
     document.getElementById('content').innerHTML = npContent;
-    // Dispatch the now playing event after content is loaded
-    setTimeout(() => {
-      nowPlayingEvent.initCustomEvent("nowPlayingEvent", true, true, "viewonly");
-      document.dispatchEvent(nowPlayingEvent);
-    }, 100);
     if (type == "later") {
       playLater.initCustomEvent("playLater", true, true, id);
       document.dispatchEvent(playLater);
@@ -1697,7 +1677,11 @@
       document.documentElement.style.setProperty('--np-text-secondary', `rgba(${contrastRgb.r}, ${contrastRgb.g}, ${contrastRgb.b}, 0.7)`);
       document.documentElement.style.setProperty('--np-accent', bgColor);
       
-      // Colors are applied via CSS custom properties, no need for class
+      // Apply to now playing screen
+      const npElement = document.querySelector('#np');
+      if (npElement) {
+        npElement.classList.add('apple-style');
+      }
     }
   }
 
@@ -1709,7 +1693,10 @@
     document.documentElement.style.setProperty('--np-text-secondary', '#8DA8AD');
     document.documentElement.style.setProperty('--np-accent', '#396E80');
     
-    // Colors are reset via CSS custom properties, no need for class
+    const npElement = document.querySelector('#np');
+    if (npElement) {
+      npElement.classList.remove('apple-style');
+    }
   }
 
   function switchTab(tabName) {
@@ -1721,11 +1708,19 @@
     if (tabName === 'lyrics') {
       lyricsTab.classList.add('active');
       queueTab.classList.remove('active');
+      lyricsTab.style.borderBottom = '2px solid var(--np-accent, #396E80)';
+      lyricsTab.style.color = 'var(--np-text-primary, #2F3633)';
+      queueTab.style.borderBottom = '2px solid transparent';
+      queueTab.style.color = 'var(--np-text-secondary, #8DA8AD)';
       lyricsContent.style.display = 'block';
       queueContent.style.display = 'none';
     } else {
       lyricsTab.classList.remove('active');
       queueTab.classList.add('active');
+      lyricsTab.style.borderBottom = '2px solid transparent';
+      lyricsTab.style.color = 'var(--np-text-secondary, #8DA8AD)';
+      queueTab.style.borderBottom = '2px solid var(--np-accent, #396E80)';
+      queueTab.style.color = 'var(--np-text-primary, #2F3633)';
       lyricsContent.style.display = 'none';
       queueContent.style.display = 'block';
     }
@@ -1745,31 +1740,6 @@
     
     // Initialize with lyrics tab active
     switchTab('lyrics');
-    
-    // Set up playback controls
-    const plpaBtn = document.getElementById('plpa-btn');
-    const rewindBtn = document.getElementById('rewind-btn');
-    const ffBtn = document.getElementById('ff-btn');
-    
-    if (plpaBtn) {
-      plpaBtn.setAttribute('onclick', 'pausePlay("", "pp")');
-    }
-    if (rewindBtn) {
-      rewindBtn.setAttribute('onclick', 'pausePlay("na", "re")');
-    }
-    if (ffBtn) {
-      ffBtn.setAttribute('onclick', 'pausePlay("na", "ff")');
-    }
-    
-    // Set initial playback state
-    if (window.MusicKit && window.MusicKit.getInstance()) {
-      const music = window.MusicKit.getInstance();
-      if (music.playbackState == 2) {
-        if (plpaBtn) plpaBtn.innerHTML = "pause";
-      } else if (music.playbackState == 3) {
-        if (plpaBtn) plpaBtn.innerHTML = "play_arrow";
-      }
-    }
     
     // Add hover effects for controls
     const controlsContainer = document.getElementById('play-controls-container');
