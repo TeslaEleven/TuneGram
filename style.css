@@ -788,7 +788,6 @@ artcard:active {
   overflow-y: scroll;
   max-width: 29vw;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
 }
 
