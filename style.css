@@ -139,7 +139,7 @@ apple-music-progress {
   margin: 0;
   flex: 0 1 auto;
   position: fixed;
-  background-image: linear-gradient(#8DA8AD 10px, transparent 2px);
+  background-image: linear-gradient(#8DA8AD, transparent);
   z-index: 1000;
   width: 100vw;
 }
@@ -177,31 +177,10 @@ body {
     'opsz' 24
 }
 
-.loading-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  background-color: #E3E1DB;
-  transition: opacity 0.5s ease-out;
-}
-
 .moving-note {
-  animation: moveUpDown 1.5s ease-in-out infinite alternate;
-  position: relative;
-  font-size: 4em;
-  color: #396E80;
-}
+  animation: moveUpDown 0.5s linear infinite alternate;
+  position: inline-flex;
 
-.loading-container.hidden {
-  opacity: 0;
-  pointer-events: none;
 }
 
 #table-wrap {
@@ -227,17 +206,10 @@ body {
 @keyframes moveUpDown {
   0% {
     color: #396E80;
-    transform: translateY(0px) scale(1);
-  }
-
-  50% {
-    color: #5A8A9A;
-    transform: translateY(-10px) scale(1.1);
   }
 
   100% {
     color: #8DA8AD;
-    transform: translateY(0px) scale(1);
   }
 }
 
@@ -786,19 +758,6 @@ artcard:active {
   overflow-x: hidden;
   overflow-y: scroll;
   max-width: 29vw;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-#np.apple-style {
-  background: linear-gradient(135deg, var(--np-bg-primary, rgba(57, 110, 128, 0.15)) 0%, var(--np-bg-secondary, rgba(141, 168, 173, 0.1)) 100%);
-  backdrop-filter: blur(30px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 #np-child {
