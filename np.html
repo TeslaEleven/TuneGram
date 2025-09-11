@@ -1,13 +1,29 @@
 <div id="infobox" style="display:flex" class="skeleton-page">
-    <div id="np" style="margin:2%;display:block">
-        <div id="np-child" style="display:grid!important">
+    <div id="np" style="margin-bottom:0 !important;margin:2%;display:block;align-items:center">
+        <div id="np-child">
             <img src="fallback.svg" id="info-img" style="width:100%!important;height:auto!important" />
             <div id="info-wrapper-np">
                 <p class="focus-subheading" id="info-title" style="color:#396E80;margin-top:5%">Not Playing</p>
                 <p class="focus-subheading" style="font-size:1.5em" id="info-artist"></p>
-                <p class="focus-subheading" style="font-size:1.3em" id="info-album"></p>
+                <p class="focus-subheading" style="font-size:1.3em; cursor: pointer;" id="info-album" onclick="toAlbumFromNowPlaying()"></p>
                 <p style="font-size: 1.5em; color: #ACC0C3; margin: 0; margin-left: 3%; font-size: 1em;"
                     id="info-details"></p>
+            </div>
+            <div id="queuehistorywrapper" style="flex-direction: column;flex-grow:1;width:95%;margin-left:2%">
+                <div id="queue-header" onclick="toggleQueue()" style="display: flex; align-items: center; cursor: pointer; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <p class="focus-heading queuehistory" id="queuehistory" style="margin: 0; flex: 1;">Queue & History</p>
+                    <span id="queue-arrow" class="material-symbols-outlined" style="transition: transform 0.3s ease;">keyboard_arrow_down</span>
+                </div>
+                <br>
+                <div id="queue-content" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                    <div style="margin-left:auto;margin-right:auto;" id="table-wrap">
+                        <table id="tracklist" class="queue-trklst" style="width:100%">
+                            <th class="labels">Playback</th>
+                            <th class="labels">Name</th>
+                            <th class="labels">Runtime</th>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="greater-pc">
@@ -25,16 +41,12 @@
                 <p id="lyrics-text"></p>
             </div>
         </div>
-        <div id="queuehistorywrapper" style="flex-direction: column;flex-grow:1;width:95%;margin-left:2%">
-            <p class="focus-heading queuehistory" id="queuehistory">Queue & History</p>
-            <div style="margin-left:auto;margin-right:auto;" id="table-wrap">
-                <table id="tracklist" class="queue-trklst" style="width:100%">
-                    <th class="labels">Playback</th>
-                    <th class="labels">Name</th>
-                    <th class="labels">Runtime</th>
-                </table>
-            </div>
-        </div>
+    </div>
+    <div id="greater-pc-desktop">
+        <p id="rewind-btn" class="material-symbols-outlined" onclick="pausePlay('na', 're')">fast_rewind</p>
+        <p id="plpa-btn" class="material-symbols-outlined" onclick="pausePlay('na', 'pp')">play_arrow</p>
+        <p id="ff-btn" class="material-symbols-outlined" onclick="pausePlay('na', 'ff')">fast_forward</p>
+        <apple-music-progress></apple-music-progress>
     </div>
 </div>
 <script>
