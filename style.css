@@ -2,11 +2,16 @@
   cursor: pointer;
   transform: scale(1);
   transition: 100ms ease-in;
+  font-family: MuseoModerno;
+  font-size: 3em;
+  margin: 0;
+  color: #8DA8AD;
+  transition: font-weight 0.3s ease-in-out;
+  font-weight: 300;
 }
 
 #name:hover {
-  transform: scale(1.05);
-  transition: 100ms ease-in;
+  font-weight: 500;
 }
 
 .header-itms {
