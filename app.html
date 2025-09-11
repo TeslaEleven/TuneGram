@@ -602,6 +602,8 @@
                 document.body.style.backgroundColor = `${bgColor}`;
                 document.body.style.color = `${contrastColor}`;
                 var theme = getDark(bgColor);
+                var invert = (theme == "dark") ? "light" : "dark"
+                document.querySelector('apple-music-playback-controls').setAttribute("theme", invert);
                 document.querySelector('apple-music-progress').setAttribute("theme", theme);
                 document.querySelectorAll('.focus-subheading').forEach(a => a.style.color = `${contrastColor}`);
                 document.querySelectorAll('.focus-heading').forEach(a => a.style.color = `${contrastColor}`);
@@ -1743,7 +1745,7 @@
     const b = parseInt(match[2], 10);
 
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness < 128 ? "dark" : "true";
+    return brightness < 128 ? "dark" : "light";
   }
   
   document.addEventListener('mousemove', resetMouseActivityTimer);
