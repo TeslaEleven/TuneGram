@@ -15,18 +15,26 @@
   <meta name="apple-music-app-build" content="2.1.0" />
   <title>TuneGram</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=neue-haas-grotesk-display:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
   <style>
+    html {
+      font-weight: 600;
+    }
     .container {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       margin: 0;
       padding: 0;
+    }
+
+    .header {
+      padding-bottom: 0;
+      border: none;
     }
 
     .left {
@@ -38,16 +46,17 @@
     }
 
     .title {
-      font-family: Ubuntu;
+      font-family: neue-haas-grotesk-display;
       font-size: 2em;
-      font-weight: bold;
       color: #396E80;
+      font-weight: 600;
     }
 
     .body-text {
-      font-family: Ubuntu;
+      font-family: neue-haas-grotesk-display;
       font-size: 1.2em;
       color: #333;
+      font-weight: 500;
     }
 
     .video {
@@ -237,9 +246,9 @@
     </div>
     <div
       style="background-color: #8DA8AD; color: #2F3633; padding: 20px; margin-top: 20px; text-align: left;border-radius:8px;margin-bottom:20px">
-      <h2 id="account-heading" style="margin: 0; font-family: Ubuntu;">Ready to begin?</h2>
-      <div style="font-family: Ubuntu; font-size: 1.2em; margin-top: 10px;">
-        <p><b id="auth" style="cursor:pointer">Authorize with Apple Music</b> or <i style="cursor:pointer"
+      <h2 id="account-heading" style="margin: 0; font-family: neue-haas-grotesk-display;">Ready to begin?</h2>
+      <div style="font-family: neue-haas-grotesk-display; font-size: 1.2em; margin-top: 10px;">
+        <p><b id="auth" style="cursor:pointer;font-weight: 600;">Authorize with Apple Music</b> or <i style="cursor:pointer"
             onclick="window.location.replace('app')">enter Preview Mode</i></p>
         <p style="font-size:.7em;margin:0">You may also enter your user token <b onclick="manualCreds()">manually</b>
         </p>
