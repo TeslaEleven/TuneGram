@@ -296,7 +296,7 @@
           if (music) {
             try {
               const userToken = await music.authorize();
-              prompt('Token for Manual Entry: ' + userToken);
+              prompt('Token for Manual Entry: ', userToken);
             } catch (err) {
               alert('Authorization failed: ' + err);
             }
