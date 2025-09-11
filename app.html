@@ -152,6 +152,11 @@
     if (queueContent) {
       queueContent.style.backgroundColor = '';
     }
+    
+    // Reset header items
+    document.querySelectorAll('.header-itm').forEach(a => a.style.background = '');
+    document.querySelectorAll('.header-itm').forEach(a => a.style.border = '');
+    document.querySelectorAll('.header-itm').forEach(a => a.style.color = '');
   }
   
   function resetLyricVariables() {
@@ -1700,5 +1705,36 @@
       imgEl.src = imgUrl;
     });
   }
+
+  // Mouse activity detection for greater-pc-desktop
+  let mouseActivityTimeout;
+  
+  function showGreaterPcDesktop() {
+    const greaterPcDesktop = document.getElementById('greater-pc-desktop');
+    if (greaterPcDesktop) {
+      greaterPcDesktop.style.opacity = '1';
+      greaterPcDesktop.style.transform = 'translateY(0)';
+    }
+  }
+  
+  function hideGreaterPcDesktop() {
+    const greaterPcDesktop = document.getElementById('greater-pc-desktop');
+    if (greaterPcDesktop) {
+      greaterPcDesktop.style.opacity = '0';
+      greaterPcDesktop.style.transform = 'translateY(100%)';
+    }
+  }
+  
+  function resetMouseActivityTimer() {
+    clearTimeout(mouseActivityTimeout);
+    showGreaterPcDesktop();
+    mouseActivityTimeout = setTimeout(hideGreaterPcDesktop, 5000);
+  }
+  
+  // Add mouse activity listeners
+  document.addEventListener('mousemove', resetMouseActivityTimer);
+  document.addEventListener('mousedown', resetMouseActivityTimer);
+  document.addEventListener('mouseup', resetMouseActivityTimer);
+  document.addEventListener('scroll', resetMouseActivityTimer);
 
 </script>

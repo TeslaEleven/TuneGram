@@ -142,7 +142,6 @@ apple-music-progress {
   width: 100vw;
   padding-bottom: 10px;
   padding-top: 5px;
-  border-bottom: 1px solid #2F3633;
   background-color: #E3E1DB;
 }
 
@@ -165,10 +164,6 @@ apple-music-progress {
   transform: translateY(100%);
 }
 
-body:hover #greater-pc-desktop {
-  opacity: 1;
-  transform: translateY(0);
-}
 
 .title-font {
   font-family: "MuseoModerno", sans-serif;
