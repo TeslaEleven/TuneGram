@@ -603,7 +603,6 @@
                 document.body.style.color = `${contrastColor}`;
                 var theme = getDark(bgColor);
                 var invert = (theme == "dark") ? "light" : "dark"
-                document.querySelector('apple-music-playback-controls').setAttribute("theme", invert);
                 document.querySelector('apple-music-progress').setAttribute("theme", theme);
                 document.querySelectorAll('.focus-subheading').forEach(a => a.style.color = `${contrastColor}`);
                 document.querySelectorAll('.focus-heading').forEach(a => a.style.color = `${contrastColor}`);
