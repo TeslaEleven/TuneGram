@@ -13,8 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
-    <link rel="stylesheet" href="https://use.typekit.net/rtp1cee.css">
-
+  <link rel="stylesheet" href="https://use.typekit.net/rtp1cee.css">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-music-app-name" content="TuneGram" />
   <meta name="apple-music-app-build" content="2.1.0" />
@@ -38,9 +37,8 @@
   </svg>
   <div class="header" style="height:82px;">
     <div id="nameplate" valign="left" style="border:none;margin-left:2%;flex-grow:1;display:flex;vertical-align: middle;">
-      <img id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
-      hx-swap="innerHTML swap:1s" src="logo.svg" alt="TuneGram"
-        style="width:auto;height:55px;padding-top:15px;vertical-align: middle;padding:10px">
+      <p id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content"
+      hx-swap="innerHTML swap:1s" style="width:auto;height:55px;padding-top:15px;vertical-align: middle;padding:10px">TuneGram</p>
     <button id="bug-btn"
       style="background-color:inherit;border:none;border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <span class="material-symbols-outlined" style="font-size:2em;color:#2F3633;">bug_report</span>
@@ -123,22 +121,25 @@
     document.getElementById('content').style.height = "87.5vh";
   })
   function resetNowPlayingColors() {
-    // Reset body colors
     document.body.style.backgroundColor = "#E3E1DB";
     document.body.style.color = "#2F3633";
     
-    // Reset CSS variables
     const header = document.querySelector('.header');
     if (header) {
       header.style.backgroundColor = "#E3E1DB";
     }
+
+    const name = document.querySelector('#name');
+    if (name) {
+      name.style.color = "#8DA8AD";
+    }
+    
     document.documentElement.style.setProperty('--np-bg-primary', '');
     document.documentElement.style.setProperty('--np-bg-secondary', '');
     document.documentElement.style.setProperty('--np-text-primary', '');
     document.documentElement.style.setProperty('--np-text-secondary', '');
     document.documentElement.style.setProperty('--np-accent', '');
     
-    // Reset element colors
     document.querySelectorAll('.focus-subheading').forEach(el => {
       el.style.color = '';
     });
@@ -146,20 +147,17 @@
       el.style.color = '';
     });
     
-    // Reset queue content background
     const queueContent = document.getElementById('queue-content');
     if (queueContent) {
       queueContent.style.backgroundColor = '';
     }
     
-    // Reset header items
     document.querySelectorAll('.header-itm').forEach(a => a.style.background = '');
     document.querySelectorAll('.header-itm').forEach(a => a.style.border = '');
     document.querySelectorAll('.header-itm').forEach(a => a.style.color = '');
   }
   
   function resetLyricVariables() {
-    // Reset all lyric-related variables
     if (window.lyricLines) {
       window.lyricLines.forEach(line => {
         line.classList.remove('highlight');
@@ -168,18 +166,15 @@
       });
     }
     
-    // Reset scroll lock
     window.scrollLock = false;
     if (window.scrollLockTimeout) {
       clearTimeout(window.scrollLockTimeout);
       window.scrollLockTimeout = null;
     }
     
-    // Reset highlight tracking
     window.lastHighlighted = -1;
     window.lastBreakIdx = -1;
     
-    // Stop any ongoing animations
     if (window.glowAnimationFrame) {
       cancelAnimationFrame(window.glowAnimationFrame);
       window.glowAnimationFrame = null;
@@ -607,6 +602,8 @@
                 bgColor = bgColor || "#396E80";
                 document.body.style.backgroundColor = `${bgColor}`;
                 document.body.style.color = `${contrastColor}`;
+                var theme = getDark(bgColor);
+                document.querySelector('apple-music-progress').setAttribute("theme", theme);
                 document.querySelectorAll('.focus-subheading').forEach(a => a.style.color = `${contrastColor}`);
                 document.querySelectorAll('.focus-heading').forEach(a => a.style.color = `${contrastColor}`);
                 if(document.querySelectorAll('detail-label')){
@@ -614,10 +611,14 @@
                   document.querySelectorAll('detail-label').forEach(a => a.style.border = `1px solid ${contrastColor}`);
                 }
                 const header = document.querySelector('.header');
-                 if (header) {
+                const name = document.querySelector('#name');
+                if (header) {
                    header.style.backgroundColor = bgColor;
                    header.style.borderBottom = `none`;
-                 }
+                }
+                if (name) {
+                  name.style.color = contrastColor;
+                }
                 document.querySelectorAll('.header-itm').forEach(a => a.style.background = `transparent !important`);
                 document.querySelectorAll('.header-itm').forEach(a => a.style.border = `none !important`);
                 document.querySelectorAll('.header-itm').forEach(a => a.style.color = `${contrastColor}`);
@@ -1729,8 +1730,23 @@
     showGreaterPcDesktop();
     mouseActivityTimeout = setTimeout(hideGreaterPcDesktop, 5000);
   }
+
+  function getDark(rgbString) {
+    const match = rgbString.match(/\d+/g);
   
-  // Add mouse activity listeners
+    if (!match || match.length < 3) {
+      console.error("Invalid");
+      return null;
+    }
+  
+    const r = parseInt(match[0], 10);
+    const g = parseInt(match[1], 10);
+    const b = parseInt(match[2], 10);
+
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness < 128;
+  }
+  
   document.addEventListener('mousemove', resetMouseActivityTimer);
   document.addEventListener('mousedown', resetMouseActivityTimer);
   document.addEventListener('mouseup', resetMouseActivityTimer);
