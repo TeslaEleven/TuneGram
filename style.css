@@ -6,8 +6,9 @@
   font-size: 3em;
   margin: 0;
   color: #8DA8AD;
-  transition: font-weight 0.3s ease-in-out;
+  transition: font-weight 0.2s ease-in-out;
   font-weight: 300;
+  margin-bottom: 20px;
 }
 
 #name:hover {
@@ -16,6 +17,44 @@
 
 .header-itms {
   display: flex;
+}
+
+apple-music-progress {
+  margin-top: 11px !important;
+}
+
+/* Hide body overflow when now playing is active and visible */
+body:has(#content #np) {
+  overflow-y: hidden;
+}
+
+/* Alternative approach using class-based targeting */
+body.np-active {
+  overflow-y: hidden;
+}
+
+/* Style Apple Music playback controls play button with contrast color */
+apple-music-playback-controls::part(play-button) {
+  color: var(--contrast-color, #2F3633) !important;
+}
+
+apple-music-playback-controls::part(play-button) svg {
+  fill: var(--contrast-color, #2F3633) !important;
+}
+
+/* Alternative approach using CSS custom properties */
+apple-music-playback-controls {
+  --amp-icon-color: var(--contrast-color, #2F3633);
+  --amp-icon-fill: var(--contrast-color, #2F3633);
+}
+
+/* Target the play button specifically */
+apple-music-playback-controls button[data-action="play"] {
+  color: var(--contrast-color, #2F3633) !important;
+}
+
+apple-music-playback-controls button[data-action="play"] svg {
+  fill: var(--contrast-color, #2F3633) !important;
 }
 
 .header-itm {
@@ -127,16 +166,6 @@ apple-music-progress {
   transition: 100ms ease;
 }
 
-#rewind-btn,
-#ff-btn,
-#plpa-btn {
-  cursor: pointer;
-  font-size: 200%
-}
-
-#plpa-btn {
-  transform: scale(1.5)
-}
 
 .header {
   display: flex;
@@ -148,6 +177,7 @@ apple-music-progress {
   padding-bottom: 10px;
   padding-top: 5px;
   background-color: #E3E1DB;
+  opacity: .8;
 }
 
 #greater-pc-desktop {
@@ -199,6 +229,8 @@ body {
   flex-flow: column;
 }
 
+
+
 .material-symbols-outlined {
   font-variation-settings:
     'FILL' 0,
@@ -215,7 +247,8 @@ body {
 
 #lyrics {
   text-align: right;
-  height: 100vh;
+  height: calc(100vh - 82px);
+  max-height: calc(100vh - 82px);
 }
 
 #table-wrap {
@@ -473,12 +506,13 @@ body::-webkit-scrollbar {
 
 #content {
   width: 100%;
-  flex: 1 1 auto;
-  display: inline-flex;
+  height: calc(100vh - 82px);
+  display: flex;
   justify-content: center;
   align-items: center;
-  overflow: auto;
+  overflow: hidden;
   margin-top: 82px;
+  position: relative;
 }
 
 card {
@@ -994,15 +1028,12 @@ hr {
   padding: 0;
 }
 
-#greater-pc-desktop p {
-  cursor: pointer;
-  font-size: 200%;
-  transition: 100ms ease;
+#greater-pc-desktop apple-music-playback-controls {
+  color: inherit;
 }
 
-#greater-pc-desktop p:hover {
-  color: #396E80;
-  transition: 100ms ease;
+#greater-pc-desktop apple-music-progress {
+  color: inherit;
 }
 
 

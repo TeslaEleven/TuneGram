@@ -127,6 +127,7 @@
     const header = document.querySelector('.header');
     if (header) {
       header.style.backgroundColor = "#E3E1DB";
+      header.style.opacity = ""; // Reset opacity
     }
 
     const name = document.querySelector('#name');
@@ -150,7 +151,26 @@
     const queueContent = document.getElementById('queue-content');
     if (queueContent) {
       queueContent.style.backgroundColor = '';
+      queueContent.style.color = '';
     }
+    
+    // Reset queue header and arrow colors
+    const queueHeader = document.getElementById('queue-header');
+    if (queueHeader) {
+      queueHeader.style.color = '';
+    }
+    
+    const queueArrow = document.getElementById('queue-arrow');
+    if (queueArrow) {
+      queueArrow.style.color = '';
+    }
+    
+    // Reset theme attributes
+    document.querySelectorAll('apple-music-progress').forEach(el => el.removeAttribute("theme"));
+    document.querySelectorAll('apple-music-playback-controls').forEach(el => el.removeAttribute("theme"));
+    
+    // Reset contrast color CSS variable
+    document.documentElement.style.removeProperty('--contrast-color');
     
     document.querySelectorAll('.header-itm').forEach(a => a.style.background = '');
     document.querySelectorAll('.header-itm').forEach(a => a.style.border = '');
@@ -158,29 +178,22 @@
   }
   
   function resetLyricVariables() {
-    if (window.lyricLines) {
-      window.lyricLines.forEach(line => {
-        line.classList.remove('highlight');
-        line.style.transform = '';
-        line.style.opacity = '';
-      });
+    // Reset any lyric lines that might exist
+    const lyricLines = document.querySelectorAll('.lyric-line');
+    lyricLines.forEach(line => {
+      line.classList.remove('highlight');
+      line.style.transform = '';
+      line.style.opacity = '';
+    });
+    
+    // Clear any scroll timeouts
+    if (window.scrollTimeout) {
+      clearTimeout(window.scrollTimeout);
+      window.scrollTimeout = null;
     }
     
-    window.scrollLock = false;
-    if (window.scrollLockTimeout) {
-      clearTimeout(window.scrollLockTimeout);
-      window.scrollLockTimeout = null;
-    }
-    
-    window.lastHighlighted = -1;
-    window.lastBreakIdx = -1;
-    
-    if (window.glowAnimationFrame) {
-      cancelAnimationFrame(window.glowAnimationFrame);
-      window.glowAnimationFrame = null;
-    }
-    
-    // Reset pulse animation
+    // Reset highlight index
+    window.currentHighlightIndex = -1;
     document.querySelectorAll('.lyric-break-note').forEach(note => {
       note.style.opacity = '0.3';
       note.style.filter = 'brightness(1)';
@@ -214,6 +227,11 @@
       hideNowPlayingScreen();
       resetNowPlayingColors();
       document.body.style.backgroundColor = "#E3E1DB";
+      // Remove now playing class to restore body overflow
+      document.body.classList.remove('np-active');
+    } else {
+      // Add now playing class to hide body overflow
+      document.body.classList.add('np-active');
     }
     if (page === "np" || page === "np-header") {
       if (showNowPlayingScreen()) {
@@ -260,7 +278,7 @@
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzU3NjI0ODk1LCJleHAiOjE3NjEwODA4OTUsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.Jwi7O__04qqmIonDbdSqzyPnN7nidhxZW6Wu7aDwDW8TCQhbotA2XAO2BFUDBe9AsrrqI_7R8DsDle6_IGHlJA',
+        developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzU3NjM3MTU4LCJleHAiOjE3NTc3MjM1NTgsIm9yaWdpbiI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDAiXX0.59H-1Q6LKWbkfIxN3nmgVLYUdCv-O-mTXdXoVR9Lyfm-wE2FenWdWeMC9wJXkXXuy0acGq7IXz3GVsRdm27-eA',
         app: {
           name: 'TuneGram',
           build: '2.1.0',
@@ -451,15 +469,6 @@
             // Reset lyric variables when NP screen loads
             resetLyricVariables();
             
-            if (music.playbackState == 2) {
-              document.getElementById('plpa-btn').innerHTML = "pause"
-              const desktopPlpaBtn = document.querySelector('#greater-pc-desktop #plpa-btn');
-              if (desktopPlpaBtn) desktopPlpaBtn.innerHTML = "pause";
-            } else if (music.playbackState == 3) {
-              document.getElementById('plpa-btn').innerHTML = "play_arrow"
-              const desktopPlpaBtn = document.querySelector('#greater-pc-desktop #plpa-btn');
-              if (desktopPlpaBtn) desktopPlpaBtn.innerHTML = "play_arrow";
-            }
           }
         })
         document.addEventListener("listenSeeMore", async (e) => {
@@ -603,7 +612,12 @@
                 document.body.style.color = `${contrastColor}`;
                 var theme = getDark(bgColor);
                 var invert = (theme == "dark") ? "light" : "dark"
-                document.querySelector('apple-music-progress').setAttribute("theme", theme);
+                // Set theme for all progress bars and playback controls
+                document.querySelectorAll('apple-music-progress').forEach(el => el.setAttribute("theme", theme));
+                document.querySelectorAll('apple-music-playback-controls').forEach(el => el.setAttribute("theme", theme));
+                
+                // Set contrast color CSS variable for Apple Music controls
+                document.documentElement.style.setProperty('--contrast-color', contrastColor);
                 document.querySelectorAll('.focus-subheading').forEach(a => a.style.color = `${contrastColor}`);
                 document.querySelectorAll('.focus-heading').forEach(a => a.style.color = `${contrastColor}`);
                 if(document.querySelectorAll('detail-label')){
@@ -626,10 +640,23 @@
                 document.querySelectorAll('#greater-pc-desktop').forEach(a => a.style.border = `none !important`);
                 document.querySelectorAll('#greater-pc-desktop').forEach(a => a.style.color = `${contrastColor}`);
                 document.querySelectorAll('#greater-pc-desktop p').forEach(a => a.style.color = `${contrastColor}`);
-                // Update queue content background
+                // Update queue content background and text colors
                 const queueContent = document.getElementById('queue-content');
                 if (queueContent) {
                   queueContent.style.backgroundColor = bgColor;
+                  queueContent.style.color = contrastColor;
+                }
+                
+                // Update queue header colors
+                const queueHeader = document.getElementById('queue-header');
+                if (queueHeader) {
+                  queueHeader.style.color = contrastColor;
+                }
+                
+                // Update queue arrow color
+                const queueArrow = document.getElementById('queue-arrow');
+                if (queueArrow) {
+                  queueArrow.style.color = contrastColor;
                 }
               });
             }
@@ -660,16 +687,6 @@
             console.log('Found a parenthesis or bracket in the album name: ' + name);
             finalAlbumName = (root.albumName).split('(')[0].split('[')[0].trim();
           }
-          document.querySelector('#np #plpa-btn').setAttribute('onclick', `pausePlay('${id}', 'pp')`)
-          document.querySelector('#np #rewind-btn').setAttribute('onclick', `pausePlay('na', 're')`)
-          document.querySelector('#np #ff-btn').setAttribute('onclick', `pausePlay('na', 'ff')`)
-          // Also update greater-pc-desktop controls
-          const desktopPlpaBtn = document.querySelector('#greater-pc-desktop #plpa-btn');
-          const desktopRewindBtn = document.querySelector('#greater-pc-desktop #rewind-btn');
-          const desktopFfBtn = document.querySelector('#greater-pc-desktop #ff-btn');
-          if (desktopPlpaBtn) desktopPlpaBtn.setAttribute('onclick', `pausePlay('${id}', 'pp')`);
-          if (desktopRewindBtn) desktopRewindBtn.setAttribute('onclick', `pausePlay('na', 're')`);
-          if (desktopFfBtn) desktopFfBtn.setAttribute('onclick', `pausePlay('na', 'ff')`);
           document.querySelector('#info-wrapper-np #info-title').innerHTML = finalName
           document.querySelector('#info-wrapper-np #info-artist').innerHTML = root.artistName
           document.querySelector('#info-wrapper-np #info-album').innerHTML = finalAlbumName
@@ -772,8 +789,8 @@
                 sheet.deleteRule(i);
               }
             }
-            document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; }`, 0);
-            document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; }`, 0);
+            document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.6; transform: translateY(0) translateX(0); }`, 0);
+            document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1; transform: translateY(-2px) translateX(-5px); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }`, 0);
           });
           fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
             .then(response => response.json())
@@ -810,38 +827,15 @@
                   });
                   const css = `@media (max-width: 650px) { #lyrics { width: fit-content !important; } }`;
                   document.styleSheets[0].insertRule(css, 0);
-                  const lyricLines = document.querySelectorAll('.lyric-line');
-                  let lastHighlighted = -1;
-                  let scrollLock = false;
-                  let scrollLockTimeout = null;
-                  let pulseFrame = null;
-
+                  // APPLE MUSIC-STYLE LYRICS SYSTEM
                   const lyricsDiv = document.getElementById('lyrics');
-                  if (lyricsDiv) {
-                    lyricsDiv.addEventListener('wheel', function () {
-                      scrollLock = true;
-                      if (scrollLockTimeout) clearTimeout(scrollLockTimeout);
-                      scrollLockTimeout = setTimeout(() => {
-                        scrollLock = false;
-                      }, 5000);
-                    }, { passive: true });
-                  }
+                  const lyricLines = document.querySelectorAll('.lyric-line');
+                  let currentHighlightIndex = -1;
+                  let isUserScrolling = false;
+                  let scrollTimeout = null;
+                  let animationFrame = null;
 
-                  lyricLines.forEach((line, idx) => {
-                    line.addEventListener('click', function (e) {
-                      const t = line.getAttribute('data-time');
-                      if (t) {
-                        const [min, sec] = t.split(':');
-                        const time = parseInt(min) * 60 + parseFloat(sec);
-                        if (music && typeof music.seekToTime === 'function') {
-                          music.seekToTime(time);
-                        } else if (music && music.player && typeof music.player.seekToTime === 'function') {
-                          music.player.seekToTime(time);
-                        }
-                      }
-                    });
-                  });
-
+                  // Simple time parsing
                   function parseTime(timeStr) {
                     if (!timeStr) return NaN;
                     const [min, sec] = timeStr.split(':');
@@ -849,180 +843,130 @@
                     return (parseInt(min) * 60 + parseFloat(sec)) * 1000;
                   }
 
-                  let lastBreakIdx = -1;
-                  let glowAnimationFrame = null;
-
-                  function stopPulse() {
-                    if (glowAnimationFrame) cancelAnimationFrame(glowAnimationFrame);
-                    document.querySelectorAll('.lyric-break-note').forEach(note => {
-                      note.style.opacity = 0.3;
-                      note.style.filter = 'brightness(1)';
-                      note.style.transform = 'scale(1)';
+                  // Handle user scrolling
+                  if (lyricsDiv) {
+                    lyricsDiv.addEventListener('scroll', function() {
+                      isUserScrolling = true;
+                      if (scrollTimeout) clearTimeout(scrollTimeout);
+                      scrollTimeout = setTimeout(() => {
+                        isUserScrolling = false;
+                      }, 3000);
                     });
                   }
 
-                  var audio = document.querySelector('audio');
-                  var now = audio.currentTime * 1000;
-
-                  if (audio) {
-                    audio.addEventListener('timeupdate', function () {
-                      now = audio.currentTime * 1000;
-                      window.now = now;
-                    });
-                  }
-
-
-                  if (!Object.getOwnPropertyDescriptor(window, 'now')) {
-                    let _now = 0;
-                    Object.defineProperty(window, 'now', {
-                      get() { return _now; },
-                      set(value) {
-                        _now = value;
-                        window.dispatchEvent(new CustomEvent('nowChanged', { detail: { now: value } }));
+                  // Add click handlers for seeking
+                  lyricLines.forEach((line) => {
+                    line.addEventListener('click', function() {
+                      const timeStr = line.getAttribute('data-time');
+                      if (timeStr && music) {
+                        const [min, sec] = timeStr.split(':');
+                        const time = parseInt(min) * 60 + parseFloat(sec);
+                        music.seekToTime(time);
                       }
                     });
-                  }
-
-                  window.addEventListener('nowChanged', function (e) {
-                    highlightCurrentLine();
                   });
 
-                  function animateGlow(note, breakStart, breakEnd) {
-                    function step() {
-                      if (now < breakStart || now > breakEnd) {
-                        note.style.opacity = 0.3;
-                        note.style.filter = 'brightness(1)';
-                        note.style.transform = 'scale(1)';
-                        return;
-                      }
-                      const progress = Math.max(0, Math.min(1, (now - breakStart) / (breakEnd - breakStart)));
-                      // Use easing function for smoother animation
-                      const easedProgress = 1 - Math.pow(1 - progress, 3);
-                      note.style.opacity = 0.3 + 0.7 * easedProgress;
-                      note.style.filter = `brightness(${1 + easedProgress * 0.5})`;
-                      note.style.transform = `scale(${1 + easedProgress * 0.1})`;
-                      if (progress < 1 && now < breakEnd) {
-                        glowAnimationFrame = requestAnimationFrame(step);
-                      }
-                    }
-                    step();
-                  }
-
-                  function highlightCurrentLine() {
-                    const EPSILON = 80; // Increased leniency for smoother transitions
-                    const currentTime = now;
-                    let highlightIndex = -1;
-                    let breakIdx = -1, breakStart = null, breakEnd = null;
-
-                    // Find the current line and any active break
-                    for (let i = 0; i < lyricLines.length; i++) {
-                      const lineTime = lyricLines[i].getAttribute('data-time');
-                      const lineText = lyricLines[i].classList.contains('lyric-break') ? '' : lyricLines[i].innerHTML.trim();
-                      const thisTime = parseTime(lineTime);
-
-                      if (!isNaN(thisTime) && currentTime + EPSILON >= thisTime) {
-                        if (lineText === '') {
-                          // This is a lyric break
-                          breakIdx = i;
-                          breakStart = thisTime;
-                          breakEnd = (i + 1 < lyricLines.length) ? parseTime(lyricLines[i + 1].getAttribute('data-time')) : Infinity;
-                        } else {
-                          // This is a regular lyric line
-                          highlightIndex = i;
-                        }
-                      }
-                    }
-
-                    // Remove all highlights first
-                    lyricLines.forEach(line => line.classList.remove('highlight'));
-
-                    // Handle lyric breaks
-                    if (breakIdx !== -1) {
-                      lyricLines[breakIdx].classList.add('highlight');
-                      if (breakIdx !== lastBreakIdx) {
-                        stopPulse();
-                        const note = lyricLines[breakIdx].querySelector('.lyric-break-note');
-                        if (note) animateGlow(note, breakStart, breakEnd);
-                        lastBreakIdx = breakIdx;
-                      }
-                    } else {
-                      // No active break, stop any ongoing pulse animation
-                      if (lastBreakIdx !== -1) {
-                        stopPulse();
-                        lastBreakIdx = -1;
-                      }
-                    }
-
-                    // Handle regular lyric highlighting with staggered effects
-                    if (highlightIndex !== -1) {
-                      lyricLines[highlightIndex].classList.add('highlight');
-                      
-                      // Add subtle stagger effect to nearby lines
-                      for (let i = Math.max(0, highlightIndex - 2); i <= Math.min(lyricLines.length - 1, highlightIndex + 2); i++) {
-                        if (i !== highlightIndex) {
-                          const distance = Math.abs(i - highlightIndex);
-                          const delay = distance * 100; // 100ms delay per line distance
-                          setTimeout(() => {
-                            if (lyricLines[i]) {
-                              lyricLines[i].style.transform = `translateY(${-1 * distance}px) translateX(${-2 * distance}px)`;
-                              lyricLines[i].style.opacity = 0.7 + (0.3 / (distance + 1));
-                            }
-                          }, delay);
-                        }
-                      }
-                      
-                      if (highlightIndex !== lastHighlighted) {
-                        // Only scroll if we're moving forward to a later line
-                        if (highlightIndex > lastHighlighted && !scrollLock) {
-                          const lyricsDiv = document.querySelector("#lyrics");
-                          const target = lyricLines[highlightIndex];
-                          // Add a small delay for smoother scrolling
-                          setTimeout(() => {
-                            if (!scrollLock) {
-                              scrollParentToChild(lyricsDiv, target);
-                            }
-                          }, 150);
-                        }
-                        lastHighlighted = highlightIndex;
-                      }
-                    } else if (breakIdx !== -1 && !scrollLock && breakIdx > lastBreakIdx) {
-                      // Only scroll to the next line after the lyric break if we're moving forward
-                      const lyricsDiv = document.querySelector("#lyrics");
-                      const nextLine = lyricLines[breakIdx + 1];
-                      if (nextLine) {
-                        setTimeout(() => {
-                          if (!scrollLock) {
-                            scrollParentToChild(lyricsDiv, nextLine);
-                          }
-                        }, 150);
-                      }
-                    } else if (highlightIndex === -1 && breakIdx === -1) {
-                      // No active line or break - unhighlight the last line if we're past the end
-                      if (lastHighlighted !== -1) {
-                        lyricLines[lastHighlighted].classList.remove('highlight');
-                        // Reset nearby lines
-                        for (let i = Math.max(0, lastHighlighted - 2); i <= Math.min(lyricLines.length - 1, lastHighlighted + 2); i++) {
-                          if (lyricLines[i]) {
-                            lyricLines[i].style.transform = 'translateY(0) translateX(0)';
-                            lyricLines[i].style.opacity = '0.6';
-                          }
-                        }
-                        lastHighlighted = -1;
-                      }
-                    }
+                  // Apple Music-style staggered animation
+                  function animateLyricTransition(newIndex, oldIndex) {
+                    if (animationFrame) cancelAnimationFrame(animationFrame);
                     
-                    // Always reset lines that are far from current highlight
-                    if (highlightIndex !== -1) {
-                      for (let i = 0; i < lyricLines.length; i++) {
-                        if (i !== highlightIndex && Math.abs(i - highlightIndex) > 2) {
-                          lyricLines[i].style.transform = 'translateY(0) translateX(0)';
-                          lyricLines[i].style.opacity = '0.6';
-                        }
+                    const lines = Array.from(lyricLines);
+                    const maxDistance = 3; // Maximum distance for animation effect
+                    
+                    lines.forEach((line, index) => {
+                      const distance = Math.abs(index - newIndex);
+                      
+                      if (distance <= maxDistance) {
+                        // Calculate stagger delay based on distance
+                        const delay = distance * 50; // 50ms per line distance
+                        const opacity = Math.max(0.3, 1 - (distance * 0.2));
+                        const translateY = (index - newIndex) * 8; // 8px per line
+                        const scale = Math.max(0.95, 1 - (distance * 0.02));
+                        
+                        setTimeout(() => {
+                          line.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                          line.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                          line.style.opacity = opacity;
+                        }, delay);
+                      } else {
+                        // Reset lines that are too far
+                        line.style.transition = 'all 0.3s ease';
+                        line.style.transform = 'translateY(0) scale(1)';
+                        line.style.opacity = '0.3';
                       }
+                    });
+                  }
+
+                  // Center scroll function - always center the highlighted line
+                  function scrollToCenter(targetLine) {
+                    if (!targetLine || !lyricsDiv) return;
+                    
+                    const containerHeight = lyricsDiv.clientHeight;
+                    const lineHeight = targetLine.offsetHeight;
+                    const lineTop = targetLine.offsetTop;
+                    const targetScroll = lineTop - (containerHeight / 2) + (lineHeight / 2);
+                    
+                    lyricsDiv.scrollTo({
+                      top: Math.max(0, targetScroll),
+                      behavior: 'smooth'
+                    });
+                  }
+
+
+                  // Main highlight function with Apple Music-style effects
+                  function updateLyricsHighlight() {
+                    // Use MusicKit's audio element for better accuracy
+                    const audio = document.querySelector('#apple-music-player') || document.querySelector('audio') || audio_;
+                    const currentTime = audio ? audio.currentTime * 1000 : 0;
+                    let newHighlightIndex = -1;
+
+                    // Find current line
+                    for (let i = 0; i < lyricLines.length; i++) {
+                      const lineTime = parseTime(lyricLines[i].getAttribute('data-time'));
+                      if (!isNaN(lineTime) && currentTime >= lineTime) {
+                        newHighlightIndex = i;
+                      }
+                    }
+
+                    // Only update if changed
+                    if (newHighlightIndex !== currentHighlightIndex) {
+                      // Remove all highlights first
+                      lyricLines.forEach(line => {
+                        line.classList.remove('highlight');
+                      });
+
+                      // Add highlight to current line
+                      if (newHighlightIndex >= 0 && lyricLines[newHighlightIndex]) {
+                        lyricLines[newHighlightIndex].classList.add('highlight');
+                        
+                        // Apply Apple Music-style staggered animation
+                        animateLyricTransition(newHighlightIndex, currentHighlightIndex);
+                        
+                        // ALWAYS center the highlighted line
+                        setTimeout(() => {
+                          scrollToCenter(lyricLines[newHighlightIndex]);
+                        }, 100); // Small delay to let animation start
+                      } else {
+                        // No active line, reset all
+                        lyricLines.forEach(line => {
+                          line.style.transition = 'all 0.3s ease';
+                          line.style.transform = 'translateY(0) scale(1)';
+                          line.style.opacity = '0.3';
+                        });
+                      }
+
+                      currentHighlightIndex = newHighlightIndex;
                     }
                   }
 
-                  highlightCurrentLine();
+                  // Start the highlight system
+                  updateLyricsHighlight();
+                  
+                  // Update on time changes using MusicKit's audio element for better accuracy
+                  const audio = document.querySelector('#apple-music-player') || document.querySelector('audio') || audio_;
+                  if (audio) {
+                    audio.addEventListener('timeupdate', updateLyricsHighlight);
+                  }
                 } else if (data.plainLyrics) {
                   var plainLyrics = data.plainLyrics.replace(/\n/g, "<br>");
                   document.querySelector('#lyrics').innerHTML = plainLyrics;
@@ -1036,29 +980,6 @@
         } else {
           document.querySelector('#lyrics').innerText = 'No song playing.';
         }
-      }
-      function scrollParentToChild(parent, child) {
-        if (!parent || !child) return;
-        
-        const parentRect = parent.getBoundingClientRect();
-        const childRect = child.getBoundingClientRect();
-        const offset = childRect.top - parentRect.top;
-        const currentScroll = parent.scrollTop;
-        
-        // Calculate target position - only scroll if the line is below the center
-        const targetScroll = currentScroll + offset - (parent.clientHeight / 3); // Use 1/3 instead of 1/2 for better forward scrolling
-        const maxScroll = parent.scrollHeight - parent.clientHeight;
-        const finalScroll = Math.max(0, Math.min(targetScroll, maxScroll));
-        
-        // Only scroll if the target is significantly different and we're moving forward
-        const scrollDifference = finalScroll - currentScroll;
-        if (scrollDifference < 30) return; // Don't scroll for small differences
-        
-        // Use smooth scrolling with custom easing
-        parent.scrollTo({ 
-          top: finalScroll, 
-          behavior: 'smooth'
-        });
       }
 
       function updateHighlightedTrack() {
@@ -1147,15 +1068,6 @@
         if (state == "10") {
           loadContent('onboard');
           htmx.ajax('GET', 'onboard.html', { target: '#content', swap: 'innerHTML' });
-        }
-        if (state == 2) {
-          document.getElementById('plpa-btn').innerHTML = "pause"
-          const desktopPlpaBtn = document.querySelector('#greater-pc-desktop #plpa-btn');
-          if (desktopPlpaBtn) desktopPlpaBtn.innerHTML = "pause";
-        } else if (state == 3) {
-          document.getElementById('plpa-btn').innerHTML = "play_arrow"
-          const desktopPlpaBtn = document.querySelector('#greater-pc-desktop #plpa-btn');
-          if (desktopPlpaBtn) desktopPlpaBtn.innerHTML = "play_arrow";
         }
       });
 
@@ -1531,14 +1443,69 @@
     htmx.ajax('GET', 'info.html?id=' + id, { target: '#content', swap: 'innerHTML', delay: "500ms" })
   }
 
-  function toAlbumFromNowPlaying() {
+  async function toAlbumFromNowPlaying() {
     const music = window.MusicKit ? window.MusicKit.getInstance() : null;
     if (music && music.queue.currentItem) {
       const currentItem = music.queue.currentItem;
-      // Get the album ID from the current song's relationships
-      if (currentItem.relationships && currentItem.relationships.albums && currentItem.relationships.albums.data && currentItem.relationships.albums.data.length > 0) {
-        const albumId = currentItem.relationships.albums.data[0].id;
-        toAlbum(albumId);
+      const songName = currentItem.attributes.name;
+      const artistName = currentItem.attributes.artistName;
+      const albumName = currentItem.attributes.albumName;
+      
+      try {
+        // For library songs, we can't use catalog API, so use search instead
+        if (currentItem.id.startsWith('l.')) {
+          // This is a library song - use search to find the album
+          if (albumName && artistName) {
+            const searchQuery = `${albumName} ${artistName}`;
+            const searchResults = await music.api.search(searchQuery, { types: ['albums'], limit: 1 });
+            
+            if (searchResults.albums && searchResults.albums.data && searchResults.albums.data.length > 0) {
+              const albumId = searchResults.albums.data[0].id;
+              toAlbum(albumId);
+              return;
+            }
+          }
+        } else {
+          // This is a catalog song - try to get album relationships
+          const song = await music.api.music(`/v1/catalog/${music.storefrontId}/songs/${currentItem.id}`, {
+            include: 'albums'
+          });
+          
+          if (song.data && song.data[0] && song.data[0].relationships && song.data[0].relationships.albums && song.data[0].relationships.albums.data && song.data[0].relationships.albums.data.length > 0) {
+            const albumId = song.data[0].relationships.albums.data[0].id;
+            toAlbum(albumId);
+            return;
+          }
+        }
+        
+        // Fallback: search for album using song and artist name
+        if (songName && artistName) {
+          const searchQuery = `${songName} ${artistName}`;
+          const searchResults = await music.api.search(searchQuery, { types: ['songs'], limit: 1 });
+          
+          if (searchResults.songs && searchResults.songs.data && searchResults.songs.data.length > 0) {
+            const foundSong = searchResults.songs.data[0];
+            if (foundSong.relationships && foundSong.relationships.albums && foundSong.relationships.albums.data && foundSong.relationships.albums.data.length > 0) {
+              const albumId = foundSong.relationships.albums.data[0].id;
+              toAlbum(albumId);
+              return;
+            }
+          }
+        }
+        
+        // Final fallback: search for album directly
+        if (albumName && artistName) {
+          searchTerm(`${albumName} ${artistName}`);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching album info:', error);
+        // Final fallback: search for album using available info
+        if (albumName && artistName) {
+          searchTerm(`${albumName} ${artistName}`);
+        } else if (songName && artistName) {
+          searchTerm(`${songName} ${artistName}`);
+        }
       }
     }
   }
