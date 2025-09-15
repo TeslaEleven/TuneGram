@@ -111,6 +111,8 @@
   var toDrawRecs = "";
   var recsProcessed = 0;
   var recsToCount = 0;
+  
+  
   function boundToString(rect) {
     return `rect(w=${rect.width}, h=${rect.height})`;
   }
@@ -192,13 +194,24 @@
       window.scrollTimeout = null;
     }
     
-    // Reset highlight index
+    // Reset all lyric-related variables
     window.currentHighlightIndex = -1;
+    window.isUserScrolling = false;
+    window.animationFrame = null;
+    
+    // Reset lyric break symbols
     document.querySelectorAll('.lyric-break-note').forEach(note => {
       note.style.opacity = '0.3';
       note.style.filter = 'brightness(1)';
       note.style.transform = 'scale(1)';
+      note.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
     });
+    
+    // Clear any existing lyric content
+    const lyricsDiv = document.getElementById('lyrics');
+    if (lyricsDiv) {
+      lyricsDiv.innerHTML = '<p>Loading lyrics...</p>';
+    }
   }
   
   function toggleQueue() {
@@ -360,7 +373,7 @@
             drawSadResults('both');
           }
         }).catch((err) => {
-          console.error(err)
+          console.error(err);
         })
       }
       async function infoDo(id) {
@@ -830,10 +843,10 @@
                   // APPLE MUSIC-STYLE LYRICS SYSTEM
                   const lyricsDiv = document.getElementById('lyrics');
                   const lyricLines = document.querySelectorAll('.lyric-line');
-                  let currentHighlightIndex = -1;
-                  let isUserScrolling = false;
-                  let scrollTimeout = null;
-                  let animationFrame = null;
+                  window.currentHighlightIndex = -1;
+                  window.isUserScrolling = false;
+                  window.scrollTimeout = null;
+                  window.animationFrame = null;
 
                   // Simple time parsing
                   function parseTime(timeStr) {
@@ -846,10 +859,10 @@
                   // Handle user scrolling
                   if (lyricsDiv) {
                     lyricsDiv.addEventListener('scroll', function() {
-                      isUserScrolling = true;
-                      if (scrollTimeout) clearTimeout(scrollTimeout);
-                      scrollTimeout = setTimeout(() => {
-                        isUserScrolling = false;
+                      window.isUserScrolling = true;
+                      if (window.scrollTimeout) clearTimeout(window.scrollTimeout);
+                      window.scrollTimeout = setTimeout(() => {
+                        window.isUserScrolling = false;
                       }, 3000);
                     });
                   }
@@ -868,7 +881,7 @@
 
                   // Apple Music-style staggered animation
                   function animateLyricTransition(newIndex, oldIndex) {
-                    if (animationFrame) cancelAnimationFrame(animationFrame);
+                    if (window.animationFrame) cancelAnimationFrame(window.animationFrame);
                     
                     const lines = Array.from(lyricLines);
                     const maxDistance = 3; // Maximum distance for animation effect
@@ -897,11 +910,14 @@
                     });
                   }
 
-                  // Center scroll function - always center the highlighted line
+                  // Center scroll function - center within the tlcontent-np container
                   function scrollToCenter(targetLine) {
                     if (!targetLine || !lyricsDiv) return;
                     
-                    const containerHeight = lyricsDiv.clientHeight;
+                    const tlcontentNp = document.getElementById('tlcontent-np');
+                    if (!tlcontentNp) return;
+                    
+                    const containerHeight = tlcontentNp.clientHeight;
                     const lineHeight = targetLine.offsetHeight;
                     const lineTop = targetLine.offsetTop;
                     const targetScroll = lineTop - (containerHeight / 2) + (lineHeight / 2);
@@ -928,8 +944,37 @@
                       }
                     }
 
+                    // Update lyric break symbols with progressive opacity
+                    lyricLines.forEach((line, index) => {
+                      const lineTime = parseTime(line.getAttribute('data-time'));
+                      const nextLineTime = index < lyricLines.length - 1 ? 
+                        parseTime(lyricLines[index + 1].getAttribute('data-time')) : 
+                        lineTime + 2000; // Default 2 seconds if no next line
+                      
+                      if (line.classList.contains('lyric-break')) {
+                        const breakNote = line.querySelector('.lyric-break-note');
+                        if (breakNote) {
+                          if (index === newHighlightIndex) {
+                            // Highlight the break when it's the active line
+                            breakNote.style.opacity = '1';
+                            breakNote.style.filter = 'brightness(1.5)';
+                          } else if (currentTime >= lineTime && currentTime < nextLineTime) {
+                            // Progressive opacity during the break period
+                            const progress = (currentTime - lineTime) / (nextLineTime - lineTime);
+                            const opacity = Math.min(0.3 + (progress * 0.7), 1);
+                            breakNote.style.opacity = opacity.toString();
+                            breakNote.style.filter = `brightness(${1 + (progress * 0.5)})`;
+                          } else {
+                            // Reset to default state
+                            breakNote.style.opacity = '0.3';
+                            breakNote.style.filter = 'brightness(1)';
+                          }
+                        }
+                      }
+                    });
+
                     // Only update if changed
-                    if (newHighlightIndex !== currentHighlightIndex) {
+                    if (newHighlightIndex !== window.currentHighlightIndex) {
                       // Remove all highlights first
                       lyricLines.forEach(line => {
                         line.classList.remove('highlight');
@@ -955,7 +1000,7 @@
                         });
                       }
 
-                      currentHighlightIndex = newHighlightIndex;
+                      window.currentHighlightIndex = newHighlightIndex;
                     }
                   }
 
@@ -1057,8 +1102,13 @@
             var recs = parentData[num].relationships.contents.data;
             var attrs = parentData[num].attributes.title.stringForDisplay;
             recs.forEach(drawRecs)
-            document.querySelector("#rec-heading").innerHTML = attrs;
-            sessionStorage.setItem("rec-heading-innerhtml", document.querySelector("#rec-heading").innerHTML);
+            const recHeading = document.querySelector("#rec-heading");
+            if (recHeading) {
+              recHeading.innerHTML = attrs;
+              sessionStorage.setItem("rec-heading-innerhtml", attrs);
+            } else {
+              sessionStorage.setItem("rec-heading-innerhtml", attrs);
+            }
           })
         } else {
           drawBoth()
@@ -1097,14 +1147,24 @@
           }
           
           const response = await music.api.music(apiUrl, { l: 'en-us' });
-          const data = response?.data?.data?.[0];
+          let data;
+          let tracks;
           
-          if (!data || !data.relationships || !data.relationships.tracks || !data.relationships.tracks.data) {
+          // Handle different response structures for playlists vs albums
+          if (isPlaylist) {
+            data = response?.data?.data;
+            // For playlists, we need to make a separate call to get the tracks
+            const tracksResponse = await music.api.music(`${apiUrl}/tracks`, { l: 'en-us' });
+            tracks = tracksResponse?.data?.data;
+          } else {
+            data = response?.data?.data?.[0];
+            tracks = data?.relationships?.tracks?.data;
+          }
+          
+          if (!tracks || tracks.length === 0) {
             console.error('No tracks found for', id);
             return;
           }
-          
-          const tracks = data.relationships.tracks.data;
           const ids = tracks.map(track => {
             // For library items, use the track ID directly
             // For catalog items, use reportingId if available
@@ -1158,14 +1218,24 @@
           }
           
           const response = await music.api.music(apiUrl, { l: 'en-us' });
-          const data = response?.data?.data?.[0];
+          let data;
+          let tracks;
           
-          if (!data || !data.relationships || !data.relationships.tracks || !data.relationships.tracks.data) {
+          // Handle different response structures for playlists vs albums
+          if (isPlaylist) {
+            data = response?.data?.data;
+            // For playlists, we need to make a separate call to get the tracks
+            const tracksResponse = await music.api.music(`${apiUrl}/tracks`, { l: 'en-us' });
+            tracks = tracksResponse?.data?.data;
+          } else {
+            data = response?.data?.data?.[0];
+            tracks = data?.relationships?.tracks?.data;
+          }
+          
+          if (!tracks || tracks.length === 0) {
             console.error('No tracks found for', id);
             return;
           }
-          
-          const tracks = data.relationships.tracks.data;
           const ids = tracks.map(track => {
             // For library items, use the track ID directly
             // For catalog items, use reportingId if available
@@ -1213,17 +1283,38 @@
       var edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
       subheading = `Edited: ${edited}`;
     }
-    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading></card>`
-    recsProcessed++
-    toDrawRecs += card
-    if (recsProcessed == recsToCount && recsProcessed !== 0) {
-      document.querySelector('#rec-cards').innerHTML += toDrawRecs
-      var setStorageStr = toDrawRecs;
-      if (sessionStorage.getItem('recStorage')) {
-        setStorageStr = sessionStorage.getItem('recStorage') + toDrawRecs;
+    
+    // Get colors from cover image
+    getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      bgColor = bgColor || "#cccaca";
+      contrastColor = contrastColor || "#E3E1DB";
+      
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      recsProcessed++
+      toDrawRecs += card
+      if (recsProcessed == recsToCount && recsProcessed !== 0) {
+        document.querySelector('#rec-cards').innerHTML += toDrawRecs
+        var setStorageStr = toDrawRecs;
+        if (sessionStorage.getItem('recStorage')) {
+          setStorageStr = sessionStorage.getItem('recStorage') + toDrawRecs;
+        }
+        sessionStorage.setItem('recStorage', setStorageStr)
       }
-      sessionStorage.setItem('recStorage', setStorageStr)
-    }
+    }).catch((err) => {
+      console.error('Error getting background color:', err);
+      // Fallback with default colors
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      recsProcessed++
+      toDrawRecs += card
+      if (recsProcessed == recsToCount && recsProcessed !== 0) {
+        document.querySelector('#rec-cards').innerHTML += toDrawRecs
+        var setStorageStr = toDrawRecs;
+        if (sessionStorage.getItem('recStorage')) {
+          setStorageStr = sessionStorage.getItem('recStorage') + toDrawRecs;
+        }
+        sessionStorage.setItem('recStorage', setStorageStr)
+      }
+    });
   }
   function drawAlbums(item, index, array) {
     albumsToCount = array.length
@@ -1262,22 +1353,47 @@
       }
     }
     var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
-    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}</card>`
-    albumsProcessed++
-    toDrawAlbums += card
-    if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
-      document.querySelector('#bigcards').innerHTML += toDrawAlbums;
-      var setStorageStr = toDrawAlbums;
-      if (sessionStorage.getItem('albumStorage')) {
-        setStorageStr = sessionStorage.getItem('albumStorage') + toDrawAlbums;
+    
+    // Get colors from cover image
+    getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      bgColor = bgColor || "#396E80";
+      contrastColor = contrastColor || "#E3E1DB";
+      
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      albumsProcessed++
+      toDrawAlbums += card
+      if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
+        document.querySelector('#bigcards').innerHTML += toDrawAlbums;
+        var setStorageStr = toDrawAlbums;
+        if (sessionStorage.getItem('albumStorage')) {
+          setStorageStr = sessionStorage.getItem('albumStorage') + toDrawAlbums;
+        }
+        sessionStorage.setItem('albumStorage', setStorageStr)
       }
-      sessionStorage.setItem('albumStorage', setStorageStr)
-    }
+    }).catch((err) => {
+      console.error('Error getting background color:', err);
+      // Fallback with default colors
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      albumsProcessed++
+      toDrawAlbums += card
+      if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
+        document.querySelector('#bigcards').innerHTML += toDrawAlbums;
+        var setStorageStr = toDrawAlbums;
+        if (sessionStorage.getItem('albumStorage')) {
+          setStorageStr = sessionStorage.getItem('albumStorage') + toDrawAlbums;
+        }
+        sessionStorage.setItem('albumStorage', setStorageStr)
+      }
+    });
   }
   function drawHeavy(item, index, array) {
-    heavyProcessed++
+    heavyToCount = array.length
+    // Reset processed counter for new batch
+    if (index === 0) {
+      heavyProcessed = 0;
+      toDrawHeavy = "";
+    }
     if (item.attributes) {
-      heavyToCount = array.length
       var cover = "";
       if (item.attributes.artwork) {
         cover = MusicKit.formatArtworkURL(item.attributes.artwork, 500, 500);
@@ -1288,22 +1404,46 @@
       if (item.attributes.artistName) {
         subheading = item.attributes.artistName;
       } else {
-        var date = new Date(item.attributes.lastModifiedDate);
-        var edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
-        subheading = `Edited: ${edited}`;
+        subheading = "Unknown Artist";
       }
-      var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading></card>`
-      toDrawHeavy += card
-      if (heavyProcessed == heavyToCount && heavyProcessed !== 0) {
-        document.querySelector('#heavycards').innerHTML += toDrawHeavy
-        var setStorageStr = toDrawHeavy;
-        if (sessionStorage.getItem('heavyStorage')) {
-          setStorageStr = sessionStorage.getItem('heavyStorage') + toDrawHeavy;
+      // Get colors from cover image
+      getImageColors(cover).then(({ bgColor, contrastColor }) => {
+        bgColor = bgColor || "#396E80";
+        contrastColor = contrastColor || "#E3E1DB";
+        
+        var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+        heavyProcessed++
+        toDrawHeavy += card
+        if (heavyProcessed == heavyToCount && heavyProcessed !== 0) {
+          document.querySelector('#heavycards').innerHTML += toDrawHeavy
+          var setStorageStr = toDrawHeavy;
+          if (sessionStorage.getItem('heavyStorage')) {
+            setStorageStr = sessionStorage.getItem('heavyStorage') + toDrawHeavy;
+          }
+          sessionStorage.setItem('heavyStorage', setStorageStr)
+          // Reset the accumulator for next batch
+          toDrawHeavy = "";
         }
-        sessionStorage.setItem('heavyStorage', setStorageStr)
-      }
+      }).catch((err) => {
+        console.error('Error getting background color:', err);
+        // Fallback with default colors
+        var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+        heavyProcessed++
+        toDrawHeavy += card
+        if (heavyProcessed == heavyToCount && heavyProcessed !== 0) {
+          document.querySelector('#heavycards').innerHTML += toDrawHeavy
+          var setStorageStr = toDrawHeavy;
+          if (sessionStorage.getItem('heavyStorage')) {
+            setStorageStr = sessionStorage.getItem('heavyStorage') + toDrawHeavy;
+          }
+          sessionStorage.setItem('heavyStorage', setStorageStr)
+          // Reset the accumulator for next batch
+          toDrawHeavy = "";
+        }
+      });
     } else {
       console.warn('Couldn\'t append an item in Heavy Rotation. Likely a station.')
+      heavyProcessed++
       if (heavyProcessed == heavyToCount && heavyProcessed !== 0) {
         document.querySelector('#heavycards').innerHTML += toDrawHeavy
         var setStorageStr = toDrawHeavy;
@@ -1316,22 +1456,32 @@
   }
   function drawSadResults(type) {
     if (type == "album") {
-      document.querySelector('#bigcards').remove()
-      document.querySelector('#albums-results').remove()
+      const bigcards = document.querySelector('#bigcards');
+      const albumsResults = document.querySelector('#albums-results');
+      if (bigcards) bigcards.remove();
+      if (albumsResults) albumsResults.remove();
     }
     if (type == "song") {
-      document.querySelector('#songcards').remove()
-      document.querySelector('#songs-results').remove()
+      const songcards = document.querySelector('#songcards');
+      const songsResults = document.querySelector('#songs-results');
+      if (songcards) songcards.remove();
+      if (songsResults) songsResults.remove();
     }
     if (type == "plist") {
-      document.querySelector('#plistcards').remove()
-      document.querySelector('#plist-results').remove()
+      const plistcards = document.querySelector('#plistcards');
+      const plistResults = document.querySelector('#plist-results');
+      if (plistcards) plistcards.remove();
+      if (plistResults) plistResults.remove();
     }
     if (type == "both") {
-      document.querySelector('#bigcards').remove()
-      document.querySelector('#songcards').remove()
-      document.querySelector('#albums-results').remove()
-      document.querySelector('#songs-results').remove()
+      const bigcards = document.querySelector('#bigcards');
+      const songcards = document.querySelector('#songcards');
+      const albumsResults = document.querySelector('#albums-results');
+      const songsResults = document.querySelector('#songs-results');
+      if (bigcards) bigcards.remove();
+      if (songcards) songcards.remove();
+      if (albumsResults) albumsResults.remove();
+      if (songsResults) songsResults.remove();
     }
   }
   function searchAlbums(item, index, array) {
@@ -1351,21 +1501,39 @@
       item.attributes.name = (item.attributes.name).split('(')[0].split('[')[0].trim();
       detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
     }
-    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}</card>`
-    albumsProcessed++
-    toDrawAlbums += card
-    if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
-      document.querySelector('#bigcards').innerHTML = toDrawAlbums
-    }
+    // Get colors from cover image
+    getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      bgColor = bgColor || "#396E80";
+      contrastColor = contrastColor || "#E3E1DB";
+      
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      albumsProcessed++
+      toDrawAlbums += card
+      if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
+        document.querySelector('#bigcards').innerHTML = toDrawAlbums
+      }
+    }).catch((err) => {
+      console.error('Error getting background color:', err);
+      // Fallback with default colors
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      albumsProcessed++
+      toDrawAlbums += card
+      if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
+        document.querySelector('#bigcards').innerHTML = toDrawAlbums
+      }
+    });
   }
   function searchPlists(item, index, array) {
     plistsToCount = array.length
     var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 1000, 1000);
     console.log(cover)
     getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      bgColor = bgColor || "#396E80";
+      contrastColor = contrastColor || "#E3E1DB";
+      
       var date = new Date(item.attributes.lastModifiedDate);
       edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
-      var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
       plistsProcessed++
       toDrawPlists += card
       if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
@@ -1375,6 +1543,17 @@
       }
     }).catch((err) => {
       console.error('Error getting background color:', err);
+      // Fallback with default colors
+      var date = new Date(item.attributes.lastModifiedDate);
+      edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="enter-btn" title="Enter Playlist">keyboard_return</button></card>`
+      plistsProcessed++
+      toDrawPlists += card
+      if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
+        document.querySelector('#plistcards').innerHTML = toDrawPlists;
+        plistsProcessed = 0;
+        toDrawPlists = ""
+      }
     });
   }
 
@@ -1383,7 +1562,10 @@
     var cover = MusicKit.formatArtworkURL(item.attributes.artwork, 1000, 1000);
     console.log(cover)
     getImageColors(cover).then(({ bgColor, contrastColor }) => {
-      var card = `<card style="background-color:${bgColor};" onclick="toAlbum('s${item.id}')"><img src="${cover}"/><heading style="color:${contrastColor}">${item.attributes.name}</heading><subheading style="color:${contrastColor}">${item.attributes.artistName}</subheading></card>`
+      bgColor = bgColor || "#396E80";
+      contrastColor = contrastColor || "#E3E1DB";
+      
+      var card = `<card onclick="toAlbum('s${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading><button class="play-btn" onclick="event.stopPropagation(); musicPlay('${item.id}', '${cover}')" title="Play Song">play_arrow</button></card>`
       songsProcessed++
       toDrawSongs += card
       if (songsProcessed == songsToCount && songsProcessed !== 0) {
@@ -1393,14 +1575,29 @@
       }
     }).catch((err) => {
       console.error('Error getting background color:', err);
+      // Fallback with default colors
+      var card = `<card onclick="toAlbum('s${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading><button class="play-btn" onclick="event.stopPropagation(); musicPlay('${item.id}', '${cover}')" title="Play Song">play_arrow</button></card>`
+      songsProcessed++
+      toDrawSongs += card
+      if (songsProcessed == songsToCount && songsProcessed !== 0) {
+        document.querySelector('#songcards').innerHTML = toDrawSongs;
+        songsProcessed = 0;
+        toDrawSongs = ""
+      }
     });
   }
   function drawBoth() {
-    document.querySelector('#bigcards').innerHTML = sessionStorage.getItem('albumStorage')
-    document.querySelector('#heavycards').innerHTML = sessionStorage.getItem('heavyStorage')
-    document.querySelector('#smallcards').innerHTML = sessionStorage.getItem('plistStorage')
-    document.querySelector('#rec-cards').innerHTML = sessionStorage.getItem('recStorage')
-    document.querySelector("#rec-heading").innerHTML = sessionStorage.getItem("rec-heading-innerhtml");
+    const bigcards = document.querySelector('#bigcards');
+    const heavycards = document.querySelector('#heavycards');
+    const smallcards = document.querySelector('#smallcards');
+    const recCards = document.querySelector('#rec-cards');
+    const recHeading = document.querySelector("#rec-heading");
+    
+    if (bigcards) bigcards.innerHTML = sessionStorage.getItem('albumStorage');
+    if (heavycards) heavycards.innerHTML = sessionStorage.getItem('heavyStorage');
+    if (smallcards) smallcards.innerHTML = sessionStorage.getItem('plistStorage');
+    if (recCards) recCards.innerHTML = sessionStorage.getItem('recStorage');
+    if (recHeading) recHeading.innerHTML = sessionStorage.getItem("rec-heading-innerhtml");
   }
   function drawPlists(item, index, array) {
     plistsToCount = array.length
@@ -1423,17 +1620,37 @@
       var date = new Date(item.attributes.lastModifiedDate);
       edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
     }
-    var card = `<card onclick="toAlbum('${item.id}')"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading></card>`
-    plistsProcessed++
-    toDrawPlists += card
-    if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
-      document.querySelector('#smallcards').innerHTML += toDrawPlists
-      var setStorageStr = toDrawPlists;
-      if (sessionStorage.getItem('plistStorage')) {
-        setStorageStr = sessionStorage.getItem('plistStorage') + toDrawPlists;
+    // Get colors from cover image
+    getImageColors(cover).then(({ bgColor, contrastColor }) => {
+      bgColor = bgColor || "#396E80";
+      contrastColor = contrastColor || "#E3E1DB";
+      
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      plistsProcessed++
+      toDrawPlists += card
+      if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
+        document.querySelector('#smallcards').innerHTML += toDrawPlists
+        var setStorageStr = toDrawPlists;
+        if (sessionStorage.getItem('plistStorage')) {
+          setStorageStr = sessionStorage.getItem('plistStorage') + toDrawPlists;
+        }
+        sessionStorage.setItem('plistStorage', setStorageStr)
       }
-      sessionStorage.setItem('plistStorage', setStorageStr)
-    }
+    }).catch((err) => {
+      console.error('Error getting background color:', err);
+      // Fallback with default colors
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="enter-btn" title="Enter Playlist">keyboard_return</button></card>`
+      plistsProcessed++
+      toDrawPlists += card
+      if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
+        document.querySelector('#smallcards').innerHTML += toDrawPlists
+        var setStorageStr = toDrawPlists;
+        if (sessionStorage.getItem('plistStorage')) {
+          setStorageStr = sessionStorage.getItem('plistStorage') + toDrawPlists;
+        }
+        sessionStorage.setItem('plistStorage', setStorageStr)
+      }
+    });
   }
   var infoId = ""
   var npId = ""
@@ -1573,6 +1790,15 @@
 
   function getImageColors(imgUrl) {
     return new Promise((resolve, reject) => {
+      // Special handling for fallback.svg
+      if (imgUrl.includes('fallback.svg')) {
+        resolve({
+          bgColor: '#cccccc',
+          contrastColor: '#000000'
+        });
+        return;
+      }
+      
       const imgEl = new Image();
       imgEl.crossOrigin = 'Anonymous';
 
@@ -1625,7 +1851,7 @@
 
         const bgIndex = count.indexOf(Math.max(...count));
         const bgColor = avg[bgIndex].map(x => Math.ceil(x));
-        const bgRgbStr = `rgb(${bgColor.join(",")})`;
+        let bgRgbStr = `rgb(${bgColor.join(",")})`;
 
         function colorDistance(c1, c2) {
           return Math.sqrt(
@@ -1718,5 +1944,6 @@
   document.addEventListener('mousedown', resetMouseActivityTimer);
   document.addEventListener('mouseup', resetMouseActivityTimer);
   document.addEventListener('scroll', resetMouseActivityTimer);
+
 
 </script>

@@ -22,17 +22,6 @@
 apple-music-progress {
   margin-top: 11px !important;
 }
-
-/* Hide body overflow when now playing is active and visible */
-body:has(#content #np) {
-  overflow-y: hidden;
-}
-
-/* Alternative approach using class-based targeting */
-body.np-active {
-  overflow-y: hidden;
-}
-
 /* Style Apple Music playback controls play button with contrast color */
 apple-music-playback-controls::part(play-button) {
   color: var(--contrast-color, #2F3633) !important;
@@ -221,7 +210,7 @@ body {
   background-color: #E3E1DB;
   margin: 0;
   font-family: "neue-haas-grotesk-display", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-style: normal;
   overflow-x: hidden;
   max-width: 100%;
@@ -229,7 +218,11 @@ body {
   flex-flow: column;
 }
 
-
+input[type="search"] {
+  font-family: "neue-haas-grotesk-display", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
 
 .material-symbols-outlined {
   font-variation-settings:
@@ -442,6 +435,7 @@ body::-webkit-scrollbar {
 
   .lyric-line {
     text-align: left !important;
+    font-size: 2.5em !important;
   }
 
   #info-artist {
@@ -485,6 +479,10 @@ body::-webkit-scrollbar {
   #greater-pc {
     overflow: hidden;
     white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 
   #greater-trklst {
@@ -502,6 +500,7 @@ body::-webkit-scrollbar {
   flex-grow: 1;
   flex-direction: column;
   text-align: center;
+  width:100%;
 }
 
 #content {
@@ -518,12 +517,11 @@ body::-webkit-scrollbar {
 card {
   min-width: 269.232px;
   max-width: 269.232px;
-  height: auto;
-  border: 1px solid #777F76;
-  padding: 10px;
-  box-shadow: -1px 1px #777F76;
+  height: 269.232px;
+  border: 3px solid var(--card-bg-color, #396E80);
+  padding: 0;
   border-radius: 10px;
-  transition: 100ms ease-in;
+  transition: all 300ms ease-in-out;
   position: relative;
   margin-top: 2%;
   margin-bottom: 2%;
@@ -533,6 +531,7 @@ card {
   overflow: hidden;
   cursor: pointer;
   white-space: nowrap;
+  background-color: var(--card-bg-color, #396E80);
 }
 
 .marquee-style {
@@ -647,45 +646,118 @@ card {
 }
 
 card img {
-  width: 90%;
-  max-width: 250px !important;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  border-radius: 10px;
-  margin-bottom: 3px;
+  border-radius: 7px;
+  transition: all 300ms ease-in-out;
 }
 
 card heading {
-  color: #2F3633;
-  font-weight: 600;
-  font-size: 150%;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-right: 0;
-  min-width: 0;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 269.232px;
-  display: block;
+  display: none;
 }
 
 card subheading {
-  color: #2F3633;
-  font-weight: 500;
-  font-size: 100%;
-  display: block;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-right: 0;
-  min-width: 0;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  display: none;
 }
 
 card:hover {
-  box-shadow: -3px 3px #777F76;
-  transition: 100ms ease-in;
+  transform: scale(1.10);
+}
+
+card:hover img {
+  filter: brightness(0.95);
+}
+
+card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: all 300ms ease-in-out;
+  z-index: 1;
+  pointer-events: none;
+}
+
+card:hover::before {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+card detail-label {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  color: var(--card-contrast-color, #E3E1DB);
+  background-color: var(--card-bg-color, #E3E1DB);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  border:none;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+  pointer-events: none;
+}
+
+card:hover detail-label {
+  opacity: 1;
+}
+
+card .play-btn {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 3;
+  background: var(--card-bg-color, #396E80);
+  color: var(--card-contrast-color, #E3E1DB);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Material Symbols Outlined';
+  font-size: 24px;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+  cursor: pointer;
+  border: none;
+  pointer-events: none;
+}
+
+card:hover .play-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+card .shuffle-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 3;
+  background: var(--card-bg-color, #396E80);
+  color: var(--card-contrast-color, #E3E1DB);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Material Symbols Outlined';
+  font-size: 20px;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+  cursor: pointer;
+  border: none;
+}
+
+card:hover .shuffle-btn {
+  opacity: 1;
 }
 
 #onboard {
