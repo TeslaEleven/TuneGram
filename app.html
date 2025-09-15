@@ -827,17 +827,30 @@
                   }).filter(html => html !== '').join('<br>');
                   document.querySelector('#lyrics').innerHTML = lyricsHtml;
                   
-                  // Add fade-in effect to all lyric lines
+                  // Add fade-in effect to all lyric lines only if this is the first song in queue
+                  // This prevents jittering when playing songs that aren't first in queue
+                  const isFirstInQueue = music.queue.position === 0;
                   const allLyricLines = document.querySelectorAll('.lyric-line');
-                  allLyricLines.forEach((line, index) => {
-                    line.style.opacity = '0';
-                    line.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                      line.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                  
+                  if (isFirstInQueue) {
+                    // Apply fade-in animation only for first song in queue
+                    allLyricLines.forEach((line, index) => {
+                      line.style.opacity = '0';
+                      line.style.transform = 'translateY(20px)';
+                      setTimeout(() => {
+                        line.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                        line.style.opacity = '0.6';
+                        line.style.transform = 'translateY(0)';
+                      }, index * 50); // Stagger the fade-in
+                    });
+                  } else {
+                    // For songs not first in queue, set initial state without animation
+                    allLyricLines.forEach((line) => {
                       line.style.opacity = '0.6';
                       line.style.transform = 'translateY(0)';
-                    }, index * 50); // Stagger the fade-in
-                  });
+                      line.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                    });
+                  }
                   const css = `@media (max-width: 650px) { #lyrics { width: fit-content !important; } }`;
                   document.styleSheets[0].insertRule(css, 0);
                   // APPLE MUSIC-STYLE LYRICS SYSTEM
