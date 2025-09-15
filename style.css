@@ -22,7 +22,6 @@
 apple-music-progress {
   margin-top: 11px !important;
 }
-/* Style Apple Music playback controls play button with contrast color */
 apple-music-playback-controls::part(play-button) {
   color: var(--contrast-color, #2F3633) !important;
 }
@@ -31,13 +30,11 @@ apple-music-playback-controls::part(play-button) svg {
   fill: var(--contrast-color, #2F3633) !important;
 }
 
-/* Alternative approach using CSS custom properties */
 apple-music-playback-controls {
   --amp-icon-color: var(--contrast-color, #2F3633);
   --amp-icon-fill: var(--contrast-color, #2F3633);
 }
 
-/* Target the play button specifically */
 apple-music-playback-controls button[data-action="play"] {
   color: var(--contrast-color, #2F3633) !important;
 }
@@ -1233,7 +1230,6 @@ hr {
   visibility: hidden;
 }
 
-/* Desktop-specific queue styling */
 @media (min-width: 651px) {
   #queue-content {
     padding: 5px;
