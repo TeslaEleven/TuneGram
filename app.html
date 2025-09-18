@@ -120,7 +120,7 @@
     document.getElementById('content').style.height = "fit-content";
   })
   document.body.addEventListener('htmx:beforeSwap', function () {
-    document.getElementById('content').style.height = "87.5vh";
+    document.getElementById('content').style.height = "calc(100vh - 82px)";
   })
   function resetNowPlayingColors() {
     document.body.style.backgroundColor = "#E3E1DB";
