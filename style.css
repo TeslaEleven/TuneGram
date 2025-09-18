@@ -426,7 +426,7 @@ body::-webkit-scrollbar {
 
   #lyrics {
     width: 91.4% !important;
-    height: calc(100vh - 120px) !important;
+    height: 70vh !important;
     text-align: left !important;
   }
 
@@ -584,7 +584,7 @@ card {
   font-family: "neue-haas-grotesk-display", sans-serif;
   border-radius: 10px;
   overflow-y: scroll;
-  height: calc(100vh - 82px);
+  height: 100vh;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
@@ -601,41 +601,39 @@ card {
   cursor: pointer;
   font-weight: 600;
   text-align: right;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0.4;
-  transform: translateY(0) translateX(0) scale(1);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+  transform: translateY(0) translateX(0);
   transition-delay: 0ms;
-  line-height: 1.2;
 }
 
 .lyric-line.highlight {
   opacity: 1;
-  transform: translateY(-3px) translateX(-8px) scale(1.05);
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px) translateX(-5px);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition-delay: 0ms;
-  font-weight: 700;
 }
 
 .lyric-line:nth-child(1) { transition-delay: 0ms; }
-.lyric-line:nth-child(2) { transition-delay: 30ms; }
-.lyric-line:nth-child(3) { transition-delay: 60ms; }
-.lyric-line:nth-child(4) { transition-delay: 90ms; }
-.lyric-line:nth-child(5) { transition-delay: 120ms; }
-.lyric-line:nth-child(6) { transition-delay: 150ms; }
-.lyric-line:nth-child(7) { transition-delay: 180ms; }
-.lyric-line:nth-child(8) { transition-delay: 210ms; }
-.lyric-line:nth-child(9) { transition-delay: 240ms; }
-.lyric-line:nth-child(10) { transition-delay: 270ms; }
-.lyric-line:nth-child(11) { transition-delay: 300ms; }
-.lyric-line:nth-child(12) { transition-delay: 330ms; }
-.lyric-line:nth-child(13) { transition-delay: 360ms; }
-.lyric-line:nth-child(14) { transition-delay: 390ms; }
-.lyric-line:nth-child(15) { transition-delay: 420ms; }
-.lyric-line:nth-child(16) { transition-delay: 450ms; }
-.lyric-line:nth-child(17) { transition-delay: 480ms; }
-.lyric-line:nth-child(18) { transition-delay: 510ms; }
-.lyric-line:nth-child(19) { transition-delay: 540ms; }
-.lyric-line:nth-child(20) { transition-delay: 570ms; }
+.lyric-line:nth-child(2) { transition-delay: 50ms; }
+.lyric-line:nth-child(3) { transition-delay: 100ms; }
+.lyric-line:nth-child(4) { transition-delay: 150ms; }
+.lyric-line:nth-child(5) { transition-delay: 200ms; }
+.lyric-line:nth-child(6) { transition-delay: 250ms; }
+.lyric-line:nth-child(7) { transition-delay: 300ms; }
+.lyric-line:nth-child(8) { transition-delay: 350ms; }
+.lyric-line:nth-child(9) { transition-delay: 400ms; }
+.lyric-line:nth-child(10) { transition-delay: 450ms; }
+.lyric-line:nth-child(11) { transition-delay: 500ms; }
+.lyric-line:nth-child(12) { transition-delay: 550ms; }
+.lyric-line:nth-child(13) { transition-delay: 600ms; }
+.lyric-line:nth-child(14) { transition-delay: 650ms; }
+.lyric-line:nth-child(15) { transition-delay: 700ms; }
+.lyric-line:nth-child(16) { transition-delay: 750ms; }
+.lyric-line:nth-child(17) { transition-delay: 800ms; }
+.lyric-line:nth-child(18) { transition-delay: 850ms; }
+.lyric-line:nth-child(19) { transition-delay: 900ms; }
+.lyric-line:nth-child(20) { transition-delay: 950ms; }
 
 .more-btn {
   font-size: inherit !important;
