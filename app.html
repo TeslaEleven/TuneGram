@@ -1016,21 +1016,28 @@
                     });
                   }
 
-                  function scrollToCenter(targetLine) {
-                    if (!targetLine || !lyricsDiv) return;
+                  function scrollParentToChild(parent, child) {
+                    if (!child) return;
+                    if (!parent || !parent.contains(child)) {
+                      try {
+                        child.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                      } catch (e) {
+                        child.scrollIntoView();
+                      }
+                      return;
+                    }
 
-                    const tlcontentNp = document.getElementById('tlcontent-np');
-                    if (!tlcontentNp) return;
+                    const parentRect = parent.getBoundingClientRect();
+                    const childRect = child.getBoundingClientRect();
 
-                    const containerHeight = tlcontentNp.clientHeight;
-                    const lineHeight = targetLine.offsetHeight;
-                    const lineTop = targetLine.offsetTop;
-                    const targetScroll = lineTop - (containerHeight / 2) + (lineHeight / 2);
+                    const childTopRelativeToParent = (childRect.top - parentRect.top) + parent.scrollTop;
 
-                    lyricsDiv.scrollTo({
-                      top: Math.max(0, targetScroll),
-                      behavior: 'smooth'
-                    });
+                    const targetScroll = childTopRelativeToParent - (parent.clientHeight / 2) + (child.clientHeight / 2);
+
+                    const maxScroll = Math.max(0, parent.scrollHeight - parent.clientHeight);
+                    const finalScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+                    parent.scrollTo({ top: finalScroll, behavior: 'smooth' });
                   }
 
 
@@ -1081,7 +1088,8 @@
                         animateLyricTransition(newHighlightIndex, currentHighlightIndex);
 
                         setTimeout(() => {
-                          scrollToCenter(lyricLines[newHighlightIndex]);
+                          const parentEl = (typeof lyricsDiv !== 'undefined' && lyricsDiv) ? lyricsDiv : document.getElementById('tlcontent-np') || lyricLines[newHighlightIndex].parentElement;
+                          scrollParentToChild(parentEl, lyricLines[newHighlightIndex]);
                         }, 100);
                       } else {
                         lyricLines.forEach(line => {

@@ -319,6 +319,9 @@ body::-webkit-scrollbar {
   #greater-pc {
     display: none !important;
   }
+  #np {
+    width: 29vw;
+  }
 }
 
 @media (max-width: 650px) {
@@ -381,10 +384,14 @@ body::-webkit-scrollbar {
     flex-direction: column;
   }
 
-  #np #np-child {
-    flex-direction: column !important;
-    align-items: center;
+  #np-child.info-page {
+    flex-direction: row-reverse !important;;
   }
+
+  #infobox {
+    height: unset !important;
+  }
+  
 
   #greater-pc apple-music-progress {
     width: 95% !important;
@@ -1243,10 +1250,6 @@ hr {
 
   body {
     margin-bottom: 100px;
-  }
-
-  .song-title {
-    text-align: center;
   }
 
   .mobile-nav-btn span {
