@@ -502,6 +502,7 @@ body::-webkit-scrollbar {
 
 #content {
   width: 100%;
+  min-height: calc(100vh - 82px);
   height: calc(100vh - 82px);
   display: flex;
   justify-content: center;
