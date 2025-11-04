@@ -1,3 +1,7 @@
+:root {
+  --fixed-height: calc(100vh - 82px);
+}
+
 #name {
   cursor: pointer;
   transform: scale(1);
@@ -11,7 +15,21 @@
   margin-bottom: 20px;
 }
 
-#name:hover {
+#name-preview {
+  cursor: pointer;
+  transform: scale(1);
+  transition: 100ms ease-in;
+  font-family: MuseoModerno;
+  font-size: 3em;
+  margin: 0;
+  color: #8DA8AD;
+  transition: font-weight 0.2s ease-in-out;
+  font-weight: 300;
+  margin-bottom: 20px;
+  display:none;
+}
+
+#name:hover, #name-preview:hover {
   font-weight: 500;
 }
 
@@ -237,8 +255,8 @@ input[type="search"] {
 
 #lyrics {
   text-align: right;
-  height: calc(100vh - 82px);
-  max-height: calc(100vh - 82px);
+  height: var(--fixed-height);
+  max-height: var(--fixed-height);
 }
 
 #table-wrap {
@@ -502,8 +520,8 @@ body::-webkit-scrollbar {
 
 #content {
   width: 100%;
-  min-height: calc(100vh - 82px);
-  height: calc(100vh - 82px);
+  min-height: var(--fixed-height);
+  height: var(--fixed-height);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -580,19 +598,18 @@ card {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  padding: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
   font-weight: 500;
   font-family: "neue-haas-grotesk-display", sans-serif;
   border-radius: 10px;
   overflow-y: scroll;
   height: 100vh;
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
 #lyrics::-webkit-scrollbar {
-  display: none; /* WebKit */
+  display: none;
 }
 
 .lyric-line {
@@ -996,7 +1013,7 @@ artcard:active {
 
 #tlcontent {
   max-width: 70vw;
-  max-height: 90vh;
+  max-height: var(--fixed-height);
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -1010,7 +1027,7 @@ artcard:active {
   padding-top: 2.5%;
   padding-right: 2%;
   width: 70vw;
-  max-height: 90vh;
+  max-height: calc(var(--fixed-height) - 2.5%);
   justify-content: space-between;
   display: flex;
   overflow: auto;
