@@ -289,12 +289,12 @@
   const playNext = document.createEvent('CustomEvent')
   const listenSeeMore = document.createEvent('CustomEvent')
   function getSearch() {
-    htmx.ajax('GET', 'search.html', { target: '#content', swap: 'innerHTML', delay: "500ms" })
+    htmx.ajax('GET', 'search.html', { target: '#content', swap: 'innerHTML' })
   }
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: "eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzYyMjI4Mzc5LCJleHAiOjE3NjU2ODQzNzksIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.QHB1oO23iYF3DI5EYw42Ng8_kC7SIZtBl2K5rz-Jq7fR45uboog9Rmbl1zawZYjwcbvtVDcMnEN5sU1GIb4n1w",
+        developerToken: "eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzYyNDg5MTU2LCJleHAiOjE3NjU5NDUxNTYsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.qhpCW9p2BUFb3R2T3BJBvmKlLEBxgy8o95ae2iVjRJi-Z25Da73P4NB2s2viuFRNqxamq0-97a7aTpcxfseedw",
         app: {
           name: 'TuneGram',
           build: '2.2.0',
@@ -585,11 +585,11 @@
               const title = (item.attributes && item.attributes.name) ? item.attributes.name : 'Unknown';
               const sub = (item.attributes && (item.attributes.artistName || item.attributes.releaseDate)) ? (item.attributes.artistName || '') : '';
               if (type === 'album' || type === 'heavy') {
-                return `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${title}</heading><subheading>${sub}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`;
+                return `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${title}</heading><subheading>${sub}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`;
               } else if (type === 'plist') {
                 const edited = item.attributes && item.attributes.lastModifiedDate ? new Date(item.attributes.lastModifiedDate) : null;
                 const editedLabel = edited ? `${edited.getMonth() + 1}/${edited.getDate()}/${edited.getFullYear()}` : 'Edited: Unknown';
-                return `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${title}</heading><subheading>Edited ${editedLabel}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`;
+                return `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${title}</heading><subheading>Edited ${editedLabel}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`;
               }
               return '';
             } catch (e) {
@@ -647,31 +647,23 @@
           });
           loadLibrary()
         }, false);
-        document.addEventListener("pausePlayEvent", async (e) => {
-          var typee = e.detail
-          var type = typee.slice(0, 2);
-          var id = typee.slice(2)
-          if (type == "re") {
-            await music.skipToPreviousItem()
-          } else if (type == "ff") {
-            await music.skipToNextItem()
-          } else {
-            if (music.isPlaying == true) {
-              music.pause()
 
-            } else {
-              music.play();
-
-            }
+        
+        document.addEventListener('playbackShuffleModeDidChange', (event) => {
+          if (nowPlayingScreenVisible()) {
+            loadVisuals(music.queue.items, music.queue.currentItem.id);
+            (music.queue.items).forEach(appendTracks)
+            updateHighlightedTrack();
           }
-        }, false);
+        });
         document.addEventListener("nowPlayingEvent", async (e) => {
           loadVisuals(queue, e.detail)
           var songId = [e.detail];
           if (e.detail !== "") {
             if (e.detail !== "viewonly") {
-              await music.setQueue({ songs: songId, startPlaying: true })
-              loadVisuals(music.queue.items, e.detail)
+              music.setQueue({ songs: songId, startPlaying: true })
+              loadVisuals(music.queue.items, e.detail);
+              updateHighlightedTrack();
             } else {
               if (music.queue.currentItem) {
                 loadVisuals(music.queue.items, music.queue.currentItem.id);
@@ -704,10 +696,9 @@
         }
       }, false);
       music.addEventListener('nowPlayingItemDidChange', ({ item }) => {
-
         resetLyricVariables();
-
         if (item !== undefined) {
+          (music.queue.items).forEach(appendTracks)
           loadVisuals(queue, item.id)
           updateHighlightedTrack();
           loadLyrics()
@@ -719,7 +710,13 @@
         loadVisuals(queue, music.queue.currentItem)
         updateHighlightedTrack();
       });
+      function nowPlayingScreenVisible() {
+        return document.querySelector('.np-active') !== null;
+      }
       function loadVisuals(queue, id) {
+        if (nowPlayingScreenVisible() == false) {
+          return;
+        }
         var songPlaying = music.queue.currentItem;
         if (songPlaying !== undefined) {
           var queueItems = music.queue.items;
@@ -1175,7 +1172,6 @@
         document.querySelector('#info #info-img').src = cover;
         document.querySelector("#info-details").innerHTML = detailSubheading;
         document.querySelector("#play-all").setAttribute('onclick', `playAll('${item.id}')`);
-        document.querySelector("#shuffle-all").setAttribute('onclick', `shuffleAll('${item.id}')`);
       }
       async function loadLibrary() {
         if (!sessionStorage.getItem('plistStorage') || !sessionStorage.getItem('albumStorage') || !sessionStorage.getItem('heavyStorage')) {
@@ -1217,79 +1213,16 @@
         }
       });
 
-      window.shuffleAll = async function (id) {
-        try {
-          let apiUrl;
-          let isPlaylist = false;
-
-
-          if (id.startsWith('pl')) {
-
-            apiUrl = `/v1/catalog/${storefront}/playlists/${id}`;
-            isPlaylist = true;
-          } else if (id.startsWith('p') && !id.startsWith('pl')) {
-
-            apiUrl = `/v1/me/library/playlists/${id}`;
-            isPlaylist = true;
-          } else if (id.startsWith('i')) {
-
-            apiUrl = `/v1/me/library/albums/${id}`;
-          } else if (id.startsWith('l')) {
-
-            apiUrl = `/v1/me/library/albums/${id}`;
-          } else {
-
-            apiUrl = `/v1/catalog/${storefront}/albums/${id}`;
-          }
-
-          const response = await music.api.music(apiUrl, { l: 'en-us' });
-          let data;
-          let tracks;
-
-
-          if (isPlaylist) {
-            data = response?.data?.data;
-
-            const tracksResponse = await music.api.music(`${apiUrl}/tracks`, { l: 'en-us' });
-            tracks = tracksResponse?.data?.data;
-          } else {
-            data = response?.data?.data?.[0];
-            tracks = data?.relationships?.tracks?.data;
-          }
-
-          if (!tracks || tracks.length === 0) {
-            console.error('No tracks found for', id);
-            return;
-          }
-          const ids = tracks.map(track => {
-
-
-            if (isPlaylist || id.startsWith('i') || id.startsWith('l')) {
-              return track.id;
-            } else {
-              return track.attributes?.playParams?.reportingId || track.id;
-            }
-          }).filter(Boolean);
-
-          if (!ids.length) {
-            console.error('No valid track IDs found');
-            return;
-          }
-
-          loadContent('np');
-          htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" });
-
-
-          const shuffledIds = [...ids].sort(() => Math.random() - 0.5);
-          await music.setQueue({ songs: shuffledIds, startPlaying: true });
-          queue = music.queue.items;
-        } catch (error) {
-          console.error('Error in shuffleAll:', error);
-        }
-      }
-
       window.playAll = async function (id) {
         try {
+          if (music.isPlaying) {
+            await music.stop();
+          }
+
+          // CLEAR QUEUE
+
+          music.setQueue({ songs: [] });
+
           let apiUrl;
           let isPlaylist = false;
 
@@ -1348,8 +1281,7 @@
           }
 
           loadContent('np');
-          htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" });
-
+          htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML' });
 
           await music.setQueue({ songs: ids, startPlaying: true });
           queue = music.queue.items;
@@ -1407,7 +1339,7 @@
       bgColor = bgColor || "#396E80";
       contrastColor = contrastColor || "#E3E1DB";
 
-      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
       albumsProcessed++
       toDrawAlbums += card
       if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
@@ -1421,7 +1353,7 @@
     }).catch((err) => {
       console.error('Error getting background color:', err);
 
-      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
       albumsProcessed++
       toDrawAlbums += card
       if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
@@ -1459,7 +1391,7 @@
         bgColor = bgColor || "#396E80";
         contrastColor = contrastColor || "#E3E1DB";
 
-        var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+        var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
         heavyProcessed++
         toDrawHeavy += card
         if (heavyProcessed == heavyToCount && heavyProcessed !== 0) {
@@ -1475,7 +1407,7 @@
       }).catch((err) => {
         console.error('Error getting background color:', err);
 
-        var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+        var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${subheading}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
         heavyProcessed++
         toDrawHeavy += card
         if (heavyProcessed == heavyToCount && heavyProcessed !== 0) {
@@ -1554,7 +1486,7 @@
       bgColor = bgColor || "#396E80";
       contrastColor = contrastColor || "#E3E1DB";
 
-      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
       albumsProcessed++
       toDrawAlbums += card
       if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
@@ -1563,7 +1495,7 @@
     }).catch((err) => {
       console.error('Error getting background color:', err);
 
-      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: #396E80; --card-contrast-color: #E3E1DB;"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading>${detailSubheading}<button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
       albumsProcessed++
       toDrawAlbums += card
       if (albumsProcessed == albumsToCount && albumsProcessed !== 0) {
@@ -1581,7 +1513,7 @@
 
       var date = new Date(item.attributes.lastModifiedDate);
       edited = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
-      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
       plistsProcessed++
       toDrawPlists += card
       if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
@@ -1668,7 +1600,7 @@
       bgColor = bgColor || "#396E80";
       contrastColor = contrastColor || "#E3E1DB";
 
-      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button><button class="shuffle-btn" onclick="event.stopPropagation(); shuffleAll('${item.id}')" title="Shuffle All">shuffle</button></card>`
+      var card = `<card onclick="toAlbum('${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>Edited ${edited}</subheading><button class="play-btn" onclick="event.stopPropagation(); playAll('${item.id}')" title="Play All">play_arrow</button></card>`
       plistsProcessed++
       toDrawPlists += card
       if (plistsProcessed == plistsToCount && plistsProcessed !== 0) {
@@ -1699,7 +1631,7 @@
   var searchId = ""
   function toAlbum(id) {
     infoId = id
-    htmx.ajax('GET', 'info.html?id=' + id, { target: '#content', swap: 'innerHTML', delay: "500ms" })
+    htmx.ajax('GET', 'info.html?id=' + id, { target: '#content', swap: 'innerHTML' })
   }
 
   async function toAlbumFromNowPlaying() {
@@ -1773,7 +1705,7 @@
     if (!id.startsWith('prev+')) {
       if (id !== "itunesonly") {
         loadContent('np');
-        htmx.ajax('GET', 'np.html?id=' + id, { target: '#content', swap: 'innerHTML', delay: "500ms" })
+        htmx.ajax('GET', 'np.html?id=' + npId, { target: '#content', swap: 'innerHTML' })
       } else {
         alert('This content is only available on the iTunes Store.')
       }
@@ -1787,7 +1719,7 @@
   function playNextOrLast(id, type) {
     npId = "viewonly"
     loadContent('np');
-    htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML', delay: "500ms" })
+    htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML' })
     if (type == "later") {
       playLater.initCustomEvent("playLater", true, true, id);
       document.dispatchEvent(playLater);

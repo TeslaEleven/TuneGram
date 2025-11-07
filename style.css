@@ -746,10 +746,6 @@ card subheading {
   display: none;
 }
 
-card:hover {
-  transform: scale(1.10);
-}
-
 card:hover img {
   filter: brightness(0.95);
 }
@@ -814,6 +810,11 @@ card .play-btn {
   pointer-events: none;
 }
 
+card .play-btn:active {
+  transform: scale(.92, .92);
+  transition: 100ms ease;
+}
+
 card:hover .play-btn {
   opacity: 1;
   pointer-events: auto;
@@ -847,16 +848,6 @@ card:hover .shuffle-btn {
 #onboard {
   transition: opacity 300ms ease-in;
   display: block;
-}
-
-subcard:active {
-  transform: scale(.92, .92);
-  transition: 100ms ease;
-}
-
-card:active {
-  transform: scale(.92, .92);
-  transition: 100ms ease;
 }
 
 
@@ -1137,8 +1128,7 @@ artcard:active {
 }
 
 .playing {
-  color: #396E80;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .song-title:hover {
@@ -1270,7 +1260,6 @@ hr {
   display: none;
 }
 
-/* Queue functionality for both desktop and mobile */
 #queuehistorywrapper {
   margin-top: 3%;
   position: relative;
@@ -1299,28 +1288,21 @@ hr {
   bottom: 100%;
   left: 0;
   right: 0;
-  background: var(--np-bg-primary, #E3E1DB);
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--contrast-color, #2F3633);
+  border-radius: 12px;
+  margin-bottom: 10px;
   z-index: 1000;
-  max-height: 0;
-  overflow: hidden;
+  max-height: 40vh !important;
+  overflow-y: scroll;
   transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
-  border: 1px solid rgba(47, 54, 51, 0.2);
-  border-bottom: none;
   padding: 20px;
   opacity: 0;
   visibility: hidden;
+  background-color: var(--background-color, #E3E1DB);
+  padding: 5px !important;
 }
 
 @media (min-width: 651px) {
-  #queue-content {
-    padding: 5px;
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -6px 25px rgba(0, 0, 0, 0.4);
-    background: var(--np-bg-primary, #E3E1DB);
-  }
-
   #queue-header {
     padding: 15px 0;
   }
