@@ -294,7 +294,7 @@
   document.addEventListener('musickitloaded', async function () {
     try {
       await MusicKit.configure({
-        developerToken: "eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzYyNDg5MTU2LCJleHAiOjE3NjU5NDUxNTYsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.qhpCW9p2BUFb3R2T3BJBvmKlLEBxgy8o95ae2iVjRJi-Z25Da73P4NB2s2viuFRNqxamq0-97a7aTpcxfseedw",
+        developerToken: "eyJhbGciOiJFUzI1NiIsImtpZCI6IlFOMjVSSkFEQk4ifQ.eyJpc3MiOiJRN0MyVEMzNlQyIiwiaWF0IjoxNzYyNjczNjUxLCJleHAiOjE3NjYxMjk2NTEsIm9yaWdpbiI6WyJodHRwczovL3RnLmNvbWljc2VydmVyLm9yZyJdfQ.v2rfM7IXMbCfeH87krMeHcE3D02uuMI5C0gs1tU52QQ0yz5q2uKWnQXVKS6EpxZx0EWKT9Sgx9sFAvkiCzhdtw",
         app: {
           name: 'TuneGram',
           build: '2.2.0',
@@ -567,8 +567,43 @@
           }
         })
         document.addEventListener("listenSeeMore", async (e) => {
-          seeMore();
-        })
+          var rawMethod = methodType;
+          var chosenFunc = "";
+          var methodUrl = ""
+          var offset = document.querySelector(targetPractice).children.length + 1;
+          if (rawMethod == "heavy") {
+            methodUrl = "/v1/me/history/heavy-rotation";
+            chosenFunc = drawHeavy;
+          } else if (rawMethod == "album") {
+            methodUrl = "/v1/me/library/albums";
+            chosenFunc = drawAlbums;
+          } else if (rawMethod == "playlist") {
+            methodUrl = "/v1/me/library/playlists";
+            chosenFunc = drawPlists;
+          }
+          const greaterAlbums = await music.api.music(methodUrl, { offset, limit: 100 }).then((data) => {
+            if (data.data) {
+              var res = data.data.data;
+              if (res.length == 0) {
+                $(targetPractice + ' card').last()[0].scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                  block: 'nearest',
+                  inline: 'center',
+                });
+              } else {
+                res.forEach(chosenFunc)
+                $(targetPractice + ' card').last()[0].scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                  block: 'nearest',
+                  inline: 'center',
+                });
+              }
+            }
+          });
+        }, false);
+
         async function loadLibrary() {
 
           if (sessionStorage.getItem('plistStorage') && sessionStorage.getItem('albumStorage') && sessionStorage.getItem('heavyStorage')) {
@@ -657,7 +692,6 @@
           }
         });
         document.addEventListener("nowPlayingEvent", async (e) => {
-          loadVisuals(queue, e.detail)
           var songId = [e.detail];
           if (e.detail !== "") {
             if (e.detail !== "viewonly") {
@@ -726,7 +760,7 @@
           var bgColor = "#396E80";
           if (root.artwork) {
             if (root.artwork.url) {
-              art = MusicKit.formatArtworkURL(root.artwork, 500, 500);
+              art = (cArt) ? cArt : MusicKit.formatArtworkURL(root.artwork, 500, 500);
               getImageColors(art).then(({ bgColor, contrastColor }) => {
                 bgColor = bgColor || "#396E80";
                 document.body.style.backgroundColor = `${bgColor}`;
@@ -1219,72 +1253,24 @@
             await music.stop();
           }
 
-          // CLEAR QUEUE
-
-          music.setQueue({ songs: [] });
-
-          let apiUrl;
           let isPlaylist = false;
 
-
           if (id.startsWith('pl')) {
-
-            apiUrl = `/v1/catalog/${storefront}/playlists/${id}`;
             isPlaylist = true;
           } else if (id.startsWith('p') && !id.startsWith('pl')) {
-
-            apiUrl = `/v1/me/library/playlists/${id}`;
             isPlaylist = true;
-          } else if (id.startsWith('i')) {
-
-            apiUrl = `/v1/me/library/albums/${id}`;
-          } else if (id.startsWith('l')) {
-
-            apiUrl = `/v1/me/library/albums/${id}`;
-          } else {
-
-            apiUrl = `/v1/catalog/${storefront}/albums/${id}`;
-          }
-
-          const response = await music.api.music(apiUrl, { l: 'en-us' });
-          let data;
-          let tracks;
-
-
-          if (isPlaylist) {
-            data = response?.data?.data;
-
-            const tracksResponse = await music.api.music(`${apiUrl}/tracks`, { l: 'en-us' });
-            tracks = tracksResponse?.data?.data;
-          } else {
-            data = response?.data?.data?.[0];
-            tracks = data?.relationships?.tracks?.data;
-          }
-
-          if (!tracks || tracks.length === 0) {
-            console.error('No tracks found for', id);
-            return;
-          }
-          const ids = tracks.map(track => {
-
-
-            if (isPlaylist || id.startsWith('i') || id.startsWith('l')) {
-              return track.id;
-            } else {
-              return track.attributes?.playParams?.reportingId || track.id;
-            }
-          }).filter(Boolean);
-
-          if (!ids.length) {
-            console.error('No valid track IDs found');
-            return;
           }
 
           loadContent('np');
           htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML' });
-
-          await music.setQueue({ songs: ids, startPlaying: true });
-          queue = music.queue.items;
+          
+          if (isPlaylist) {
+            await music.setQueue({ playlist: id, startPlaying: true });
+            queue = music.queue.items;
+          } else {
+            await music.setQueue({ album: id, startPlaying: true });
+            queue = music.queue.items;
+          }
         } catch (error) {
           console.error('Error in playAll:', error);
         }
@@ -1628,6 +1614,7 @@
   }
   var infoId = ""
   var npId = ""
+  var cArt = "";
   var searchId = ""
   function toAlbum(id) {
     infoId = id
@@ -1702,6 +1689,7 @@
   }
   function musicPlay(id, art) {
     npId = id;
+    cArt = art;
     if (!id.startsWith('prev+')) {
       if (id !== "itunesonly") {
         loadContent('np');
