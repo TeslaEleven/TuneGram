@@ -1253,6 +1253,8 @@
             await music.stop();
           }
 
+          music.setQueue({ songs: [] });
+
           let isPlaylist = false;
 
           if (id.startsWith('pl')) {
