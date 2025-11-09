@@ -760,7 +760,7 @@
           var bgColor = "#396E80";
           if (root.artwork) {
             if (root.artwork.url) {
-              art = (cArt) ? cArt : MusicKit.formatArtworkURL(root.artwork, 500, 500);
+              art = MusicKit.formatArtworkURL(root.artwork, 500, 500);
               getImageColors(art).then(({ bgColor, contrastColor }) => {
                 bgColor = bgColor || "#396E80";
                 document.body.style.backgroundColor = `${bgColor}`;
