@@ -11,6 +11,11 @@
 <script>
 document.querySelectorAll('#content')[0].style.display = "block";
 var srchBar = document.querySelector('input');
+srchBar.focus();
+var cachedTerm = sessionStorage.getItem("term");
+if(cachedTerm) {
+    srchBar.value = cachedTerm;
+}
 $('#result').css({ 
         height: '67.5vh'
     });

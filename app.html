@@ -348,7 +348,8 @@
         getSearch()
       }
       document.addEventListener("listenSearch", (e) => {
-        searchTerm(e.detail)
+        searchTerm(e.detail);
+        sessionStorage.setItem("term", e.detail);
       }, false);
       async function searchTerm(term) {
         await music.api.music(`/v1/catalog/${storefront}/search`, { term: term, types: 'albums,songs,playlists' }).then((res) => {
@@ -378,6 +379,9 @@
           console.error(err);
         })
       }
+
+
+
       async function infoDo(id) {
         if (id.startsWith('pl')) {
           await music.api.music(`/v1/catalog/${storefront}/playlists/${id}`, queryParameters).then(async (res) => {
@@ -691,7 +695,8 @@
           var songId = [e.detail];
           if (e.detail !== "") {
             if (e.detail !== "viewonly") {
-              music.setQueue({ songs: songId, startPlaying: true })
+              music.setQueue({ songs: songId, startPlaying: true });
+              setCurrentAlbum(songId[0]);
               loadVisuals(music.queue.items, e.detail);
               updateHighlightedTrack();
             } else {
@@ -739,6 +744,7 @@
         queue.forEach(appendTracks)
         loadVisuals(queue, music.queue.currentItem)
         updateHighlightedTrack();
+        setCurrentAlbum(music.queue.currentItem);
       });
       function nowPlayingScreenVisible() {
         return document.querySelector('.np-active') !== null;
@@ -784,6 +790,7 @@
                 if (name) {
                   name.style.color = contrastColor;
                 }
+
                 document.querySelectorAll('.header-itm').forEach(a => a.style.background = `transparent !important`);
                 document.querySelectorAll('.header-itm').forEach(a => a.style.border = `none !important`);
                 document.querySelectorAll('.header-itm').forEach(a => a.style.color = `${contrastColor}`);
@@ -926,7 +933,7 @@
         var dur = music.queue.currentItem ? music.queue.currentItem.attributes.durationInMillis : '';
         if (songName && artistName && albumName && dur) {
           var duration = dur / 1000;
-          document.querySelector('#lyrics').innerHTML = '<p>Loading lyrics...</p>';
+          document.querySelector('#lyrics').innerHTML = '<p><span class="material-symbols-outlined">progress_activity</span></p>';
           const cover = document.querySelector('#np #info-img').src;
           getImageColors(cover).then(({ bgColor, contrastColor }) => {
             var lightContrast = contrastColor.replace(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/, (match, r, g, b) => `rgba(${r}, ${g}, ${b}, 0.5)`);
@@ -944,9 +951,24 @@
             document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.6; transform: translateY(0) translateX(0); }`, 0);
             document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1; transform: translateY(-2px) translateX(-5px); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }`, 0);
           });
+          var sessionLyrics = sessionStorage.getItem("lyrics");
+          if(sessionLyrics) { 
+            runLyrics(sessionLyrics);
+            return;
+          }
           fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
             .then(response => response.json())
             .then(data => {
+              runLyrics(data);
+              sessionStorage.setItem("lyrics", data);
+            })
+        } else {
+          document.querySelector('#lyrics').innerText = 'No song playing.';
+        }
+      }
+
+      function runLyrics(data) {
+        {
               if (data.instrumental == false && (data.plainLyrics || data.syncedLyrics)) {
                 if (data.syncedLyrics) {
                   const lyricsArray = data.syncedLyrics.split('\n').map(line => {
@@ -1145,10 +1167,7 @@
               } else {
                 document.querySelector('#lyrics').innerText = 'Lyrics not found.';
               }
-            })
-        } else {
-          document.querySelector('#lyrics').innerText = 'No song playing.';
-        }
+            }
       }
 
       function updateHighlightedTrack() {
@@ -1259,13 +1278,15 @@
             isPlaylist = true;
           }
 
+          npId = "viewonly";
           loadContent('np');
-          htmx.ajax('GET', 'np.html?id=', { target: '#content', swap: 'innerHTML' });
+          htmx.ajax('GET', 'np.html?id=viewonly', { target: '#content', swap: 'innerHTML' });
           
           if (isPlaylist) {
             await music.setQueue({ playlist: id, startPlaying: true });
             queue = music.queue.items;
           } else {
+            sessionStorage.setItem("albumId", id);
             await music.setQueue({ album: id, startPlaying: true });
             queue = music.queue.items;
           }
@@ -1528,7 +1549,6 @@
     getImageColors(cover).then(({ bgColor, contrastColor }) => {
       bgColor = bgColor || "#396E80";
       contrastColor = contrastColor || "#E3E1DB";
-
       var card = `<card onclick="toAlbum('s${item.id}')" style="--card-bg-color: ${bgColor}; --card-contrast-color: ${contrastColor};"><img src="${cover}"/><heading>${item.attributes.name}</heading><subheading>${item.attributes.artistName}</subheading><button class="play-btn" onclick="event.stopPropagation(); musicPlay('${item.id}', '${cover}')" title="Play Song">play_arrow</button></card>`
       songsProcessed++
       toDrawSongs += card
@@ -1550,6 +1570,18 @@
       }
     });
   }
+
+  function toAlbumFromNowPlaying() {
+    const music = window.MusicKit ? window.MusicKit.getInstance() : null;
+          if (music) {
+            var albumId = sessionStorage.getItem("albumId");
+            if(albumId) {
+              infoId = albumId
+              htmx.ajax('GET', 'info.html?id=' + albumId, { target: '#content', swap: 'innerHTML' })
+            }
+          }
+  }
+
   function drawBoth() {
     const bigcards = document.querySelector('#bigcards');
     const heavycards = document.querySelector('#heavycards');
@@ -1612,86 +1644,25 @@
   }
   var infoId = ""
   var npId = ""
-  var cArt = "";
   var searchId = ""
   function toAlbum(id) {
     infoId = id
     htmx.ajax('GET', 'info.html?id=' + id, { target: '#content', swap: 'innerHTML' })
   }
 
-  async function toAlbumFromNowPlaying() {
-    const music = window.MusicKit ? window.MusicKit.getInstance() : null;
-    if (music && music.queue.currentItem) {
-      const currentItem = music.queue.currentItem;
-      const songName = currentItem.attributes.name;
-      const artistName = currentItem.attributes.artistName;
-      const albumName = currentItem.attributes.albumName;
-
-      try {
-
-        if (currentItem.id.startsWith('l.')) {
-
-          if (albumName && artistName) {
-            const searchQuery = `${albumName} ${artistName}`;
-            const searchResults = await music.api.search(searchQuery, { types: ['albums'], limit: 1 });
-
-            if (searchResults.albums && searchResults.albums.data && searchResults.albums.data.length > 0) {
-              const albumId = searchResults.albums.data[0].id;
-              toAlbum(albumId);
-              return;
-            }
-          }
-        } else {
-
-          const song = await music.api.music(`/v1/catalog/${music.storefrontId}/songs/${currentItem.id}`, {
-            include: 'albums'
-          });
-
-          if (song.data && song.data[0] && song.data[0].relationships && song.data[0].relationships.albums && song.data[0].relationships.albums.data && song.data[0].relationships.albums.data.length > 0) {
-            const albumId = song.data[0].relationships.albums.data[0].id;
-            toAlbum(albumId);
-            return;
-          }
-        }
-
-
-        if (songName && artistName) {
-          const searchQuery = `${songName} ${artistName}`;
-          const searchResults = await music.api.search(searchQuery, { types: ['songs'], limit: 1 });
-
-          if (searchResults.songs && searchResults.songs.data && searchResults.songs.data.length > 0) {
-            const foundSong = searchResults.songs.data[0];
-            if (foundSong.relationships && foundSong.relationships.albums && foundSong.relationships.albums.data && foundSong.relationships.albums.data.length > 0) {
-              const albumId = foundSong.relationships.albums.data[0].id;
-              toAlbum(albumId);
-              return;
-            }
-          }
-        }
-
-
-        if (albumName && artistName) {
-          searchTerm(`${albumName} ${artistName}`);
-        }
-
-      } catch (error) {
-        console.error('Error fetching album info:', error);
-
-        if (albumName && artistName) {
-          searchTerm(`${albumName} ${artistName}`);
-        } else if (songName && artistName) {
-          searchTerm(`${songName} ${artistName}`);
-        }
-      }
-    }
+  async function setCurrentAlbum(id) {
+    await music.api.music(`/v1/catalog/${storefront}/songs/` + id).then((res) => {
+        var albumId = res.data.data[0].relationships.albums.data[0].id
+        sessionStorage.setItem("albumId", albumId);
+    });
   }
+
   function musicPlay(id, art) {
     npId = id;
-    cArt = art;
     if (!id.startsWith('prev+')) {
       if (id !== "itunesonly") {
         loadContent('np');
-        htmx.ajax('GET', 'np.html?id=' + npId, { target: '#content', swap: 'innerHTML' })
+        htmx.ajax('GET', 'np.html?id=' + npId, { target: '#content', swap: 'innerHTML' });
       } else {
         alert('This content is only available on the iTunes Store.')
       }
@@ -1702,6 +1673,7 @@
       audio.play();
     }
   }
+
   function playNextOrLast(id, type) {
     npId = "viewonly"
     loadContent('np');
