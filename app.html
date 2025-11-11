@@ -38,7 +38,7 @@
   <div class="header" style="height:82px;">
     <div id="nameplate" valign="left"
       style="border:none;margin-left:2%;flex-grow:1;display:flex;vertical-align: middle;">
-      <p id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s"
+      <p id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML swap"
         style="width:auto;height:55px;vertical-align: middle;padding:10px">TuneGram</p>
       <p id="name-preview" onclick="window.location.replace('/')"
         style="width:auto;height:55px;vertical-align: middle;padding:10px">TuneGram</p>
@@ -49,22 +49,22 @@
     </div>
     <div class="header-itms">
       <div title="Now Playing" class="header-itm" id="np-btn" onclick="loadContent('np-header')"
-        hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap:1s">
+        hx-get="np.html?id=viewonly" hx-target="#content" hx-swap="innerHTML swap">
         <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">graphic_eq</p>
       </div>
       <div title="Search" class="header-itm" id="srch-btn" onclick="loadContent('srch')" hx-get="search.html"
-        hx-target="#content" hx-swap="innerHTML swap:1s">
+        hx-target="#content" hx-swap="innerHTML swap">
         <p style="font-size:3em;text-align:center;" class="material-symbols-outlined">search</p>
       </div>
     </div>
   </div>
   <div id="mobile-nav">
     <button class="mobile-nav-btn" id="np-btn-mobile" onclick="loadContent('np-header')" hx-get="np.html?id=viewonly"
-      hx-target="#content" hx-swap="innerHTML swap:1s">
+      hx-target="#content" hx-swap="innerHTML swap">
       <span class="material-symbols-outlined">graphic_eq</span>
     </button>
     <button class="mobile-nav-btn" id="srch-btn-mobile" onclick="loadContent('srch')" hx-get="search.html"
-      hx-target="#content" hx-swap="innerHTML swap:1s">
+      hx-target="#content" hx-swap="innerHTML swap">
       <span class="material-symbols-outlined">search</span>
     </button>
   </div>
@@ -1273,7 +1273,6 @@
           }
 
           npId = "viewonly";
-          loadContent('np');
           htmx.ajax('GET', 'np.html?id=viewonly', { target: '#content', swap: 'innerHTML' });
           
           if (isPlaylist) {
@@ -1285,11 +1284,11 @@
             queue = music.queue.items;
           }
         } catch (error) {
-          console.error('Error in playAll:', error);
+          alert('Error in playAll:', error);
         }
       }
 
-        async function setCurrentAlbum() {
+  async function setCurrentAlbum() {
     var songId = music.queue.currentItem.id
     alert(JSON.stringify(music.queue));
     await music.api.music(`/v1/catalog/${storefront}/songs/` + songId).then((res) => {
