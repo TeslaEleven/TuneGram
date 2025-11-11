@@ -1289,6 +1289,16 @@
         }
       }
 
+        async function setCurrentAlbum() {
+    var songId = music.queue.currentItem.id
+    alert(JSON.stringify(music.queue));
+    await music.api.music(`/v1/catalog/${storefront}/songs/` + songId).then((res) => {
+        var albumId = res.data.data[0].relationships.albums.data[0].id
+        sessionStorage.setItem("albumId", albumId);
+    });
+  }
+
+
     } catch (err) {
       console.error(err)
     }
@@ -1643,15 +1653,6 @@
   function toAlbum(id) {
     infoId = id
     htmx.ajax('GET', 'info.html?id=' + id, { target: '#content', swap: 'innerHTML' })
-  }
-
-  async function setCurrentAlbum() {
-    var songId = music.queue.currentItem.id
-    alert(JSON.stringify(music.queue));
-    await music.api.music(`/v1/catalog/${storefront}/songs/` + songId).then((res) => {
-        var albumId = res.data.data[0].relationships.albums.data[0].id
-        sessionStorage.setItem("albumId", albumId);
-    });
   }
 
   function musicPlay(id, art) {
