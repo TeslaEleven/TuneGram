@@ -1295,10 +1295,10 @@
       return;
     }
     await music.api.music(`/v1/catalog/${storefront}/songs/` + id).then((res) => {
-      alert(res);
+      alert(JSON.stringify(res));
         var albumId = res.data.data[0].relationships.albums.data[0].id
         sessionStorage.setItem("albumId", albumId);
-    }).catch(err => { alert(err) })
+    })
   }
 
 
