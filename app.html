@@ -951,16 +951,10 @@
             document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.6; transform: translateY(0) translateX(0); }`, 0);
             document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1; transform: translateY(-2px) translateX(-5px); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }`, 0);
           });
-          var sessionLyrics = sessionStorage.getItem("lyrics");
-          if(sessionLyrics) { 
-            runLyrics(sessionLyrics);
-            return;
-          }
           fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
             .then(response => response.json())
             .then(data => {
               runLyrics(data);
-              sessionStorage.setItem("lyrics", data);
             })
         } else {
           document.querySelector('#lyrics').innerText = 'No song playing.';
