@@ -1566,6 +1566,7 @@
   }
 
   function toAlbumFromNowPlaying() {
+    alert(sessionStorage.getItem("albumId"))
     const music = window.MusicKit ? window.MusicKit.getInstance() : null;
           if (music) {
             var albumId = sessionStorage.getItem("albumId");
