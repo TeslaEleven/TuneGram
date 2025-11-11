@@ -1262,8 +1262,6 @@
             await music.stop();
           }
 
-          await music.setQueue({ songs: [] });
-
           let isPlaylist = false;
 
           if (id.startsWith('pl')) {
@@ -1284,7 +1282,7 @@
             queue = music.queue.items;
           }
         } catch (error) {
-          alert('Error in playAll:' + error);
+          console.error('Error in playAll:', error);
         }
       }
 
