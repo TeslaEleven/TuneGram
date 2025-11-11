@@ -240,7 +240,6 @@
 
   function loadContent(page) {
     if (page !== "np" && page !== "np-header") {
-      hideNowPlayingScreen();
       resetNowPlayingColors();
       document.body.style.backgroundColor = "#E3E1DB";
 
@@ -250,7 +249,6 @@
       document.body.classList.add('np-active');
     }
     if (page === "np" || page === "np-header") {
-      if (showNowPlayingScreen()) {
         if (page == "np-header") {
           npId = "viewonly"
           document.querySelector('#np-btn').style.color = "#396E80";
@@ -260,8 +258,6 @@
           document.querySelector('#np-btn').style.color = "#396E80";
           document.querySelector('#srch-btn').style.color = "#2F3633";
         }
-        return;
-      }
     }
 
     document.getElementById('content').innerHTML = `<div class="moving-note"><p style="font-size:3em;text-align:center;margin-bottom:10%;margin-left:25%;margin-right:25%;margin-top:10%" class="material-symbols-outlined">music_note</p>`
@@ -570,7 +566,7 @@
           var rawMethod = methodType;
           var chosenFunc = "";
           var methodUrl = ""
-          var offset = document.querySelector(targetPractice).children.length + 1;
+          var offset = (document.querySelector(targetPractice).children.length + 1).toString();
           if (rawMethod == "heavy") {
             methodUrl = "/v1/me/history/heavy-rotation";
             chosenFunc = drawHeavy;
@@ -581,7 +577,7 @@
             methodUrl = "/v1/me/library/playlists";
             chosenFunc = drawPlists;
           }
-          const greaterAlbums = await music.api.music(methodUrl, { offset, limit: 100 }).then((data) => {
+          const greaterAlbums = await music.api.music(methodUrl, { offset }).then((data) => {
             if (data.data) {
               var res = data.data.data;
               if (res.length == 0) {
@@ -1253,7 +1249,7 @@
             await music.stop();
           }
 
-          music.setQueue({ songs: [] });
+          await music.setQueue({ songs: [] });
 
           let isPlaylist = false;
 
@@ -1721,35 +1717,6 @@
   function pausePlay(id, type) {
     pausePlayEvent.initCustomEvent("pausePlayEvent", true, true, type + id);
     document.dispatchEvent(pausePlayEvent);
-  }
-
-  function showNowPlayingScreen() {
-    const npContainer = document.getElementById('np-container');
-    if (npContainer.childElementCount > 0) {
-      document.getElementById('content').innerHTML = '';
-      while (npContainer.firstChild) {
-        document.getElementById('content').appendChild(npContainer.firstChild);
-      }
-      document.getElementById('content').style.display = "inline-flex";
-      document.getElementById('content').style.height = "fit-content";
-      npContainer.style.display = "none";
-      return true;
-    }
-    return false;
-  }
-
-  function hideNowPlayingScreen() {
-    const content = document.getElementById('content');
-    const npScreen = content.querySelector('#np');
-    if (npScreen) {
-      const npContainer = document.getElementById('np-container');
-      npContainer.innerHTML = '';
-      while (content.firstChild) {
-        npContainer.appendChild(content.firstChild);
-      }
-      npContainer.style.display = "none";
-      content.innerHTML = '';
-    }
   }
 
   function getImageColors(imgUrl) {
