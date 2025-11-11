@@ -696,7 +696,7 @@
           if (e.detail !== "") {
             if (e.detail !== "viewonly") {
               music.setQueue({ songs: songId, startPlaying: true });
-              setCurrentAlbum(e.detail);
+              setCurrentAlbum();
               loadVisuals(music.queue.items, e.detail);
               updateHighlightedTrack();
             } else {
@@ -739,12 +739,12 @@
           loadLyrics()
         }
       });
-      music.addEventListener('queueItemsDidChange', ({ item }) => {
+      music.addEventListener('queueItemsDidChange', () => {
         const queue = music.queue.items;
         queue.forEach(appendTracks)
         loadVisuals(queue, music.queue.currentItem)
         updateHighlightedTrack();
-        setCurrentAlbum(music.queue.currentItem.id);
+        setCurrentAlbum();
       });
       function nowPlayingScreenVisible() {
         return document.querySelector('.np-active') !== null;
@@ -1645,8 +1645,10 @@
     htmx.ajax('GET', 'info.html?id=' + id, { target: '#content', swap: 'innerHTML' })
   }
 
-  async function setCurrentAlbum(id) {
-    await music.api.music(`/v1/catalog/${storefront}/songs/` + id).then((res) => {
+  async function setCurrentAlbum() {
+    var songId = music.queue.currentItem.id
+    alert(JSON.stringify(music.queue));
+    await music.api.music(`/v1/catalog/${storefront}/songs/` + songId).then((res) => {
         var albumId = res.data.data[0].relationships.albums.data[0].id
         sessionStorage.setItem("albumId", albumId);
     });
