@@ -1562,7 +1562,7 @@
 
   function toAlbumFromNowPlaying() {
     const music = window.MusicKit ? window.MusicKit.getInstance() : null;
-    setCurrentAlbum(music.queue.currentItem);
+    setCurrentAlbum(music.queue.currentItem.attributes.playParams.reportingId);
     alert(sessionStorage.getItem("albumId"))
           if (music) {
             var albumId = sessionStorage.getItem("albumId");
@@ -1578,12 +1578,12 @@
     if(id.startsWith('i')) {
       await music.api.music(`/v1/me/library/songs/` + id).then((res) => {
         var songReportingId = res.data.data[0].attributes.playParams.reportingId;
+        if(songReportingId == null) { return; }
         setCurrentAlbum(songReportingId);
       });
       return;
     }
     await music.api.music(`/v1/catalog/${storefront}/songs/` + id).then((res) => {
-      prompt("hi", JSON.stringify(res));
         var albumId = res.data.data[0].relationships.albums.data[0].id
         sessionStorage.setItem("albumId", albumId);
     })
