@@ -745,11 +745,11 @@
         }
       }, false);
       music.addEventListener('nowPlayingItemDidChange', ({ item }) => {
-        resetLyricVariables();
         if (item !== undefined) {
           (music.queue.items).forEach(appendTracks)
           loadVisuals(queue, item.id)
           updateHighlightedTrack();
+          resetLyricVariables();
           loadLyrics();
         }
       });
@@ -1104,7 +1104,6 @@
       var sessionLyrics = sessionStorage.getItem(`${artistName}-${songName}-lyrics`);
       if (sessionLyrics) {
         runLyrics(JSON.parse(sessionLyrics));
-        bindAudioTimeUpdate();
         return;
       }
       fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
@@ -1112,7 +1111,6 @@
         .then(data => {
           sessionStorage.setItem(`${artistName}-${songName}-lyrics`, JSON.stringify(data));
           runLyrics(data);
-          bindAudioTimeUpdate();
         })
     } else {
       document.querySelector('#lyrics').innerText = '';
