@@ -902,7 +902,7 @@
             <td class="song-title">${title}</td>
             <td>${converter(runtime)}</td>`
           queuecontrols: if (music.isAuthorized) {
-            if (document.querySelector("#np")) {
+            if (nowPlayingScreenVisible()) {
               if (((document.querySelector("#np").parentElement).parentElement).getAttribute("id") !== "np-container") {
                 document.getElementById('tracklist').innerHTML = `
   <th class="labels">Play</th>
@@ -1104,6 +1104,7 @@
       var sessionLyrics = sessionStorage.getItem(`${artistName}-${songName}-lyrics`);
       if (sessionLyrics) {
         runLyrics(JSON.parse(sessionLyrics));
+        bindAudioTimeUpdate();
         return;
       }
       fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artistName)}&track_name=${encodeURIComponent(songName)}`)
@@ -1111,6 +1112,7 @@
         .then(data => {
           sessionStorage.setItem(`${artistName}-${songName}-lyrics`, JSON.stringify(data));
           runLyrics(data);
+          bindAudioTimeUpdate();
         })
     } else {
       document.querySelector('#lyrics').innerText = '';
@@ -1569,7 +1571,7 @@
   }
 
   document.addEventListener('keydown', (event) => {
-    if (event.code === 'Space') {
+    if (event.code === 'Space' && event.target.tagName !== 'INPUT') {
       event.preventDefault();
       const music = window.MusicKit ? window.MusicKit.getInstance() : null;
       if (music) {
