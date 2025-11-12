@@ -350,15 +350,10 @@ body::-webkit-scrollbar {
     width: 100%;
   }
 
-  .queue-trklst tr {
-    text-align: center
-  }
-
   .queue-trklst {
     margin-bottom: 2%
   }
 
-  /* Mobile-specific queue styling */
   #queuehistorywrapper {
     margin-top: 3%;
     position: relative;
@@ -649,7 +644,7 @@ card {
 }
 
 .lyric-line.highlight {
-  opacity: 1;
+  opacity: 1 !important;
   transform: translateY(-2px) translateX(-5px);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition-delay: 0ms;
@@ -1115,18 +1110,6 @@ artcard:active {
 .moving-fresh {
   animation: spin 4s linear infinite;
   width: max-content;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-    color: #396E80;
-  }
-
-  to {
-    transform: rotate(365deg);
-    color: #8DA8AD;
-  }
 }
 
 #tlcontent table {
