@@ -127,7 +127,21 @@
       audio.removeEventListener('timeupdate', audio._lyricsTimeUpdateHandler);
     }
 
+
+    let handler = window.updateLyricsHighlight;
+    if (typeof handler !== 'function') {
+
+
+      handler = function () { };
+    }
+
+    const wrapper = function () {
+      if (typeof window.updateLyricsHighlight === 'function') {
+        window.updateLyricsHighlight();
+      }
+    };
     audio.addEventListener('timeupdate', wrapper);
+    audio._lyricsTimeUpdateHandler = wrapper;
   }
 
   document.body.addEventListener('htmx:afterSwap', function (e) {
@@ -1227,7 +1241,7 @@
         }
 
 
-        function updateLyricsHighlight() {
+        function updateLyricsHighlight(ix = -1) {
           const lyricLines = document.querySelectorAll('.lyric-line');
           const audio = document.querySelector('audio') || audio_;
           const currentTime = audio ? audio.currentTime * 1000 : 0;
@@ -1288,7 +1302,7 @@
           }
         }
 
-        updateLyricsHighlight();
+        updateLyricsHighlight(-1);
 
         const audio = document.querySelector('audio') || audio_;
         if (audio) {
