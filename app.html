@@ -38,7 +38,7 @@
   <div class="header" style="height:82px;">
     <div id="nameplate" valign="left"
       style="border:none;margin-left:2%;flex-grow:1;display:flex;vertical-align: middle;">
-      <p id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML"
+      <p id="name" onclick="loadContent('nap')" hx-get="onboard.html" hx-target="#content" hx-swap="innerHTML swap:1s"
         style="width:auto;height:55px;vertical-align: middle;padding:10px">TuneGram</p>
       <p id="name-preview" onclick="window.location.replace('/')"
         style="width:auto;height:55px;vertical-align: middle;padding:10px">TuneGram</p>
@@ -127,21 +127,7 @@
       audio.removeEventListener('timeupdate', audio._lyricsTimeUpdateHandler);
     }
 
-
-    let handler = window.updateLyricsHighlight;
-    if (typeof handler !== 'function') {
-
-
-      handler = function () { };
-    }
-
-    const wrapper = function () {
-      if (typeof window.updateLyricsHighlight === 'function') {
-        window.updateLyricsHighlight();
-      }
-    };
     audio.addEventListener('timeupdate', wrapper);
-    audio._lyricsTimeUpdateHandler = wrapper;
   }
 
   document.body.addEventListener('htmx:afterSwap', function (e) {
@@ -1241,11 +1227,10 @@
         }
 
 
-        function updateLyricsHighlight(ix = -1) {
+        function updateLyricsHighlight() {
           const lyricLines = document.querySelectorAll('.lyric-line');
           const audio = document.querySelector('audio') || audio_;
           const currentTime = audio ? audio.currentTime * 1000 : 0;
-          let newHighlightIndex = ix;
 
           for (let i = 0; i < lyricLines.length; i++) {
             const lineTime = parseTime(lyricLines[i].getAttribute('data-time'));
@@ -1303,7 +1288,7 @@
           }
         }
 
-        updateLyricsHighlight(0);
+        updateLyricsHighlight();
 
         const audio = document.querySelector('audio') || audio_;
         if (audio) {
