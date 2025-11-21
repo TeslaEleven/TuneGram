@@ -76,7 +76,7 @@
   </div>
   <div id="np-container" style="display:none"></div>
   <script>
-      var audio_;
+  var audio_;
   var hiItsQue = false
   var queue = "";
   var methodType = "";
@@ -90,7 +90,7 @@
       plistsToCount = num
     }
   }
-  var tags = ["special", "edition", "mix", "demo", "video", "deluxe", "definitive", "live", "acoustic", "explicit", "master", "remix", "version", "bonus", "original", "soundtrack", "remastered", "reissue", "re-recorded", "re-recording", "reimagined", "reimagining", "cover", "stripped down"];
+  var tags = ["reel", "special", "edition", "mix", "demo", "video", "deluxe", "definitive", "live", "acoustic", "explicit", "master", "remix", "version", "bonus", "original", "soundtrack", "remastered", "reissue", "re-recorded", "re-recording", "reimagined", "reimagining", "cover", "stripped down"];
   var plistWarns = [];
 
   var albumsToCount = 0;
@@ -157,7 +157,9 @@
   });
 
   document.body.addEventListener('htmx:beforeSwap', function () {
-    document.getElementById('content').style.height = "87.5vh";
+    if(!event.detail.path == "seemore.html" || !event.detail.path == "search-results.html") {
+      document.getElementById('content').style.height = "87.5vh";
+    }
   })
   function resetNowPlayingColors() {
     document.body.style.backgroundColor = "#E3E1DB";
@@ -1282,6 +1284,7 @@
             });
 
             if (newHighlightIndex >= 0 && lyricLines[newHighlightIndex]) {
+              window.currentHighlightIndex = newHighlightIndex;
               lyricLines[newHighlightIndex].classList.add('highlight');
 
               animateLyricTransition(newHighlightIndex, currentHighlightIndex);
@@ -1297,8 +1300,6 @@
                 line.style.opacity = '0.3';
               });
             }
-
-            window.currentHighlightIndex = newHighlightIndex;
           }
         }
 
