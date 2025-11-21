@@ -1284,7 +1284,6 @@
             });
 
             if (newHighlightIndex >= 0 && lyricLines[newHighlightIndex]) {
-              window.currentHighlightIndex = newHighlightIndex;
               lyricLines[newHighlightIndex].classList.add('highlight');
 
               animateLyricTransition(newHighlightIndex, currentHighlightIndex);
@@ -1300,10 +1299,11 @@
                 line.style.opacity = '0.3';
               });
             }
+            window.currentHighlightIndex = newHighlightIndex;
           }
         }
 
-        updateLyricsHighlight(0);
+        updateLyricsHighlight(-1);
 
         const audio = document.querySelector('audio') || audio_;
         if (audio) {
