@@ -1241,11 +1241,11 @@
         }
 
 
-        function updateLyricsHighlight() {
+        function updateLyricsHighlight(ix = -1) {
           const lyricLines = document.querySelectorAll('.lyric-line');
           const audio = document.querySelector('audio') || audio_;
           const currentTime = audio ? audio.currentTime * 1000 : 0;
-          let newHighlightIndex = -1;
+          let newHighlightIndex = ix;
 
           for (let i = 0; i < lyricLines.length; i++) {
             const lineTime = parseTime(lyricLines[i].getAttribute('data-time'));
@@ -1303,7 +1303,7 @@
           }
         }
 
-        updateLyricsHighlight();
+        updateLyricsHighlight(0);
 
         const audio = document.querySelector('audio') || audio_;
         if (audio) {
