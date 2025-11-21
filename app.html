@@ -848,6 +848,9 @@
               detailSub = (root.name).split('[')[1].split(']')[0];
               finalName = (root.name).split('(')[0].split('[')[0].trim();
               detailSubheading = `<detail-subheading><detail-label>${detailSub}</detail-label></detail-subheading>`;
+            } else {
+              finalName = root.name;
+              finalAlbumName = root.albumName;
             }
           } else {
             finalName = root.name;
@@ -1139,13 +1142,10 @@
         }).filter(html => html !== '').join('<br>');
         document.querySelector('#lyrics').innerHTML = lyricsHtml;
 
-
-
         const isFirstInQueue = music.queue.position === 0;
         const allLyricLines = document.querySelectorAll('.lyric-line');
 
         if (isFirstInQueue) {
-
           allLyricLines.forEach((line, index) => {
             line.style.opacity = '0';
             line.style.transform = 'translateY(20px)';
@@ -1245,6 +1245,7 @@
           const lyricLines = document.querySelectorAll('.lyric-line');
           const audio = document.querySelector('audio') || audio_;
           const currentTime = audio ? audio.currentTime * 1000 : 0;
+          let newHighlightIndex = ix;
 
           for (let i = 0; i < lyricLines.length; i++) {
             const lineTime = parseTime(lyricLines[i].getAttribute('data-time'));
