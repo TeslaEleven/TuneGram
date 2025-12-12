@@ -1113,8 +1113,7 @@ function resetLyricVariables() {
             sheet.deleteRule(i);
           }
         }
-        document.styleSheets[0].insertRule(`.lyric-line { color: ${lightContrast} !important; margin-top: 1%; margin-bottom: 1%; font-size: 2em; cursor: pointer; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.6; transform: translateY(0) translateX(0); }`, 0);
-        document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1; transform: translateY(-2px) translateX(-5px); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }`, 0);
+        document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1;`, 0);
       });
       var sessionLyrics = sessionStorage.getItem(`${artistName}-${songName}-lyrics`);
       if (sessionLyrics) {
