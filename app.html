@@ -1113,7 +1113,6 @@ function resetLyricVariables() {
             sheet.deleteRule(i);
           }
         }
-        document.styleSheets[0].insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1;`, 0);
       });
       var sessionLyrics = sessionStorage.getItem(`${artistName}-${songName}-lyrics`);
       if (sessionLyrics) {
@@ -1131,14 +1130,11 @@ function resetLyricVariables() {
     }
   }
 
-// ...existing code...
-
 function runLyrics(data) {
   const music = window.MusicKit ? window.MusicKit.getInstance() : null;
   const lyricsDiv = document.getElementById('lyrics');
   if (!lyricsDiv) return;
 
-  // reset state
   resetLyricVariables();
   window._lyricsLines = [];
   window._finalCleared = false;
@@ -1153,7 +1149,6 @@ function runLyrics(data) {
     return;
   }
 
-  // parse time like 3:14.12 -> ms
   const parseTimeStr = (t) => {
     if (!t) return NaN;
     const m = t.match(/^(\d{1,2}):(\d{2}(?:\.\d{1,3})?)$/);
@@ -1177,7 +1172,6 @@ function runLyrics(data) {
       return;
     }
 
-    // remove previously injected lyric rules (if any) then inject simplified rules (no transforms)
     try {
       const sheet = document.styleSheets[0];
       for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
@@ -1187,12 +1181,11 @@ function runLyrics(data) {
         }
       }
       const contrast = getComputedStyle(lyricsDiv).color || '#E3E1DB';
-      sheet.insertRule(`.lyric-line { color: ${contrast}; margin: .25em 0; font-size: 2em; cursor: pointer; transition: opacity 0.35s ease, margin-top 0.35s cubic-bezier(0.4,0,0.2,1); opacity: 0.6; }`, 0);
-      sheet.insertRule(`.lyric-line.highlight { color: ${contrast} !important; opacity: 1; margin-top: -0.4em; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }`, 0);
-      sheet.insertRule(`.lyric-break-note { transition: opacity 0.35s ease, filter 0.35s ease; margin-left: 1%; opacity: 0.3; }`, 0);
+      sheet.insertRule(`.lyric-line { color: ${lightContrast}; font-size: 2em; cursor: pointer; transition: opacity 0.35s ease; opacity: 0.4; }`, 0);
+      sheet.insertRule(`.lyric-line.highlight { color: ${contrast} !important; opacity: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }`, 0);
+      sheet.insertRule(`.lyric-break-note { transition: opacity 0.35s ease, filter 0.35s ease; opacity: 0.4; }`, 0);
     } catch (e) { /* ignore stylesheet injection errors */ }
 
-    // build DOM efficiently
     lyricsDiv.innerHTML = '';
     const frag = document.createDocumentFragment();
     lines.forEach((ln, i) => {
@@ -1222,7 +1215,6 @@ function runLyrics(data) {
 
     window._lyricsLines = lines;
 
-    // initial reveal (opacity / margin only)
     const elems = Array.from(lyricsDiv.querySelectorAll('.lyric-line'));
     elems.forEach((el, idx) => {
       el.style.opacity = '0';
@@ -1233,26 +1225,22 @@ function runLyrics(data) {
       }, idx * 25);
     });
 
-    // highlight updater
     window.updateLyricsHighlight = function (forcedIndex = -1) {
       const audioEl = document.querySelector('audio') || audio_;
       const nowMs = audioEl ? (audioEl.currentTime * 1000) : 0;
       const L = window._lyricsLines || [];
       if (L.length === 0) return;
 
-      // detect trailing empty timestamp: last line empty and reached -> clear and scroll to top
       const last = L[L.length - 1];
       if (last && last.text === '' && !isNaN(last.timeMs) && nowMs >= last.timeMs) {
         if (!window._finalCleared) {
           window._finalCleared = true;
-          // clear highlights and reset lyric state
           resetLyricVariables();
           try { lyricsDiv.scrollTop = 0; } catch (e) { /* ignore */ }
         }
         return;
       }
 
-      // find greatest index with timeMs <= nowMs
       let newIndex = -1;
       for (let i = 0; i < L.length; i++) {
         if (!isNaN(L[i].timeMs) && nowMs >= L[i].timeMs) newIndex = i;
@@ -1270,7 +1258,6 @@ function runLyrics(data) {
         all.forEach(el => el.style.opacity = '0.3');
       }
 
-      // neighborhood styling (opacity & margin only)
       const maxDist = 3;
       all.forEach((el, idx) => {
         const dist = Math.abs(idx - newIndex);
@@ -1286,7 +1273,6 @@ function runLyrics(data) {
         }
       });
 
-      // scroll to highlighted line (keeps existing scrollIntoView usage elsewhere intact)
       if (newIndex >= 0 && all[newIndex]) {
         setTimeout(() => {
           try {
@@ -1316,7 +1302,6 @@ function runLyrics(data) {
     return;
   }
 
-  // fallback: plain lyrics
   if (data.plainLyrics) {
     lyricsDiv.innerHTML = data.plainLyrics.replace(/\n/g, '<br>');
     return;
@@ -1324,7 +1309,6 @@ function runLyrics(data) {
 
   lyricsDiv.textContent = 'Lyrics not found.';
 }
-// ...existing code...
 
   document.querySelectorAll('#content')[0].style.display = "block";
 
