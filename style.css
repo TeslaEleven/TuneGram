@@ -645,6 +645,7 @@ card {
 .lyric-line.highlight {
   opacity: 1 !important;
   transition-delay: 0ms;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .lyric-break-note:last-child {
