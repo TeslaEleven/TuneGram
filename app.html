@@ -1123,205 +1123,203 @@
 
   function runLyrics(data) {
     const music = window.MusicKit ? window.MusicKit.getInstance() : null;
-    const lyricsDiv = document.getElementById('lyrics');
-    if (!lyricsDiv) return;
+    if (data.instrumental == false && (data.plainLyrics || data.syncedLyrics)) {
+      if (data.syncedLyrics) {
+        const lyricsArray = data.syncedLyrics.split('\n').map(line => {
+          const match = line.match(/^\[(\d{2}:\d{2}\.\d{2})\]\s*(.*)$/);
+          return match ? { time: match[1], text: match[2] } : null;
+        }).filter(Boolean);
+        var lyricsHtml = lyricsArray.map((line, index) => {
+          if (line.text === "") {
 
-    // clear previous content and state
-    lyricsDiv.innerHTML = '';
-    window._lyricsData = null;
-    window._finalCleared = false;
-    window.currentHighlightIndex = -1;
+            if (index === lyricsArray.length - 1) {
+              return '';
+            }
+            return `<p class=\"lyric-line lyric-break\" data-time=\"${line.time}\"><span class=\"material-symbols-outlined lyric-break-note" style=\"font-size:1.2em;vertical-align:middle;opacity:0.3;transition:all 0.8s cubic-bezier(0.4, 0, 0.2, 1);\">music_note</span></p>`;
+          } else {
+            return `<p class=\"lyric-line\" data-time=\"${line.time}\">${line.text}</p>`;
+          }
+        }).filter(html => html !== '').join('<br>');
+        document.querySelector('#lyrics').innerHTML = lyricsHtml;
 
-    if (!data) return;
+        const isFirstInQueue = music.queue.position === 0;
+        const allLyricLines = document.querySelectorAll('.lyric-line');
 
-    if (data.instrumental === true) {
-      lyricsDiv.textContent = 'Instrumental';
-      return;
-    }
-
-    if (data.syncedLyrics) {
-      // parse synced lyrics -> [{ timeMs, text }]
-      function parseTimeStr(t) {
-        // accept m:ss.xx or mm:ss.xx
-        const parts = t.split(':');
-        if (parts.length !== 2) return NaN;
-        const min = parseInt(parts[0], 10);
-        const sec = parseFloat(parts[1]);
-        return Math.round((min * 60 + (isNaN(sec) ? 0 : sec)) * 1000);
-      }
-
-      const rawLines = data.syncedLyrics.split('\n');
-      const lines = [];
-      for (let raw of rawLines) {
-        const m = raw.match(/^\[(\d{1,2}:\d{2}(?:\.\d{1,3})?)\]\s*(.*)$/);
-        if (m) {
-          lines.push({
-            timeMs: parseTimeStr(m[1]),
-            text: (m[2] || '').trim()
+        if (isFirstInQueue) {
+          allLyricLines.forEach((line, index) => {
+            line.style.opacity = '0';
+            line.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+              line.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+              line.style.opacity = '0.6';
+              line.style.transform = 'translateY(0)';
+            }, index * 50);
+          });
+        } else {
+          allLyricLines.forEach((line) => {
+            line.style.opacity = '0.6';
+            line.style.transform = 'translateY(0)';
+            line.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
           });
         }
-      }
+        const css = `@media (max-width: 650px) { #lyrics { width: fit-content !important; } }`;
+        document.styleSheets[0].insertRule(css, 0);
+        const lyricsDiv = document.getElementById('lyrics');
+        const lyricLines = document.querySelectorAll('.lyric-line');
+        window.currentHighlightIndex = -1;
+        window.isUserScrolling = false;
+        window.scrollTimeout = null;
+        window.animationFrame = null;
 
-      if (lines.length === 0) {
-        lyricsDiv.textContent = 'Lyrics not found.';
-        return;
-      }
-
-      // Build DOM fragment (more efficient than repeated innerHTML)
-      const frag = document.createDocumentFragment();
-      lines.forEach((ln, i) => {
-        const p = document.createElement('p');
-        p.className = 'lyric-line' + (ln.text === '' ? ' lyric-break' : '');
-        p.setAttribute('data-time-ms', String(ln.timeMs));
-        // Click to seek
-        p.addEventListener('click', () => {
-          if (music && !isNaN(ln.timeMs)) {
-            music.seekToTime(ln.timeMs / 1000);
-          }
-        });
-
-        if (ln.text === '') {
-          const span = document.createElement('span');
-          span.className = 'material-symbols-outlined lyric-break-note';
-          span.style.fontSize = '1.2em';
-          span.style.verticalAlign = 'middle';
-          span.textContent = 'music_note';
-          p.appendChild(span);
-        } else {
-          p.textContent = ln.text;
+        function parseTime(timeStr) {
+          if (!timeStr) return NaN;
+          const [min, sec] = timeStr.split(':');
+          if (!min || !sec) return NaN;
+          return (parseInt(min) * 60 + parseFloat(sec)) * 1000;
         }
 
-        frag.appendChild(p);
-      });
-      lyricsDiv.appendChild(frag);
+        lyricLines.forEach((line) => {
+          line.addEventListener('click', function () {
+            const timeStr = line.getAttribute('data-time');
+            if (timeStr && music) {
+              const [min, sec] = timeStr.split(':');
+              const time = parseInt(min) * 60 + parseFloat(sec);
+              music.seekToTime(time);
+            }
+          });
+        });
 
-      // Apply color/background from existing logic if available (keep previous behavior)
-      const cover = document.querySelector('#np #info-img') ? document.querySelector('#np #info-img').src : '';
-      getImageColors(cover).then(({ bgColor, contrastColor }) => {
-        bgColor = bgColor || "#396E80";
-        contrastColor = contrastColor || "#E3E1DB";
-        // container styles
-        lyricsDiv.style.backgroundColor = bgColor;
-        lyricsDiv.style.color = contrastColor;
-        // remove previous dynamic lyric rules that might have scaling and insert simplified transitions
-        try {
-          const sheet = document.styleSheets[0];
-          for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
-            const sel = sheet.cssRules[i].selectorText;
-            if (sel === '.lyric-line' || sel === '.lyric-line.highlight' || sel === '#lyrics .lyric-line') {
-              sheet.deleteRule(i);
+        function animateLyricTransition(newIndex, oldIndex) {
+          if (window.animationFrame) cancelAnimationFrame(window.animationFrame);
+
+          const lines = Array.from(lyricLines);
+          const maxDistance = 3;
+
+          lines.forEach((line, index) => {
+            const distance = Math.abs(index - newIndex);
+
+            if (distance <= maxDistance) {
+              const delay = distance * 50;
+              const opacity = Math.max(0.3, 1 - (distance * 0.2));
+              const translateY = (index - newIndex) * 8;
+
+              setTimeout(() => {
+                line.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                line.style.transform = `translateY(${translateY}px)`;
+                line.style.opacity = opacity;
+              }, delay);
+            } else {
+              line.style.transition = 'all 0.3s ease';
+              line.style.transform = 'translateY(0)';
+              line.style.opacity = '0.3';
+            }
+          });
+        }
+
+        function scrollParentToChild(parent, child) {
+          if (!child) return;
+          if (!parent || !parent.contains(child)) {
+            try {
+              child.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            } catch (e) {
+              child.scrollIntoView();
+            }
+            return;
+          }
+
+          const parentRect = parent.getBoundingClientRect();
+          const childRect = child.getBoundingClientRect();
+
+          const childTopRelativeToParent = (childRect.top - parentRect.top) + parent.scrollTop;
+
+          const targetScroll = childTopRelativeToParent - (parent.clientHeight / 2) + (child.clientHeight / 2);
+
+          const maxScroll = Math.max(0, parent.scrollHeight - parent.clientHeight);
+          const finalScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+          parent.scrollTo({ top: finalScroll, behavior: 'smooth' });
+        }
+
+
+        function updateLyricsHighlight(ix = -1) {
+          const lyricLines = document.querySelectorAll('.lyric-line');
+          const audio = document.querySelector('audio') || audio_;
+          const currentTime = audio ? audio.currentTime * 1000 : 0;
+          let newHighlightIndex = ix;
+
+          for (let i = 0; i < lyricLines.length; i++) {
+            const lineTime = parseTime(lyricLines[i].getAttribute('data-time'));
+            if (!isNaN(lineTime) && currentTime >= lineTime) {
+              newHighlightIndex = i;
             }
           }
-          sheet.insertRule(`.lyric-line { color: ${contrastColor}; margin: 0.25em 0; font-size: 2em; cursor: pointer; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease; opacity: 0.6; transform: translateY(0); }`, 0);
-          sheet.insertRule(`.lyric-line.highlight { color: ${contrastColor} !important; opacity: 1; transform: translateY(-6px); text-shadow: 0 2px 8px rgba(0,0,0,0.25); }`, 0);
-          sheet.insertRule(`@media (max-width: 650px) { #lyrics { width: fit-content !important; } }`, 0);
-        } catch (e) { /* ignore stylesheet injection failures */ }
-      }).catch(() => { /* ignore getImageColors failures */ });
 
-      // store parsed lyrics for update function
-      window._lyricsData = lines;
+          lyricLines.forEach((line, index) => {
+            const lineTime = parseTime(line.getAttribute('data-time'));
+            const nextLineTime = index < lyricLines.length - 1 ?
+              parseTime(lyricLines[index + 1].getAttribute('data-time')) :
+              lineTime + 2000;
 
-      // smoother initial reveal (no scaling)
-      const lyricEls = lyricsDiv.querySelectorAll('.lyric-line');
-      const isFirstInQueue = music ? (music.queue.position === 0) : true;
-      lyricEls.forEach((el, idx) => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(8px)';
-        el.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.4,0,0.2,1)';
-        setTimeout(() => {
-          el.style.opacity = '0.6';
-          el.style.transform = 'translateY(0)';
-        }, idx * 30 + (isFirstInQueue ? 0 : 0));
-      });
+            if (line.classList.contains('lyric-break')) {
+              const breakNote = line.querySelector('.lyric-break-note');
+              if (breakNote) {
+                if (index === newHighlightIndex) {
+                  breakNote.style.opacity = '1';
+                } else if (currentTime >= lineTime && currentTime < nextLineTime) {
+                  const progress = (currentTime - lineTime) / (nextLineTime - lineTime);
+                  const opacity = Math.min(0.3 + (progress * 0.7), 1);
+                  breakNote.style.opacity = opacity.toString();
+                  breakNote.style.filter = `brightness(${1 + (progress * 0.5)})`;
+                } else {
+                  breakNote.style.opacity = '0.3';
+                  breakNote.style.filter = 'brightness(1)';
+                }
+              }
+            }
+          });
 
-      // highlight state and transition function
-      function animateLyricTransition(newIndex) {
-        const els = Array.from(lyricsDiv.querySelectorAll('.lyric-line'));
-        els.forEach((line, idx) => {
-          const distance = Math.abs(idx - newIndex);
-          if (distance <= 3) {
-            line.style.transition = 'transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease';
-            line.style.opacity = String(Math.max(0.4, 1 - distance * 0.15));
-            line.style.transform = `translateY(${(idx - newIndex) * 6}px)`;
-          } else {
-            line.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-            line.style.opacity = '0.3';
-            line.style.transform = 'translateY(0)';
-          }
-        });
-      }
-
-      // updateLyricsHighlight used globally by bindAudioTimeUpdate()
-      window.updateLyricsHighlight = function (forcedIndex = -1) {
-        const audio = document.querySelector('audio') || audio_;
-        const currentTimeMs = audio ? audio.currentTime * 1000 : (music && music.playerPosition ? music.playerPosition * 1000 : 0);
-
-        const lines = window._lyricsData || [];
-        if (lines.length === 0) return;
-
-        // If final entry is an empty timestamp (trailing timestamp), un-highlight and reset when reached
-        const last = lines[lines.length - 1];
-        if (last && last.text === '' && !isNaN(last.timeMs) && currentTimeMs >= last.timeMs) {
-          if (!window._finalCleared) {
-            window._finalCleared = true;
-            // clear highlights + reset lyric variables and scroll top
-            resetLyricVariables();
-            try { lyricsDiv.scrollTop = 0; } catch (e) { /* noop */ }
-          }
-          return;
-        }
-
-        // compute new highlight index (largest index with time <= currentTimeMs)
-        let newIndex = -1;
-        for (let i = 0; i < lines.length; i++) {
-          if (!isNaN(lines[i].timeMs) && currentTimeMs >= lines[i].timeMs) {
-            newIndex = i;
-          } else {
-            break;
-          }
-        }
-        if (forcedIndex >= 0) newIndex = forcedIndex;
-
-        if (newIndex !== window.currentHighlightIndex) {
-          const els = lyricsDiv.querySelectorAll('.lyric-line');
-          els.forEach(el => el.classList.remove('highlight'));
-          if (newIndex >= 0 && els[newIndex]) {
-            els[newIndex].classList.add('highlight');
-            animateLyricTransition(newIndex);
-            // scroll the parent container to center this line
-            setTimeout(() => {
-              const parentEl = lyricsDiv;
-              scrollParentToChild(parentEl, els[newIndex]);
-            }, 80);
-          } else {
-            // no active line -> fade others down
-            const elsArr = Array.from(els);
-            elsArr.forEach(el => {
-              el.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-              el.style.transform = 'translateY(0)';
-              el.style.opacity = '0.3';
+          if (newHighlightIndex !== window.currentHighlightIndex) {
+            lyricLines.forEach(line => {
+              line.classList.remove('highlight');
             });
+
+            if (newHighlightIndex >= 0 && lyricLines[newHighlightIndex]) {
+              window.currentHighlightIndex = newHighlightIndex;
+              lyricLines[newHighlightIndex].classList.add('highlight');
+
+              animateLyricTransition(newHighlightIndex, currentHighlightIndex);
+
+              setTimeout(() => {
+                const parentEl = (typeof lyricsDiv !== 'undefined' && lyricsDiv) ? lyricsDiv : document.getElementById('tlcontent-np') || lyricLines[newHighlightIndex].parentElement;
+                scrollParentToChild(parentEl, lyricLines[newHighlightIndex]);
+              }, 100);
+            } else {
+              lyricLines.forEach(line => {
+                line.style.transition = 'all 0.3s ease';
+                line.style.transform = 'translateY(0) scale(1)';
+                line.style.opacity = '0.3';
+              });
+            }
           }
-          window.currentHighlightIndex = newIndex;
         }
-      };
 
-      // ensure a single audio timeupdate handler is bound (bindAudioTimeUpdate handles dedup)
-      bindAudioTimeUpdate();
-      // run an initial highlight pass
-      window.updateLyricsHighlight(-1);
-      return;
+        updateLyricsHighlight(0);
+
+        const audio = document.querySelector('audio') || audio_;
+        if (audio) {
+          audio.addEventListener('timeupdate', updateLyricsHighlight);
+        }
+      } else if (data.plainLyrics) {
+        var plainLyrics = data.plainLyrics.replace(/\n/g, "<br>");
+        document.querySelector('#lyrics').innerHTML = plainLyrics;
+      }
+    } else if (data.instrumental == true) {
+      document.querySelector('#lyrics').innerText = 'Instrumental';
+    } else {
+      document.querySelector('#lyrics').innerText = 'Lyrics not found.';
     }
-
-    // plain lyrics fallback
-    if (data.plainLyrics) {
-      lyricsDiv.innerHTML = data.plainLyrics.replace(/\n/g, '<br>');
-      return;
-    }
-
-    // no lyrics
-    lyricsDiv.textContent = 'Lyrics not found.';
   }
+
 
   document.querySelectorAll('#content')[0].style.display = "block";
 
