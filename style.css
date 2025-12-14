@@ -652,7 +652,7 @@ card {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.lyric-break-note:last-child {
+.lyric-break-note:last-of-type {
   display: none;
 }
 
